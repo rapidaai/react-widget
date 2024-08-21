@@ -30,9 +30,9 @@ message AssistantConversactionMessage {
 
 message CreateAssistantMessageRequest {
   uint64 assistantId = 1 [ jstype = JS_STRING ];
-  optional uint64 assistantProviderModelId = 2 [ jstype = JS_STRING ];
+  uint64 assistantProviderModelId = 2 [ jstype = JS_STRING ];
   Message message = 3;
-  optional uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
+  uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
 }
 enum RAGStage {
   UNDEFINED_STAGE = 0;

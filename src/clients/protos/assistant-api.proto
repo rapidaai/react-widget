@@ -93,10 +93,10 @@ message AssistantAttribute {
   string description = 4;
   string visibility = 5;
   string language = 6;
-  //   optional string openingStatement = 7;
+  //   string openingStatement = 7;
   //   repeated string suggestedQuestions = 8;
-  //   optional Content assistantIcon = 9;
-  //   optional string assistantName = 10;
+  //   Content assistantIcon = 9;
+  //   string assistantName = 10;
 }
 
 message AssistantKnowledgeConfigurationAttribute {
@@ -149,7 +149,7 @@ message CreateAssistantTagRequest {
 // get request
 message GetAssistantRequest {
   uint64 id = 1 [ jstype = JS_STRING ];
-  optional uint64 assistantProviderModelId = 4 [ jstype = JS_STRING ];
+  uint64 assistantProviderModelId = 4 [ jstype = JS_STRING ];
 }
 message GetAssistantResponse {
   int32 code = 1;
@@ -219,17 +219,17 @@ message FileUploadConfig { repeated string enabledFileSource = 1; }
 message PersonalizeAssistantRequest {
   uint64 assistantId = 1 [ jstype = JS_STRING ];
   string deploymentType = 8;
-  optional string openingStatement = 2;
+  string openingStatement = 2;
   repeated string suggestedQuestions = 3;
-  optional string assistantIconUrl = 4;
+  string assistantIconUrl = 4;
   //
-  optional TextToSpeechConfig textToSpeechConfig = 5;
-  optional SpeechToTextConfig speechToTextConfig = 6;
-  optional FileUploadConfig fileUploadConfig = 7;
+  TextToSpeechConfig textToSpeechConfig = 5;
+  SpeechToTextConfig speechToTextConfig = 6;
+  FileUploadConfig fileUploadConfig = 7;
   //
 
-  optional Content assistantIcon = 9;
-  optional string assistantName = 10;
+  Content assistantIcon = 9;
+  string assistantName = 10;
 }
 service AssistantService {
   rpc GetAssistant(GetAssistantRequest) returns (GetAssistantResponse);

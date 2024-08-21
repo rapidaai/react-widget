@@ -55,10 +55,10 @@ message Variable {
   uint64 id = 1 [ jstype = JS_STRING ];
   string name = 2;
   string type = 3;
-  optional string defaultValue = 4;
-  optional string in = 5;
+  string defaultValue = 4;
+  string in = 5;
   bool required = 6;
-  optional string label = 7;
+  string label = 7;
 }
 
 message ProviderModelParameter {
@@ -69,7 +69,7 @@ message ProviderModelParameter {
 // message PromptVariable {
 //   string name = 1;
 //   string type = 2;
-//   optional string defaultValue = 3;
+//   string defaultValue = 3;
 //   string accepts = 4;
 // }
 
@@ -141,7 +141,8 @@ message Content {
   //   actual content
   bytes content = 4;
 
-// added meta data incase you want to add something which is not supported in future
+  // added meta data incase you want to add something which is not supported in
+  // future
   google.protobuf.Struct meta = 5;
 }
 
