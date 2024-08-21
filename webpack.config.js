@@ -39,7 +39,7 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          // MiniCssExtractPlugin.loader,
           "style-loader",
           "css-loader",
           "postcss-loader",
