@@ -43,7 +43,6 @@ jobs:
         run: |
           aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/app.min.js \
             --region $AWS_REGION \
-            --delete \
             --exact-timestamps
 
       - name: Invalidate CloudFront cache
