@@ -41,7 +41,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          aws s3 sync ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/ \
+          aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/app.min.js \
             --region $AWS_REGION \
             --delete \
             --exact-timestamps
