@@ -31,10 +31,3 @@ yarn-error.log*
 
 # boilerplate internals
 .eslintcache
-*_pb_service.d.ts
-*_pb_service.js
-*_pb.d.ts
-*pb.js
-
-src/app/clients/protos/*.js
-src/app/clients/protos/*.ts
