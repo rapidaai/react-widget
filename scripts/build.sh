@@ -1,0 +1,1 @@
+npx terser src/app.js --compress --mangle --output dist/app.min.js
