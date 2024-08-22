@@ -41,9 +41,7 @@ type AssistantChatApiCallAction = {
     assistantProviderModelId: string,
     currentAssistantConversactionId: string | null,
     message: Message,
-    projectId: string,
-    token: string,
-    userId: string
+    token: string
   ) => grpcWeb.ClientReadableStream<CreateAssistantMessageResponse>;
 
   /**
@@ -60,9 +58,7 @@ type AssistantChatApiCallAction = {
   onGetConversactionMessages: (
     assistantId: string,
     conversactionId: string,
-    projectId: string,
     token: string,
-    userId: string,
     onError: (err: string) => void,
     onSuccess: (e: AssistantConversactionMessage[]) => void
   ) => void;

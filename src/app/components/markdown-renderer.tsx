@@ -1,17 +1,20 @@
 import React from "react";
-import Markdown from "markdown-to-jsx"; // Or any other Markdown library
-import { cn } from "@/app/styles/media";
+import Markdown from "markdown-to-jsx"; // Importing Markdown-to-JSX library
+import { cn } from "@/app/styles/media"; // Importing utility function for conditional class names
 
+// Define the props interface for the MarkdownRenderer component
 interface MarkdownRendererProps {
-  children?: any;
+  children?: any; // Accepts children of any type
 }
 
+// Define the MarkdownRenderer functional component
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
   return (
     <div className="markdown-content">
       <Markdown
         options={{
           overrides: {
+            // Custom rendering for <p> elements
             p: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <p
@@ -25,6 +28,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </p>
               ),
             },
+            // Custom rendering for <span> elements
             span: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <p
@@ -38,7 +42,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </p>
               ),
             },
-
+            // Custom rendering for <ul> (unordered list) elements
             ul: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <ul className="list-disc pl-5 space-y-2 prose prose-gray prose-sm dark:prose-invert break-words !max-w-none prose-img:rounded-xl prose-headings:underline prose-a:text-blue-600 dark:prose-code:!bg-slate-900 dark:prose-pre:!bg-slate-900 prose-code:!bg-slate-100 prose-pre:!bg-slate-100 leading-normal">
@@ -46,7 +50,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </ul>
               ),
             },
-
+            // Custom rendering for <ol> (ordered list) elements
             ol: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <ol className="list-item pl-5 space-y-2 prose prose-gray prose-sm dark:prose-invert break-words !max-w-none prose-img:rounded-xl prose-headings:underline prose-a:text-blue-600 dark:prose-code:!bg-slate-900 dark:prose-pre:!bg-slate-900 prose-code:!bg-slate-100 prose-pre:!bg-slate-100 leading-normal">
@@ -54,11 +58,13 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </ol>
               ),
             },
+            // Custom rendering for <li> (list item) elements
             li: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <li className="pl-2">{children}</li>
               ),
             },
+            // Custom rendering for <table> elements
             table: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <div className="overflow-x-auto my-1">
@@ -68,6 +74,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </div>
               ),
             },
+            // Custom rendering for <thead> elements
             thead: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <thead className="bg-white dark:bg-gray-950 border-b dark:border-gray-700">
@@ -75,6 +82,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </thead>
               ),
             },
+            // Custom rendering for <tr> (table row) elements
             tr: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <tr className="even:bg-gray-200 odd:bg-white dark:even:bg-gray-700 dark:odd:bg-gray-800">
@@ -82,14 +90,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
                 </tr>
               ),
             },
-
+            // Custom rendering for <th> (table header) elements
             th: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <th className="px-2 py-2 text-left text-xs font-medium  uppercase tracking-wider">
+                <th className="px-2 py-2 text-left text-xs font-medium uppercase tracking-wider">
                   {children}
                 </th>
               ),
             },
+            // Custom rendering for <td> (table data) elements
             td: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <td className="px-2 py-2 text-left text-xs font-medium tracking-wider">
@@ -106,4 +115,5 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
     </div>
   );
 };
-export default MarkdownRenderer;
+
+export default MarkdownRenderer; // Export the MarkdownRenderer component

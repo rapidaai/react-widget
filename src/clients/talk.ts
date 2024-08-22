@@ -9,10 +9,9 @@ import * as grpcWeb from "grpc-web";
 import { AssistantServiceClient } from "@/app/clients/protos/Assistant-apiServiceClientPb";
 import { TalkServiceClient } from "@/app/clients/protos/Talk-apiServiceClientPb";
 import { Criteria, Paginate, Message } from "@/app/clients/protos/common_pb";
+import { assistantApiUrl } from "@/app/configs/constant";
 
-const conversactionClient = new TalkServiceClient(
-  "http://assistant.rapida.local"
-);
+const conversactionClient = new TalkServiceClient(assistantApiUrl);
 
 /**
  *
@@ -29,7 +28,9 @@ export function CreateAssistantMessage(
     message: Message;
     assistantConversactionId?: string | null;
   },
-  authHeader: { [key: string]: string }
+  authHeader: {
+    "x-api-key": string;
+  }
 ): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> {
   const req = new CreateAssistantMessageRequest();
   req.setAssistantid(assistantId);
@@ -58,7 +59,9 @@ export function GetAllAssistantConversactionMessage(
   page: number,
   pageSize: number,
   criteria: { key: string; value: string }[],
-  authHeader: {},
+  authHeader: {
+    "x-api-key": string;
+  },
   cb: (
     err: grpcWeb.RpcError | null,
     uvcr: GetAllConversactionMessageResponse | null

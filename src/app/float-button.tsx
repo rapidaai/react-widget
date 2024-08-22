@@ -2,24 +2,30 @@ import { ChatterBox } from "@/app/app/components/chatter-box";
 import { Spinner } from "@/app/app/components/loaders/spinner";
 import { GetAssistant } from "@/app/clients/assistant";
 import { GetAssistantResponse } from "@/app/clients/protos/assistant-api_pb";
-import { AssistantChatContext } from "@/app/hooks/use-assistant-chat";
+import { useAssistantChat } from "@/app/hooks/use-assistant-chat";
 import { useEnvironment } from "@/app/hooks/use-environment";
 import { useDebugger, useLogger } from "@/app/hooks/use-logger";
 import { ChevronDownIcon } from "@/app/icons/chevron-down";
 import { RapidaIcon } from "@/app/icons/rapida";
 import { cn } from "@/app/styles/media";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 export const FloatingChatButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpand, setIsExpand] = useState(false);
-  const { assistantId, token, debug } = useEnvironment();
+  const { assistantId, assistantVersion, token, debug } = useEnvironment();
   const [loadingAssistant, setLoadingAssistant] = useState<boolean>(true);
 
+  /**
+   *
+   */
   const log = useLogger();
   const { dir } = useDebugger();
-  const ctx = useContext(AssistantChatContext);
+  const ctx = useAssistantChat();
 
+  /**
+   *
+   */
   const aftergetassistant = useCallback(
     (err: any | null, gur: GetAssistantResponse | null) => {
       setLoadingAssistant(false);
@@ -43,13 +49,30 @@ export const FloatingChatButton = () => {
     []
   );
 
+  /**
+   *
+   */
   useEffect(() => {
-    if (!assistantId) return;
-    GetAssistant(assistantId, null, aftergetassistant, {
-      Authorization:
-        "61c814ba2a3868574e53860537bb4bc03a9bd1305a822800d5f0ee0c1206ac5c",
-      "x-auth-id": "2021822161534058496",
-      "x-project-id": "2021822986910171136",
+    if (!assistantId) {
+      console.error(
+        "Please provide an assistant_id for initialize the assistant."
+      );
+      return;
+    }
+    if (!token) {
+      console.error(
+        "Please provide an authentication token for initialize the assistant."
+      );
+      return;
+    }
+
+    let assistantProviderModelId = null;
+    if (assistantVersion) {
+      assistantProviderModelId = assistantVersion;
+    }
+    // x-api-key
+    GetAssistant(assistantId, assistantProviderModelId, aftergetassistant, {
+      "x-api-key": token,
     });
   }, [assistantId]);
 
@@ -67,7 +90,7 @@ export const FloatingChatButton = () => {
           "bg-white dark:bg-slate-800 border dark:border-gray-800"
         )}
       >
-        <IconComponent
+        <FloatButtonIcon
           isOpen={isOpen}
           loadingAssistant={loadingAssistant}
           appIcon={ctx.currentAssistant
@@ -77,31 +100,31 @@ export const FloatingChatButton = () => {
             ?.getStringValue()}
         />
       </div>
-      <div
-        className={cn(
-          "fixed bottom-28 right-10 w-80 bg-white dark:bg-gray-900 rounded-lg shadow-xl",
-          "dark:text-gray-300 text-gray-700",
-          "border dark:border-gray-300",
-          isExpand ? "w-[500px] h-[500px]" : "w-[400px] h-[500px]",
-          "transition-all duration-300 ease-in-out",
-          "flex flex-col",
-          isOpen
-            ? "opacity-100 scale-100"
-            : "opacity-0 scale-95 pointer-events-none"
-        )}
-      >
-        {ctx.currentAssistant && (
+      {ctx.currentAssistant && (
+        <div
+          className={cn(
+            "fixed bottom-28 right-10 w-80 bg-white dark:bg-gray-900 rounded-lg shadow-xl",
+            "dark:text-gray-300 text-gray-700",
+            "border dark:border-gray-300",
+            isExpand ? "w-[500px] h-[600px]" : "w-[400px] h-[600px]",
+            "transition-all duration-300 ease-in-out",
+            "flex flex-col",
+            isOpen
+              ? "opacity-100 scale-100"
+              : "opacity-0 scale-95 pointer-events-none"
+          )}
+        >
           <ChatterBox
             assistant={ctx.currentAssistant}
             onClose={() => setIsOpen(false)}
           />
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const IconComponent = ({
+const FloatButtonIcon = ({
   isOpen,
   loadingAssistant,
   appIcon,

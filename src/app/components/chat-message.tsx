@@ -9,9 +9,9 @@ import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 import {
   AssistantConversactionMessage,
   AssistantMessageStage,
-  RAGStage,
 } from "@/app/clients/protos/talk-api_pb";
 import MarkdownRenderer from "@/app/app/components/markdown-renderer";
+import { useEnvironment } from "@/app/hooks/use-environment";
 
 /**
  *
@@ -25,19 +25,19 @@ export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
   /**
    * current user
    */
-
+  const { user } = useEnvironment();
   //
   return (
     <div className="flex px-2 py-3 hover:bg-gray-100/50 dark:hover:bg-gray-950/20 w-full">
       <div className="h-9 w-9 rounded-full flex-shrink-0 bg-zinc-200/80 dark:bg-zinc-800/80 border-[0.5px] flex items-center justify-center dark:border-gray-700">
         <span className="font-bold text-lg opacity-80">
-          {"Prashant".charAt(0)}
+          {user.name.charAt(0)}
         </span>
       </div>
       <div className="ml-2 min-w-0">
         <div className="-mt-2">
-          <span className="font-semibold dark:text-white text-sm">
-            {"Prashant"}
+          <span className="font-semibold dark:text-white text-[14px]">
+            {user.name}
           </span>
           <span className="ml-1 text-xs text-gray-500">{time}</span>
         </div>
@@ -91,7 +91,7 @@ export const SystemChatMessage: FC<{
       </div>
       <div className="ml-2 min-w-0">
         <div className="-mt-1.5">
-          <span className="font-semibold dark:text-white capitalize text-sm">
+          <span className="font-semibold dark:text-white capitalize text-[14px]">
             {assistant?.getAppappearance()?.getFieldsMap().get("assistantName")
               ? assistant
                   ?.getAppappearance()

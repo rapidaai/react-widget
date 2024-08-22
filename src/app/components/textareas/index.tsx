@@ -41,7 +41,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
 );
 
 interface TextAreaWithActionProps extends TextAreaProps {
-  actions?: React.ReactElement[];
+  actions?: React.ReactElement;
 }
 export const ScalableTextarea = React.forwardRef<
   HTMLTextAreaElement,
@@ -73,7 +73,7 @@ export const ScalableTextarea = React.forwardRef<
   return (
     <div
       className={cn(
-        "p-1",
+        "p-2",
         "relative",
         "w-full min-h-[3rem]",
         "dark:placeholder-gray-600 placeholder-gray-400",
@@ -106,13 +106,7 @@ export const ScalableTextarea = React.forwardRef<
         placeholder={props.placeholder}
       ></textarea>
 
-      {props.actions && (
-        <div className="flex absolute space-x-2 justify-end p-1 bottom-0 right-0">
-          {props.actions.map((x, idx) => {
-            return <div key={idx}>{x}</div>;
-          })}
-        </div>
-      )}
+      {props.actions && props.actions}
     </div>
   );
 });
