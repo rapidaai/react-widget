@@ -9,7 +9,7 @@ export function CloseIcon(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn("w-5 h-5 opacity-80", props.className)}
+      className={cn("pks_w-5 pks_h-5 pks_opacity-80", props.className)}
       {...props}
     >
       <path

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  prefix: "pks_",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [],
   mode: "jit",

@@ -10,7 +10,7 @@ export function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       strokeWidth={2}
       stroke="currentColor"
-      className={cn("w-5 h-5 opacity-70", props.className)}
+      className={cn("pks_w-5 pks_h-5 pks_opacity-70", props.className)}
     >
       <path
         strokeLinecap="round"

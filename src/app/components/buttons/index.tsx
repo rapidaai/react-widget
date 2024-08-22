@@ -1,6 +1,7 @@
 import { Spinner } from "@/app/app/components/loaders/spinner";
 import React, { FC } from "react";
 import { cn } from "@/app/styles/media";
+
 /**
  *
  */
@@ -38,15 +39,15 @@ export function Button(props: ButtonProps) {
     <button
       {...btnProps}
       className={cn(
-        "flex h-9 leading-7 truncate w-fit justify-center items-center relative",
-        "bg-blue-600 font-medium text-white hover:bg-blue-500 py-1.5 px-3 rounded-full",
+        "pks_flex pks_h-9 pks_leading-7 pks_truncate pks_w-fit pks_justify-center pks_items-center pks_relative",
+        "pks_bg-blue-600 pks_font-medium pks_text-white pks_hover:bg-blue-500 pks_py-1.5 pks_px-3 pks_rounded-full",
         "button",
-        props.disabled && "!opacity-80 !cursor-not-allowed",
+        props.disabled && "!pks_opacity-80 !pks_cursor-not-allowed",
         props.className
       )}
     >
       {isLoading ? (
-        <span className="inline-block absolute">
+        <span className="pks_inline-block pks_absolute">
           <Spinner />
         </span>
       ) : (
@@ -63,19 +64,19 @@ export function BlueBorderButton(props: ButtonProps) {
     <button
       {...btnProps}
       className={cn(
-        "flex h-9 truncate w-fit justify-center items-center",
-        "py-1.5 px-3 rounded-full",
-        "font-medium",
-        "text-blue-600 dark:text-blue-400",
-        "border-[1.5px] border-blue-600 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-700",
-        "bg-gray-50 dark:bg-gray-900/50 dark:hover:bg-blue-700/20 hover:bg-blue-200/20",
+        "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center",
+        "pks_py-1.5 pks_px-3 pks_rounded-full",
+        "pks_font-medium",
+        "pks_text-blue-600 dark:pks_text-blue-400",
+        "pks_border-[1.5px] pks_border-blue-600 dark:pks_border-blue-600 pks_hover:border-blue-400 dark:pks_hover:border-blue-700",
+        "pks_bg-gray-50 dark:pks_bg-gray-900/50 dark:pks_hover:bg-blue-700/20 pks_hover:bg-blue-200/20",
         "button",
-        props.disabled && "cursor-not-allowed opacity-70",
+        props.disabled && "pks_cursor-not-allowed pks_opacity-70",
         props.className
       )}
     >
       {isLoading ? (
-        <span className="inline-block absolute">
+        <span className="pks_inline-block pks_absolute">
           <Spinner />
         </span>
       ) : (
@@ -91,13 +92,13 @@ export function BorderButton(props: ButtonProps) {
       type="button"
       {...props}
       className={cn(
-        "flex h-9 truncate w-fit justify-center items-center",
-        "text-gray-500 dark:text-gray-400 font-medium",
-        "py-2 px-2.5 rounded-full",
-        "border-[1.5px] border-gray-300/50 dark:border-gray-600/50",
-        "bg-gray-50 dark:bg-gray-900/50 dark:hover:bg-gray-700/50 hover:bg-gray-200",
+        "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center",
+        "pks_text-gray-500 dark:pks_text-gray-400 pks_font-medium",
+        "pks_py-2 pks_px-2.5 pks_rounded-full",
+        "pks_border-[1.5px] pks_border-gray-300/50 dark:pks_border-gray-600/50",
+        "pks_bg-gray-50 dark:pks_bg-gray-900/50 dark:pks_hover:bg-gray-700/50 pks_hover:bg-gray-200",
         "button",
-        "focus:outline-none focus:outline-2 focus:outline focus:outline-offset-1 outline-gray-100/10",
+        "pks_focus:outline-none pks_focus:outline-2 pks_focus:outline pks_focus:outline-offset-1 pks_outline-gray-100/10",
         props.className
       )}
     >
@@ -112,19 +113,19 @@ export const LinkBorderButton: FC<LinkProps> = (props) => {
     <a
       {...btnProps}
       className={cn(
-        "flex h-9 truncate w-fit justify-center items-center",
-        "py-1.5 px-3 rounded-full",
-        "font-medium",
-        "cursor-pointer",
-        "text-blue-600 dark:text-blue-400",
-        "border-[1.5px]  border-blue-600 dark:border-blue-600 hover:border-blue-400 dark:hover:border-blue-700",
-        "bg-gray-50 dark:bg-gray-900/50 dark:hover:bg-blue-700/20 hover:bg-blue-200/20",
+        "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center",
+        "pks_py-1.5 pks_px-3 pks_rounded-full",
+        "pks_font-medium",
+        "pks_cursor-pointer",
+        "pks_text-blue-600 dark:pks_text-blue-400",
+        "pks_border-[1.5px]  pks_border-blue-600 dark:pks_border-blue-600 pks_hover:border-blue-400 dark:pks_hover:border-blue-700",
+        "pks_bg-gray-50 dark:pks_bg-gray-900/50 dark:pks_hover:bg-blue-700/20 pks_hover:bg-blue-200/20",
         "button",
         props.className
       )}
     >
       {isLoading ? (
-        <span className="inline-block absolute">
+        <span className="pks_inline-block pks_absolute">
           <Spinner />
         </span>
       ) : (
@@ -139,12 +140,12 @@ export function SimpleButton(props: ButtonProps) {
     <button
       {...props}
       className={cn(
-        "flex h-9 truncate w-fit justify-center items-center font-medium",
-        "text-gray-500 dark:hover:text-gray-300 hover:text-gray-900",
-        "py-1.5 px-3 rounded-md",
-        "hover:bg-gray-100 dark:hover:bg-gray-900",
+        "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center pks_font-medium",
+        "pks_text-gray-500 dark:pks_hover:text-gray-300 pks_hover:text-gray-900",
+        "pks_py-1.5 pks_px-3 pks_rounded-md",
+        "pks_hover:bg-gray-100 dark:pks_hover:bg-gray-900",
         "button",
-        "focus:outline-none",
+        "pks_focus:outline-none",
         props.className
       )}
     >
@@ -156,7 +157,7 @@ export function SimpleButton(props: ButtonProps) {
 export function IconButton(props: ButtonProps) {
   return (
     <SimpleButton
-      className={cn("!h-6 !w-6 !p-[4px]", props.className)}
+      className={cn("!pks_h-6 !pks_w-6 !pks_p-[4px]", props.className)}
       onClick={props.onClick}
       {...props}
     >
@@ -170,11 +171,11 @@ export function LinkButton(props: LinkProps) {
     <a
       {...props}
       className={cn(
-        "flex h-9 truncate w-fit justify-center items-center font-medium",
-        "text-gray-500 dark:hover:text-gray-300 hover:text-gray-900",
+        "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center pks_font-medium",
+        "pks_text-gray-500 dark:pks_hover:text-gray-300 pks_hover:text-gray-900",
         "button",
-        "py-1.5 px-2",
-        "underline",
+        "pks_py-1.5 pks_px-2",
+        "pks_underline",
         props.className
       )}
     >
@@ -189,16 +190,16 @@ export function HoverButton(props: ButtonProps) {
     <button
       {...btnProps}
       className={cn(
-        "flex h-9 leading-7 truncate w-fit justify-center items-center relative border-none",
-        "font-medium py-1.5 px-3 rounded-full dark:hover:bg-gray-900 hover:bg-gray-100",
+        "pks_flex pks_h-9 pks_leading-7 pks_truncate pks_w-fit pks_justify-center pks_items-center pks_relative pks_border-none",
+        "pks_font-medium pks_py-1.5 pks_px-3 pks_rounded-full dark:pks_hover:bg-gray-900 pks_hover:bg-gray-100",
         "button",
-        "hover:shadow",
-        "focus:outline focus:outline-offset-1 focus:outline-gray-300 dark:focus:outline-gray-700",
+        "pks_hover:shadow",
+        "pks_focus:outline pks_focus:outline-offset-1 pks_focus:outline-gray-300 dark:pks_focus:outline-gray-700",
         props.className
       )}
     >
       {isLoading ? (
-        <span className="inline-block absolute">
+        <span className="pks_inline-block pks_absolute">
           <Spinner />
         </span>
       ) : (
@@ -213,15 +214,15 @@ export const OutlineButton = (props: ButtonProps) => {
   return (
     <Button
       className={cn(
-        "rounded-full h-[2.1rem] outline outline-blue-600/50 hover:outline-blue-600 outline-[1.5px] outline-offset-[2px] px-4",
+        "pks_rounded-full pks_h-[2.1rem] pks_outline pks_outline-blue-600/50 pks_hover:outline-blue-600 pks_outline-[1.5px] pks_outline-offset-[2px] pks_px-4",
         className,
-        props.disabled && "opacity-60"
+        props.disabled && "pks_opacity-60"
       )}
       type="submit"
       {...btnProps}
     >
       {props.children}
-      {props.isLoading && <Spinner className="h-4 w-4 ml-2" />}
+      {props.isLoading && <Spinner className="pks_h-4 pks_w-4 pks_ml-2" />}
     </Button>
   );
 };

@@ -71,13 +71,16 @@ export const ChatFooter: FC<ChatFooterProps> = ({
   return (
     <form
       onSubmit={handleSubmit(onSubmitForm)}
-      className={cn("flex flex-col items-center relative", className)}
+      className={cn(
+        "pks_flex pks_flex-col pks_items-center pks_relative",
+        className
+      )}
     >
       <ScalableTextarea
         placeholder="How can i help you today?"
         spellCheck="false"
         wrapperClassName="shadow"
-        className="text-[15px]"
+        className="pks_text-[15px]"
         {...register("message", {
           required: "Please write your message.",
         })}
@@ -88,18 +91,18 @@ export const ChatFooter: FC<ChatFooterProps> = ({
           }
         }}
         actions={
-          <div className="flex shrink-0 grow-0 items-center rounded-b-lg">
-            <div className="flex-1 flex items-center gap-1 opacity-0">
+          <div className="pks_flex pks_shrink-0 pks_grow-0 pks_items-center pks_rounded-b-lg">
+            <div className="pks_flex-1 pks_flex pks_items-center pks_gap-1 pks_opacity-0">
               <IconButton
                 type="button"
-                className="border-none rounded-lg !p-1.5 h-fit"
+                className="pks_border-none rounded-lg !p-1.5 h-fit"
               >
-                <i className="h-5 w-5 flex justify-center">
+                <i className="pks_h-5 w-5 flex justify-center">
                   <svg
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                     xmlnsXlink="http://www.w3.org/1999/xlink"
-                    className="w-full h-full"
+                    className="pks_w-full h-full"
                     strokeWidth={2.2}
                   >
                     <path
@@ -113,23 +116,23 @@ export const ChatFooter: FC<ChatFooterProps> = ({
                   </svg>
                 </i>
               </IconButton>
-              <div className="self-stretch py-1.5">
+              <div className="pks_self-stretch py-1.5">
                 <span
                   aria-orientation="vertical"
-                  className="flex rounded-full bg-gray-200 dark:bg-gray-800 w-px h-full"
+                  className="pks_flex rounded-full bg-gray-200 dark:bg-gray-800 w-px h-full"
                   role="separator"
                 />
               </div>
               <IconButton
                 type="button"
-                className="border-none rounded-lg !p-1.5 h-fit"
+                className="pks_border-none rounded-lg !p-1.5 h-fit"
               >
-                <i className="h-5 w-5 flex justify-center">
+                <i className="pks_h-5 w-5 flex justify-center">
                   <svg
                     viewBox="0 0 16 16"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-full"
+                    className="pks_w-full h-full"
                   >
                     <path
                       d="M15.0868 7.16044V11.9855M7.8009 11.9976L4.36302 4L0.913086 11.9976M1.5283 10.5621H7.18573M14.3764 7.85887C15.3237 8.80621 15.3237 10.3422 14.3764 11.2895C13.429 12.2368 11.8931 12.2368 10.9457 11.2895C9.99839 10.3422 9.99839 8.80621 10.9457 7.85887C11.8931 6.91153 13.429 6.91153 14.3764 7.85887Z M0 15L16 15"
@@ -141,24 +144,24 @@ export const ChatFooter: FC<ChatFooterProps> = ({
                   </svg>
                 </i>
               </IconButton>
-              <div className="self-stretch py-1.5">
+              <div className="pks_self-stretch py-1.5">
                 <span
                   aria-orientation="vertical"
-                  className="flex rounded-full bg-gray-200 dark:bg-gray-800 w-px h-full"
+                  className="pks_flex rounded-full bg-gray-200 dark:bg-gray-800 w-px h-full"
                   role="separator"
                 />
               </div>
               <IconButton
                 type="button"
-                className="border-none rounded-lg !p-1.5 h-fit"
+                className="pks_border-none rounded-lg !p-1.5 h-fit"
               >
                 <span>
-                  <i className="h-4 w-4 flex justify-center">
+                  <i className="pks_h-4 w-4 flex justify-center">
                     <svg
                       viewBox="0 0 14 14"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
-                      className="w-full h-full"
+                      className="pks_w-full h-full"
                     >
                       <path
                         d="M5 5V6.33333M9 5V6.33333M9.33333 8.792C9.33333 8.792 8.458 9.66667 7 9.66667C5.54133 9.66667 4.66667 8.792 4.66667 8.792M1 7C1 3.686 3.686 1 7 1C10.314 1 13 3.686 13 7C13 10.314 10.314 13 7 13C3.686 13 1 10.314 1 7Z"
@@ -174,31 +177,31 @@ export const ChatFooter: FC<ChatFooterProps> = ({
             </div>
             <div />
             {isValid ? (
-              <Button className="border-none rounded-lg !p-1.5 h-fit">
+              <Button className="pks_border-none pks_rounded-lg !pks_p-1.5 pks_h-fit">
                 {loading ? (
                   <Spinner size="sm" />
                 ) : (
                   <UpArrowIcon
                     strokeWidth={1.6}
-                    className="text-white h-5 w-5"
+                    className="pks_text-white pks_h-5 pks_w-5"
                   />
                 )}
               </Button>
             ) : (
               <HoverButton
                 type="button"
-                className="border-none rounded-lg !p-1.5 h-fit"
+                className="pks_border-none pks_rounded-lg pks_!p-1.5 pks_h-fit"
               >
                 {loading ? (
                   <Spinner size="sm" />
                 ) : (
-                  <UpArrowIcon strokeWidth={2} className="h-5 w-5" />
+                  <UpArrowIcon strokeWidth={2} className="pks_h-5 pks_w-5" />
                 )}
               </HoverButton>
             )}
           </div>
         }
-      ></ScalableTextarea>
+      />
     </form>
   );
 };

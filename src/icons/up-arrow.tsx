@@ -9,7 +9,7 @@ export function UpArrowIcon(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn("w-5 h-5 opacity-70", props.className)}
+      className={cn("pks_w-5 pks_h-5 pks_opacity-70", props.className)}
       {...props}
     >
       <path d="m5 12 7-7 7 7" />

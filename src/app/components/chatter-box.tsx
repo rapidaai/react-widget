@@ -11,7 +11,6 @@ import {
   HTMLAttributes,
   memo,
   useCallback,
-  useContext,
   useEffect,
   useRef,
   useState,
@@ -20,7 +19,6 @@ import {
   SystemChatMessage,
   UserChatMessage,
 } from "@/app/app/components/chat-message";
-// import { useCredential, useRapidaStore } from "@/app/hooks";
 import { ChatFooter } from "@/app/app/components/chat-footer";
 import { IconButton } from "@/app/app/components/buttons";
 import { CloseIcon } from "@/app/icons/close";
@@ -46,6 +44,7 @@ interface ChatterBoxProps extends HTMLAttributes<HTMLDivElement> {
   onClose: () => void;
   assistant: Assistant;
 }
+
 /**
  *
  * @param param0
@@ -69,8 +68,7 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
   const { token } = useEnvironment();
 
   const ctrRef = useRef<HTMLDivElement>(null);
-  //
-  //
+
   useEffect(() => {
     if (!token) return;
     if (currentAssistantConversactionId) {
@@ -79,7 +77,7 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
         currentAssistantConversactionId,
         token,
         (err) => {
-          //   hideLoader();
+          // hideLoader();
         },
         (message) => {
           onChangeConversactionMessages(message);
@@ -88,11 +86,6 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
       );
     }
   }, [currentAssistantConversactionId, token]);
-
-  /**
-   *
-   * @param message
-   */
 
   /**
    *
@@ -106,13 +99,14 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
     );
   };
 
-  //
   const [loading, setLoading] = useState<boolean>(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+
   /**
    *
    */
   const { onSend } = useAssistantChat();
+
   /**
    *
    * @param text
@@ -128,7 +122,7 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
   const onSubmitQuickNote = (note: string) => {
     onSendingMessage(createMessage(note));
   };
-  //
+
   const onSendingMessage = useCallback(
     (message: Message) => {
       if (!token) return;
@@ -179,12 +173,18 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
         scrollTo(ctrRef);
       });
     },
-    [token, currentAssistantConversactionId, assistant]
+    [
+      token,
+      currentAssistantConversactionId,
+      assistant,
+      loading,
+      conversactions,
+      onSend,
+      onChangeConversactionMessages,
+      onChangeAssistantConversactionId,
+    ]
   );
 
-  /**
-   *
-   */
   return (
     <>
       {!currentAssistantConversactionId ? (
@@ -194,23 +194,23 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
         />
       ) : (
         <>
-          <header className="dark:bg-slate-900 p-3 rounded-t-lg border-b dark:border-gray-700 flex justify-between items-center font-medium">
+          <header className="dark:pks_bg-slate-900 pks_p-3 pks_rounded-t-lg pks_border-b dark:pks_border-gray-700 pks_flex pks_justify-between pks_items-center pks_font-medium">
             Message
-            <div className="flex space-x-2">
-              <IconButton className="p-1 w-7 h-7" onClick={onClose}>
-                <CloseIcon className="opacity-90" strokeWidth={2} />
+            <div className="pks_flex pks_space-x-2">
+              <IconButton className="pks_p-1 pks_w-7 pks_h-7" onClick={onClose}>
+                <CloseIcon className="pks_opacity-90" strokeWidth={2} />
               </IconButton>
             </div>
           </header>
-          <div className="flex-1 overflow-y-auto flex-grow message-container">
+          <div className="pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container">
             {conversactions.map((x, idx) => {
               return (
                 <div
                   key={idx}
                   className={cn(
-                    "max-w-full",
+                    "pks_max-w-full",
                     x.getCreateddate() &&
-                      `day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
+                      `pks_day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
                   )}
                 >
                   {x.getRequest() && (
@@ -243,9 +243,9 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
         </>
       )}
       {notificationMessage && (
-        <div className="flex space-x-1 opacity-80 text-gray-600 dark:text-gray-400 text-sm px-4">
+        <div className="pks_flex pks_space-x-1 pks_opacity-80 pks_text-gray-600 dark:pks_text-gray-400 pks_text-sm pks_px-4">
           <DotLoader />
-          <span className="font-semibold">
+          <span className="pks_font-semibold">
             {assistant
               .getAppappearance()
               ?.getFieldsMap()
@@ -267,15 +267,15 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
         assistant={assistant}
         loading={loading}
         onSendingMessage={onSendingMessage}
-        className="px-3 py-2"
+        className="pks_px-3 pks_py-2"
       />
-      <div className="flex items-center justify-center text-sm pb-2 dark:bg-gray-900/50 rounded-b-lg">
-        <span className="opacity-80">Powered by</span>
-        <RapidaIcon className="text-blue-800 ml-1 w-4 h-4" />
+      <div className="pks_flex pks_items-center pks_justify-center pks_text-sm pks_pb-2 dark:pks_bg-gray-900/50 pks_rounded-b-lg">
+        <span className="pks_opacity-80">Powered by</span>
+        <RapidaIcon className="pks_text-blue-800 pks_ml-1 pks_w-4 pks_h-4" />
         <a
           href="https://rapida.ai"
           target="_blank"
-          className="opacity-80 font-medium hover:underline hover:text-blue-600 cursor-pointer ml-0.5"
+          className="pks_opacity-80 pks_font-medium pks_hover:underline pks_hover:text-blue-600 pks_cursor-pointer pks_ml-0.5"
         >
           Rapida
         </a>
@@ -289,15 +289,15 @@ const ChatInterface: FC<{
   onSubmitQuickNote: (s: string) => void;
 }> = memo(({ assistant, onSubmitQuickNote }) => {
   return (
-    <div className="flex flex-col h-full space-y-6 flex-grow">
-      <div className="p-3 pt-8 flex flex-col space-y-4">
+    <div className="pks_flex pks_flex-col pks_h-full pks_space-y-6 pks_flex-grow">
+      <div className="pks_p-3 pks_pt-8 pks_flex pks_flex-col pks_space-y-4">
         <div
           className={cn(
-            "transition-opacity duration-100 ease-in-out h-12 w-12"
+            "pks_transition-opacity pks_duration-100 pks_ease-in-out pks_h-12 pks_w-12"
           )}
         >
           <img
-            className="w-full h-full object-cover rounded-full"
+            className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
             alt="Assistant Icon"
             src={assistant
               ?.getAppappearance()
@@ -306,9 +306,9 @@ const ChatInterface: FC<{
               ?.getStringValue()}
           />
         </div>
-        <div className="flex flex-col">
-          <h1 className="text-xl font-bold">Hello there.</h1>
-          <p className="text-lg opacity-70">
+        <div className="pks_flex pks_flex-col">
+          <h1 className="pks_text-xl pks_font-bold">Hello there.</h1>
+          <p className="pks_text-lg pks_opacity-70">
             {assistant
               .getAppappearance()
               ?.getFieldsMap()
@@ -323,8 +323,8 @@ const ChatInterface: FC<{
         ?.getFieldsMap()
         ?.get("suggestedQuestions")
         ?.getListValue() && (
-        <div className="flex flex-col space-y-2 text-base bg-gray-100 dark:bg-gray-800 border-[0.5px] border-gray-300 dark:border-gray-600 shadow mx-3 rounded-lg p-2">
-          <div className="opacity-70 font-medium text-[14px]">
+        <div className="pks_flex pks_flex-col pks_space-y-2 pks_text-base pks_bg-gray-100 dark:pks_bg-gray-800 pks_border-[0.5px] pks_border-gray-300 dark:pks_border-gray-600 pks_shadow pks_mx-3 pks_rounded-lg pks_p-2">
+          <div className="pks_opacity-70 pks_font-medium pks_text-[14px]">
             Quick Suggestions
           </div>
           {assistant
@@ -337,15 +337,15 @@ const ChatInterface: FC<{
               return (
                 <button
                   className={cn(
-                    "group",
-                    "w-full cursor-pointer py-2 px-3 border dark:bg-slate-700 rounded-lg opacity-80 dark:border-gray-600/50 bg-white",
-                    "text-start flex justify-between text-[14px]"
+                    "pks_group",
+                    "pks_w-full pks_cursor-pointer pks_py-2 pks_px-3 pks_border dark:pks_bg-slate-700 pks_rounded-lg pks_opacity-80 dark:pks_border-gray-600/50 pks_bg-white",
+                    "pks_text-start pks_flex pks_justify-between pks_text-[14px]"
                   )}
                   key={idx}
                   onClick={() => onSubmitQuickNote(x.getStringValue())}
                 >
-                  <p className="font-medium">{x.getStringValue()}</p>
-                  <ChevronUpIcon className="rotate-90 group-hover:text-blue-600 group-hover:opacity-100" />
+                  <p className="pks_font-medium">{x.getStringValue()}</p>
+                  <ChevronUpIcon className="pks_rotate-90 pks_group-hover:text-blue-600 pks_group-hover:opacity-100" />
                 </button>
               );
             })}

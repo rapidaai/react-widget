@@ -18,11 +18,11 @@ export function Spinner({ size = "sm", className }: SpinnerProps) {
     <div role="status" className={className}>
       <svg
         className={cn(
-          "animate-spin fill-blue-600 text-blue-200 dark:text-blue-950",
-          size === "md" && "h-8 w-8",
-          size === "lg" && "h-12 w-12",
-          size === "sm" && "h-4 w-4",
-          size === "xs" && "h-[11px] w-[11px]"
+          "pks_animate-spin pks_fill-blue-600 pks_text-blue-200 dark:pks_text-blue-950",
+          size === "md" && "pks_h-8 pks_w-8",
+          size === "lg" && "pks_h-12 pks_w-12",
+          size === "sm" && "pks_h-4 pks_w-4",
+          size === "xs" && "pks_h-[11px] pks_w-[11px]"
         )}
         viewBox="0 0 100 101"
         xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +36,7 @@ export function Spinner({ size = "sm", className }: SpinnerProps) {
           fill="currentFill"
         />
       </svg>
-      <span className="sr-only">Loading...</span>
+      <span className="pks_sr-only">Loading...</span>
     </div>
   );
 }

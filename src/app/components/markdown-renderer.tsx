@@ -10,7 +10,7 @@ interface MarkdownRendererProps {
 // Define the MarkdownRenderer functional component
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
   return (
-    <div className="markdown-content">
+    <div className="pks_markdown-content">
       <Markdown
         options={{
           overrides: {
@@ -19,9 +19,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
               component: ({ children }: { children: React.ReactNode }) => (
                 <p
                   className={cn(
-                    "prose prose-gray prose-sm dark:prose-invert break-words !max-w-none prose-img:rounded-xl prose-headings:underline prose-a:text-blue-600",
-                    "dark:prose-code:!bg-slate-900 dark:prose-pre:!bg-slate-900",
-                    "prose-code:!bg-slate-100 prose-pre:!bg-slate-100 leading-normal"
+                    "pks_prose pks_prose-gray pks_prose-sm dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600",
+                    "dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900",
+                    "pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal"
                   )}
                 >
                   {children}
@@ -33,9 +33,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
               component: ({ children }: { children: React.ReactNode }) => (
                 <p
                   className={cn(
-                    "prose prose-gray prose-sm dark:prose-invert break-words !max-w-none prose-img:rounded-xl prose-headings:underline prose-a:text-blue-600",
-                    "dark:prose-code:!bg-slate-900 dark:prose-pre:!bg-slate-900",
-                    "prose-code:!bg-slate-100 prose-pre:!bg-slate-100 leading-normal"
+                    "pks_prose pks_prose-gray pks_prose-sm dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600",
+                    "dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900",
+                    "pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal"
                   )}
                 >
                   {children}
@@ -45,7 +45,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <ul> (unordered list) elements
             ul: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <ul className="list-disc pl-5 space-y-2 prose prose-gray prose-sm dark:prose-invert break-words !max-w-none prose-img:rounded-xl prose-headings:underline prose-a:text-blue-600 dark:prose-code:!bg-slate-900 dark:prose-pre:!bg-slate-900 prose-code:!bg-slate-100 prose-pre:!bg-slate-100 leading-normal">
+                <ul className="pks_list-disc pks_pl-5 pks_space-y-2 pks_prose pks_prose-gray pks_prose-sm dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600 dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900 pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal">
                   {children}
                 </ul>
               ),
@@ -53,7 +53,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <ol> (ordered list) elements
             ol: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <ol className="list-item pl-5 space-y-2 prose prose-gray prose-sm dark:prose-invert break-words !max-w-none prose-img:rounded-xl prose-headings:underline prose-a:text-blue-600 dark:prose-code:!bg-slate-900 dark:prose-pre:!bg-slate-900 prose-code:!bg-slate-100 prose-pre:!bg-slate-100 leading-normal">
+                <ol className="pks_list-item pks_pl-5 pks_space-y-2 pks_prose pks_prose-gray pks_prose-sm dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600 dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900 pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal">
                   {children}
                 </ol>
               ),
@@ -61,14 +61,14 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <li> (list item) elements
             li: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <li className="pl-2">{children}</li>
+                <li className="pks_pl-2">{children}</li>
               ),
             },
             // Custom rendering for <table> elements
             table: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <div className="overflow-x-auto my-1">
-                  <table className="min-w-fit border-t border-b dark:border-gray-700">
+                <div className="pks_overflow-x-auto pks_my-1">
+                  <table className="pks_min-w-fit pks_border-t pks_border-b dark:pks_border-gray-700">
                     {children}
                   </table>
                 </div>
@@ -77,7 +77,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <thead> elements
             thead: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <thead className="bg-white dark:bg-gray-950 border-b dark:border-gray-700">
+                <thead className="pks_bg-white dark:pks_bg-gray-950 pks_border-b dark:pks_border-gray-700">
                   {children}
                 </thead>
               ),
@@ -85,7 +85,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <tr> (table row) elements
             tr: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <tr className="even:bg-gray-200 odd:bg-white dark:even:bg-gray-700 dark:odd:bg-gray-800">
+                <tr className="pks_even:bg-gray-200 pks_odd:bg-white dark:pks_even:bg-gray-700 dark:pks_odd:bg-gray-800">
                   {children}
                 </tr>
               ),
@@ -93,7 +93,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <th> (table header) elements
             th: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <th className="px-2 py-2 text-left text-xs font-medium uppercase tracking-wider">
+                <th className="pks_px-2 pks_py-2 pks_text-left pks_text-xs pks_font-medium pks_uppercase pks_tracking-wider">
                   {children}
                 </th>
               ),
@@ -101,7 +101,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             // Custom rendering for <td> (table data) elements
             td: {
               component: ({ children }: { children: React.ReactNode }) => (
-                <td className="px-2 py-2 text-left text-xs font-medium tracking-wider">
+                <td className="pks_px-2 pks_py-2 pks_text-left pks_text-xs pks_font-medium pks_tracking-wider">
                   {children}
                 </td>
               ),

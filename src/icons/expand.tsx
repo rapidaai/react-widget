@@ -11,7 +11,7 @@ export function ExpandIcon(props: React.SVGProps<SVGSVGElement>) {
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cn("w-5 h-5 opacity-75", props.className)}
+      className={cn("pks_w-5 pks_h-5 pks_opacity-80", props.className)}
       {...props}
     >
       <polyline points="15 3 21 3 21 9" />

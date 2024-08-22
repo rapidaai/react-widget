@@ -4,7 +4,7 @@ import React, { FC, memo } from "react";
 
 export const App: FC<{}> = memo(() => {
   return (
-    <div className="!font-sans">
+    <div className="pks_font-sans">
       <AssistantChatContextProvider>
         <FloatingChatButton />
       </AssistantChatContextProvider>

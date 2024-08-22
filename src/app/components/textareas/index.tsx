@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { cn } from "@/app/styles/media";
-import { Button } from "@/app/app/components/buttons";
+
 interface TextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   row?: number;
-
   wrapperClassName?: string;
 }
 
@@ -25,13 +24,13 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         name={props.name}
         rows={props.row}
         className={cn(
-          "block p-2.5 resize-none w-full",
-          "dark:placeholder-gray-600 placeholder-gray-400",
-          "border-[1px] border-gray-300 dark:border-gray-600/50 rounded-md",
-          "dark:focus:border-blue-600 focus:border-blue-600",
-          "dark:text-slate-300 text-slate-600",
-          "focus:ring-0 focus:outline-none",
-          "bg-gray-50 dark:bg-slate-900",
+          "pks_block pks_p-2.5 pks_resize-none pks_w-full",
+          "dark:pks_placeholder-gray-600 pks_placeholder-gray-400",
+          "pks_border-[1px] pks_border-gray-300 dark:pks_border-gray-600/50 pks_rounded-md",
+          "dark:focus:pks_border-blue-600 focus:pks_border-blue-600",
+          "dark:pks_text-slate-300 pks_text-slate-600",
+          "focus:pks_ring-0 focus:pks_outline-none",
+          "pks_bg-gray-50 dark:pks_bg-slate-900",
           props.className
         )}
         placeholder={props.placeholder}
@@ -73,16 +72,15 @@ export const ScalableTextarea = React.forwardRef<
   return (
     <div
       className={cn(
-        "p-2",
-        "relative",
-        "w-full min-h-[3rem]",
-        "dark:placeholder-gray-600 placeholder-gray-400",
-        "border-[1px] border-gray-300 dark:border-gray-600/50 rounded-md",
-        "dark:focus-within:border-blue-600 focus-within:border-blue-600",
-        "dark:text-slate-300 text-slate-600",
-        "focus:ring-0 focus:outline-none",
-        "bg-gray-50 dark:bg-slate-900",
-        "focus-within:bg-white",
+        "pks_relative",
+        "pks_w-full pks_min-h-[3rem]",
+        "dark:pks_placeholder-gray-600 pks_placeholder-gray-400",
+        "pks_border-[1px] pks_border-gray-300 dark:pks_border-gray-600/50 pks_rounded-md",
+        "dark:focus-within:pks_border-blue-600 focus-within:pks_border-blue-600",
+        "dark:pks_text-slate-300 pks_text-slate-600",
+        "focus:pks_ring-0 focus:pks_outline-none",
+        "pks_bg-gray-50 dark:pks_bg-slate-900",
+        "focus-within:pks_bg-white",
         wrapperClassName
       )}
     >
@@ -95,11 +93,12 @@ export const ScalableTextarea = React.forwardRef<
         onChange={handleChange}
         style={{ height: textareaHeight }} // Dynamically set height
         className={cn(
-          "block resize-none w-full min-h-[3rem] max-h-80",
-          "dark:placeholder-gray-600 placeholder-gray-400",
-          "focus:ring-0 focus:outline-none",
-          "bg-gray-50 dark:bg-slate-900",
-          "focus:bg-white",
+          "pks_p-2 pks_rounded-lg",
+          "pks_block pks_resize-none pks_w-full pks_min-h-[3rem] pks_max-h-80",
+          "dark:pks_placeholder-gray-600 pks_placeholder-gray-400",
+          "focus:pks_ring-0 focus:pks_outline-none",
+          "pks_bg-gray-50 dark:pks_bg-slate-900",
+          "focus:pks_bg-white",
           props.className
         )}
         rows={props.row}

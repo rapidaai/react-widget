@@ -9,7 +9,7 @@ export function CopyIcon(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={cn("w-5 h-5 opacity-70", props.className)}
+      className={cn("pks_w-5 pks_h-5 pks_opacity-70", props.className)}
       {...props}
     >
       <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />

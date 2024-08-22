@@ -28,18 +28,18 @@ export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
   const { user } = useEnvironment();
   //
   return (
-    <div className="flex px-2 py-3 hover:bg-gray-100/50 dark:hover:bg-gray-950/20 w-full">
-      <div className="h-9 w-9 rounded-full flex-shrink-0 bg-zinc-200/80 dark:bg-zinc-800/80 border-[0.5px] flex items-center justify-center dark:border-gray-700">
-        <span className="font-bold text-lg opacity-80">
+    <div className="pks_flex px-2 py-3 hover:bg-gray-100/50 dark:hover:bg-gray-950/20 w-full">
+      <div className="pks_h-9 w-9 rounded-full flex-shrink-0 bg-zinc-200/80 dark:bg-zinc-800/80 border-[0.5px] flex items-center justify-center dark:border-gray-700">
+        <span className="pks_font-bold text-lg opacity-80">
           {user.name.charAt(0)}
         </span>
       </div>
-      <div className="ml-2 min-w-0">
-        <div className="-mt-2">
-          <span className="font-semibold dark:text-white text-[14px]">
+      <div className="pks_ml-2 min-w-0">
+        <div className="pks_-mt-2">
+          <span className="pks_font-semibold dark:text-white text-[14px]">
             {user.name}
           </span>
-          <span className="ml-1 text-xs text-gray-500">{time}</span>
+          <span className="pks_ml-1 text-xs text-gray-500">{time}</span>
         </div>
 
         <MarkdownRenderer>
@@ -70,14 +70,14 @@ export const SystemChatMessage: FC<{
   stages,
 }) => {
   return (
-    <div className="flex px-2 py-3 mb-3 group hover:bg-gray-100/50 relative dark:hover:bg-gray-950/20">
-      <div className="absolute -top-5 right-2 invisible group-hover:visible">
+    <div className="pks_flex px-2 py-3 mb-3 group hover:bg-gray-100/50 relative dark:hover:bg-gray-950/20">
+      <div className="pks_absolute -top-5 right-2 invisible group-hover:visible">
         <SystemMessageAction />
       </div>
-      <div className="h-9 w-9 flex-shrink-0 flex items-center justify-center dark:border-gray-700">
+      <div className="pks_h-9 w-9 flex-shrink-0 flex items-center justify-center dark:border-gray-700">
         {assistant?.getAppappearance()?.getFieldsMap().get("appIcon") ? (
           <img
-            className="w-full h-full object-cover rounded-full"
+            className="pks_w-full h-full object-cover rounded-full"
             alt="Assistant Icon"
             src={assistant
               ?.getAppappearance()
@@ -86,12 +86,12 @@ export const SystemChatMessage: FC<{
               ?.getStringValue()}
           />
         ) : (
-          <RapidaIcon className="h-8 w-8 text-blue-600 rounded-full" />
+          <RapidaIcon className="pks_h-8 w-8 text-blue-600 rounded-full" />
         )}
       </div>
-      <div className="ml-2 min-w-0">
-        <div className="-mt-1.5">
-          <span className="font-semibold dark:text-white capitalize text-[14px]">
+      <div className="pks_ml-2 min-w-0">
+        <div className="pks_-mt-1.5">
+          <span className="pks_font-semibold dark:text-white capitalize text-[14px]">
             {assistant?.getAppappearance()?.getFieldsMap().get("assistantName")
               ? assistant
                   ?.getAppappearance()
@@ -100,7 +100,7 @@ export const SystemChatMessage: FC<{
                   ?.getStringValue()
               : "Rapida"}
           </span>
-          <span className="ml-1 text-xs text-gray-500">{time}</span>
+          <span className="pks_ml-1 text-xs text-gray-500">{time}</span>
         </div>
         <MarkdownRenderer>
           {toContentText(messageContent.getContentsList().at(0))}
@@ -112,10 +112,10 @@ export const SystemChatMessage: FC<{
 
 export const SystemMessageAction: FC = () => {
   return (
-    <div className="flex w-fit border shadow-md p-1 rounded-lg space-x-1 dark:bg-gray-950/50 dark:border-gray-800">
-      <IconButton className="h-6 w-6 p-0 text-green-600">
+    <div className="pks_flex w-fit border shadow-md p-1 rounded-lg space-x-1 dark:bg-gray-950/50 dark:border-gray-800">
+      <IconButton className="pks_h-6 w-6 p-0 text-green-600">
         <svg
-          className="h-4 w-4"
+          className="pks_h-4 w-4"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -129,9 +129,9 @@ export const SystemMessageAction: FC = () => {
           />
         </svg>
       </IconButton>
-      <IconButton className="h-6 w-6 p-0 text-rose-600">
+      <IconButton className="pks_h-6 w-6 p-0 text-rose-600">
         <svg
-          className="h-4 w-4"
+          className="pks_h-4 w-4"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

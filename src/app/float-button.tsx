@@ -81,13 +81,13 @@ export const FloatingChatButton = () => {
   };
 
   return (
-    <div className="fixed bottom-10 right-10">
+    <div className="pks_fixed pks_bottom-10 pks_right-10">
       <div
         onClick={toggleChat}
         className={cn(
-          "cursor-pointer rounded-full transform hover:scale-110 transition-transform duration-300 ease-in-out",
-          "h-14 w-14 flex-shrink-0 flex items-center justify-center p-0.5 shadow-lg",
-          "bg-white dark:bg-slate-800 border dark:border-gray-800"
+          "pks_cursor-pointer pks_rounded-full pks_transform pks_hover:scale-110 pks_transition-transform pks_duration-300 pks_ease-in-out",
+          "pks_h-14 pks_w-14 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center pks_p-0.5 pks_shadow-lg",
+          "pks_bg-white dark:pks_bg-slate-800 pks_border dark:pks_border-gray-800"
         )}
       >
         <FloatButtonIcon
@@ -103,15 +103,17 @@ export const FloatingChatButton = () => {
       {ctx.currentAssistant && (
         <div
           className={cn(
-            "fixed bottom-28 right-10 w-80 bg-white dark:bg-gray-900 rounded-lg shadow-xl",
-            "dark:text-gray-300 text-gray-700",
-            "border dark:border-gray-300",
-            isExpand ? "w-[500px] h-[600px]" : "w-[400px] h-[600px]",
-            "transition-all duration-300 ease-in-out",
-            "flex flex-col",
+            "pks_fixed pks_bottom-28 pks_right-10 pks_w-80 pks_bg-white dark:pks_bg-gray-900 pks_rounded-lg pks_shadow-xl",
+            "dark:pks_text-gray-300 pks_text-gray-700",
+            "pks_border dark:pks_border-gray-300",
+            isExpand
+              ? "pks_w-[500px] pks_h-[600px]"
+              : "pks_w-[400px] pks_h-[600px]",
+            "pks_transition-all pks_duration-300 pks_ease-in-out",
+            "pks_flex pks_flex-col",
             isOpen
-              ? "opacity-100 scale-100"
-              : "opacity-0 scale-95 pointer-events-none"
+              ? "pks_opacity-100 pks_scale-100"
+              : "pks_opacity-0 pks_scale-95 pks_pointer-events-none"
           )}
         >
           <ChatterBox
@@ -139,19 +141,21 @@ const FloatButtonIcon = ({
     let icon: JSX.Element;
 
     if (isOpen) {
-      icon = <ChevronDownIcon strokeWidth={2.5} className="dark:text-white" />;
+      icon = (
+        <ChevronDownIcon strokeWidth={2.5} className="dark:pks_text-white" />
+      );
     } else if (loadingAssistant) {
       icon = <Spinner size="sm" />;
     } else if (appIcon) {
       icon = (
         <img
-          className="w-full h-full object-cover rounded-full"
+          className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
           alt="Assistant Icon"
           src={appIcon}
         />
       );
     } else {
-      icon = <RapidaIcon className="h-8 w-8 text-blue-600" />;
+      icon = <RapidaIcon className="pks_h-8 pks_w-8 pks_text-blue-600" />;
     }
 
     // Smooth transition between icons
@@ -164,8 +168,8 @@ const FloatButtonIcon = ({
   return (
     <div
       className={cn(
-        "transition-opacity duration-100 ease-in-out",
-        currentIcon ? "opacity-100" : "opacity-0"
+        "pks_transition-opacity pks_duration-100 pks_ease-in-out",
+        currentIcon ? "pks_opacity-100" : "pks_opacity-0"
       )}
     >
       {currentIcon}
