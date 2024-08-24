@@ -19,10 +19,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install Protobuf Compiler (protoc)
+      - name: Install Protobuf Compiler (protoc) Version 3.20.3
         run: |
           sudo apt-get update
-          sudo apt-get install -y protobuf-compiler=3.20.3
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protoc-3.20.3-linux-x86_64.zip
+          unzip protoc-3.20.3-linux-x86_64.zip -d protoc3
+          sudo mv protoc3/bin/* /usr/local/bin/
+          sudo mv protoc3/include/* /usr/local/include/
+          rm -rf protoc-3.20.3-linux-x86_64.zip protoc3
 
       - name: Make gRPC Client Script Executable
         run: chmod +x scripts/grpc-client.sh
