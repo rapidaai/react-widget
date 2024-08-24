@@ -37,10 +37,10 @@ message CreateAssistantMessageRequest {
 
   //   actual message
   Message message = 3;
-  uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
+  optional uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
 
   // identifier
-  ResourceIdentifier identifier = 5;
+  optional ResourceIdentifier identifier = 5;
 
   // metadata
   map<string, google.protobuf.Any> metadata = 6;
