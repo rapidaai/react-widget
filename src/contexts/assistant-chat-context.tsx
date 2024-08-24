@@ -8,7 +8,7 @@ import {
   CreateAssistantMessageResponse,
   GetAllConversactionMessageResponse,
 } from "@/app/clients/protos/talk-api_pb";
-import { Message } from "@/app/clients/protos/common_pb";
+import { Message, Owner, Source } from "@/app/clients/protos/common_pb";
 
 import {
   AssistantChatProperty,
@@ -63,10 +63,14 @@ const initialChatActionState = {
 
 const initialChatApiCallState = {
   onSend: function (
-    assistantId: string,
-    assistantProviderModelId: string,
+    assistant: {
+      assistantId: string;
+      assistantProviderModelId: string;
+    },
     currentAssistantConversactionId: string | null,
     message: Message,
+    //
+    userId: string,
     token: string
   ): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> {
     throw new Error("Function not implemented.");
@@ -176,18 +180,26 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
    * @returns
    */
   onSend: (
-    assistantId: string,
-    assistantProviderModelId: string,
+    assistant: {
+      assistantId: string;
+      assistantProviderModelId: string;
+    },
     currentAssistantConversactionId: string | null,
     message: Message,
+    //
+    userId: string,
     token: string
   ): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> => {
     return CreateAssistantMessage(
-      assistantId,
-      assistantProviderModelId,
+      assistant,
       {
         message: message,
         assistantConversactionId: currentAssistantConversactionId,
+      },
+      {
+        identifier: userId,
+        source: Source.WEB_PLUGIN,
+        owner: Owner.CLIENT,
       },
       {
         "x-api-key": token,

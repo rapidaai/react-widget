@@ -8,7 +8,14 @@ import {
 import * as grpcWeb from "grpc-web";
 import { AssistantServiceClient } from "@/app/clients/protos/Assistant-apiServiceClientPb";
 import { TalkServiceClient } from "@/app/clients/protos/Talk-apiServiceClientPb";
-import { Criteria, Paginate, Message } from "@/app/clients/protos/common_pb";
+import {
+  Criteria,
+  Paginate,
+  Message,
+  Source,
+  ResourceIdentifier,
+  Owner,
+} from "@/app/clients/protos/common_pb";
 import { assistantApiUrl } from "@/app/configs/constant";
 
 const conversactionClient = new TalkServiceClient(assistantApiUrl);
@@ -22,23 +29,41 @@ const conversactionClient = new TalkServiceClient(assistantApiUrl);
  * @param cb
  */
 export function CreateAssistantMessage(
-  assistantId: string,
-  assistantProviderModelId: string,
+  assistant: {
+    assistantId: string;
+    assistantProviderModelId: string;
+  },
   conversaction: {
     message: Message;
     assistantConversactionId?: string | null;
   },
+
+  identifier: {
+    identifier: string;
+    source: Source;
+    owner: Owner;
+  },
+  //
   authHeader: {
     "x-api-key": string;
   }
 ): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> {
   const req = new CreateAssistantMessageRequest();
-  req.setAssistantid(assistantId);
+  req.setAssistantid(assistant.assistantId);
   if (conversaction.assistantConversactionId) {
     req.setAssistantconversactionid(conversaction.assistantConversactionId);
   }
   req.setMessage(conversaction.message);
-  req.setAssistantprovidermodelid(assistantProviderModelId);
+  req.setAssistantprovidermodelid(assistant.assistantProviderModelId);
+  req.setSource(identifier.source);
+
+  let _ri = new ResourceIdentifier();
+  _ri.setSource(identifier.source);
+  _ri.setIdentifier(identifier.identifier);
+  _ri.setOwner(identifier.owner);
+
+  req.setSource(identifier.source);
+  req.setIdentifier(_ri);
   const metadata = { ...authHeader };
   return conversactionClient.createAssistantMessage(req, metadata);
 }

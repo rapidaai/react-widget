@@ -65,10 +65,9 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
     conversactions,
     onGetConversactionMessages,
   } = useAssistantChat();
-  const { token } = useEnvironment();
+  const { token, user } = useEnvironment();
 
   const ctrRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (!token) return;
     if (currentAssistantConversactionId) {
@@ -130,12 +129,15 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
       setLoading(true);
       setNotificationMessage("is thinking...");
       const stream = onSend(
-        assistant.getId(),
-        assistant.getAssistantprovidermodelid(),
+        {
+          assistantId: assistant.getId(),
+          assistantProviderModelId: assistant.getAssistantprovidermodelid(),
+        },
         currentAssistantConversactionId
           ? currentAssistantConversactionId
           : null,
         message,
+        user.user_id,
         token
       );
 
@@ -197,8 +199,8 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
           <header className="dark:pks_bg-slate-900 pks_p-3 pks_rounded-t-lg pks_border-b dark:pks_border-gray-700 pks_flex pks_justify-between pks_items-center pks_font-medium">
             Message
             <div className="pks_flex pks_space-x-2">
-              <IconButton className="pks_p-1 pks_w-7 pks_h-7" onClick={onClose}>
-                <CloseIcon className="pks_opacity-90" strokeWidth={2} />
+              <IconButton className="pks_p-1 !pks_h-fit" onClick={onClose}>
+                <CloseIcon strokeWidth={2} />
               </IconButton>
             </div>
           </header>

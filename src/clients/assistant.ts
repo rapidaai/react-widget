@@ -27,6 +27,5 @@ export function GetAssistant(
   req.setId(assistantId);
   if (assistantProviderModelId)
     req.setAssistantprovidermodelid(assistantProviderModelId);
-
   client.getAssistant(req, authHeader, cb);
 }

@@ -68,7 +68,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
             table: {
               component: ({ children }: { children: React.ReactNode }) => (
                 <div className="pks_overflow-x-auto pks_my-1">
-                  <table className="pks_min-w-fit pks_border-t pks_border-b dark:pks_border-gray-700">
+                  <table className="pks_min-w-max pks_border-t pks_border-b dark:pks_border-gray-700">
                     {children}
                   </table>
                 </div>

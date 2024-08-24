@@ -37,10 +37,14 @@ type AssistantChatApiCallAction = {
    * @returns
    */
   onSend: (
-    assistantId: string,
-    assistantProviderModelId: string,
+    assistant: {
+      assistantId: string;
+      assistantProviderModelId: string;
+    },
     currentAssistantConversactionId: string | null,
     message: Message,
+    //
+    userId: string,
     token: string
   ) => grpcWeb.ClientReadableStream<CreateAssistantMessageResponse>;
 

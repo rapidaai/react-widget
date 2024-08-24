@@ -2,6 +2,7 @@ syntax = "proto3";
 package talk_api;
 option go_package = "github.com/lexatic/web-backend/protos/lexatic-backend";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
 import "common.proto";
 
 //
@@ -29,11 +30,25 @@ message AssistantConversactionMessage {
 }
 
 message CreateAssistantMessageRequest {
+
+  // assistant parameter
   uint64 assistantId = 1 [ jstype = JS_STRING ];
   uint64 assistantProviderModelId = 2 [ jstype = JS_STRING ];
+
+  //   actual message
   Message message = 3;
   uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
+
+  // identifier
+  ResourceIdentifier identifier = 5;
+
+  // metadata
+  map<string, google.protobuf.Any> metadata = 6;
+
+  //   source
+  Source source = 7;
 }
+
 enum RAGStage {
   UNDEFINED_STAGE = 0;
   QUERY_FORMULATION = 1;

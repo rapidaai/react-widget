@@ -55,10 +55,10 @@ message Variable {
   uint64 id = 1 [ jstype = JS_STRING ];
   string name = 2;
   string type = 3;
-  string defaultValue = 4;
-  string in = 5;
+  optional string defaultValue = 4;
+  optional string in = 5;
   bool required = 6;
-  string label = 7;
+  optional string label = 7;
 }
 
 message ProviderModelParameter {
@@ -69,7 +69,7 @@ message ProviderModelParameter {
 // message PromptVariable {
 //   string name = 1;
 //   string type = 2;
-//   string defaultValue = 3;
+//   optional string defaultValue = 3;
 //   string accepts = 4;
 // }
 
@@ -179,4 +179,23 @@ message Knowledge {
   uint32 wordCount = 25;
 
   uint64 embeddingProviderId = 26 [ jstype = JS_STRING ];
+}
+
+enum Source {
+  WEB_PLUGIN = 0;
+  RAPIDA_APP = 1;
+  PYTHON_SDK = 2;
+  NODE_SDK = 3;
+}
+
+enum Owner {
+  RAPIDA = 0;
+  UNKNOWN = 1;
+  CLIENT = 2;
+}
+
+message ResourceIdentifier {
+  string identifier = 1;
+  Source source = 2;
+  Owner owner = 3;
 }

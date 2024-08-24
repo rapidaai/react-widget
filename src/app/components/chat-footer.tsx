@@ -4,19 +4,10 @@ import { Button, HoverButton, IconButton } from "@/app/app/components/buttons";
 import { UpArrowIcon } from "@/app/icons/up-arrow";
 import { Spinner } from "@/app/app/components/loaders/spinner";
 import { cn } from "@/app/styles/media";
-// import { useCredential, useRapidaStore } from "@/hooks";
 import { FC, HTMLAttributes, useContext, useState } from "react";
 import { Message } from "@/app/clients/protos/common_pb";
 import { toTextContent, toTitleCase } from "@/app/utils";
-import {
-  AssistantConversactionMessage,
-  AssistantMessageStage,
-  CreateAssistantMessageResponse,
-} from "@/app/clients/protos/talk-api_pb";
-import * as grpcWeb from "grpc-web";
-import { GetStageMessage } from "@/app/clients/talk";
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
-import { DotLoader } from "@/app/app/components/loaders/dot-loader";
 /**
  *
  */
@@ -91,7 +82,7 @@ export const ChatFooter: FC<ChatFooterProps> = ({
           }
         }}
         actions={
-          <div className="pks_flex pks_shrink-0 pks_grow-0 pks_items-center pks_rounded-b-lg">
+          <div className="pks_flex pks_shrink-0 pks_grow-0 pks_items-center pks_rounded-b-lg pks_px-0.5">
             <div className="pks_flex-1 pks_flex pks_items-center pks_gap-1 pks_opacity-0">
               <IconButton
                 type="button"

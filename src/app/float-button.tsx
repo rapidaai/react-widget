@@ -28,6 +28,8 @@ export const FloatingChatButton = () => {
    */
   const aftergetassistant = useCallback(
     (err: any | null, gur: GetAssistantResponse | null) => {
+      dir(err);
+      dir(gur);
       setLoadingAssistant(false);
       if (gur?.getSuccess()) {
         log(gur.getData());
@@ -41,8 +43,6 @@ export const FloatingChatButton = () => {
           log(errorMessage.getHumanmessage());
           return;
         }
-        dir(err);
-        dir(gur);
         log("Unable to get your assistants, please try again later.");
       }
     },
