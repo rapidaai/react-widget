@@ -70,7 +70,7 @@ export const SystemChatMessage: FC<{
   stages,
 }) => {
   return (
-    <div className="pks_flex pks_px-2 pks_py-3 pks_mb-3 pks_group hover:pks_bg-gray-100/50 pks_relative dark:hover:pks_bg-gray-950/20">
+    <div className="pks_flex pks_px-2 pks_py-3 pks_group hover:pks_bg-gray-100/50 pks_relative dark:hover:pks_bg-gray-950/20">
       <div className="pks_absolute pks_-top-5 pks_right-2 pks_invisible group-hover:pks_visible">
         <SystemMessageAction />
       </div>
@@ -112,8 +112,8 @@ export const SystemChatMessage: FC<{
 
 export const SystemMessageAction: FC = () => {
   return (
-    <div className="pks_flex pks_w-fit pks_border pks_shadow-md pks_p-1 pks_rounded-lg pks_space-x-1 dark:pks_bg-gray-950/50 dark:pks_border-gray-800">
-      <IconButton className="pks_h-6 pks_w-6 pks_p-0 pks_text-green-600">
+    <div className="pks_flex pks_w-fit pks_border pks_shadow-md pks_p-1 pks_rounded-lg pks_space-x-2 dark:pks_bg-gray-950/50 dark:pks_border-gray-800">
+      <IconButton className="!pks_h-fit !pks_p-1 pks_text-green-600 hover:!pks_bg-green-400/50 dark:hover:!pks_bg-green-800/50">
         <svg
           className="pks_h-4 pks_w-4"
           xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@ export const SystemMessageAction: FC = () => {
           />
         </svg>
       </IconButton>
-      <IconButton className="pks_h-6 pks_w-6 pks_p-0 pks_text-rose-600">
+      <IconButton className="!pks_h-fit !pks_p-1 pks_text-rose-600  hover:!pks_bg-rose-400/50 dark:hover:!pks_bg-rose-800/50">
         <svg
           className="pks_h-4 pks_w-4"
           xmlns="http://www.w3.org/2000/svg"

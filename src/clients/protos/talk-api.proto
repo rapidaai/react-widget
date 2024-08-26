@@ -39,14 +39,14 @@ message CreateAssistantMessageRequest {
   Message message = 3;
   optional uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
 
-  // identifier
-  optional ResourceIdentifier identifier = 5;
-
   // metadata
   map<string, google.protobuf.Any> metadata = 6;
 
   //   source
   Source source = 7;
+
+  // identifier
+  optional ResourceIdentifier identifier = 5;
 }
 
 enum RAGStage {
@@ -96,6 +96,12 @@ message GetAllAssistantConversactionRequest {
   uint64 assistantId = 1 [ jstype = JS_STRING ];
   Paginate paginate = 2;
   repeated Criteria criterias = 3;
+
+  //   source
+  Source source = 7;
+
+  // identifier
+  optional ResourceIdentifier identifier = 8;
 }
 
 message GetAllAssistantConversactionResponse {
@@ -115,6 +121,12 @@ message GetAllConversactionMessageRequest {
   Paginate paginate = 3;
   repeated Criteria criterias = 4;
   Ordering order = 5;
+
+  //   source
+  Source source = 7;
+
+  // identifier
+  optional ResourceIdentifier identifier = 8;
 }
 
 message GetAllConversactionMessageResponse {

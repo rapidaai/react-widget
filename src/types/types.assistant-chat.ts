@@ -62,6 +62,7 @@ type AssistantChatApiCallAction = {
   onGetConversactionMessages: (
     assistantId: string,
     conversactionId: string,
+    userId: string,
     token: string,
     onError: (err: string) => void,
     onSuccess: (e: AssistantConversactionMessage[]) => void

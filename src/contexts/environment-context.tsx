@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 
 interface EnvironmentContextProps {
@@ -41,18 +47,30 @@ export const EnvironmentContext = createContext<EnvironmentContextProps>({
 export const EnvironmentProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
-  const [userId, setUserId] = useState<string>(RandomString());
+  //   const [userId, setUserId] = useState<string>(RandomString());
 
-  useEffect(() => {
+  //   useEffect(() => {
+  //     // Check if the user_id exists in local storage
+  //     let storedUserId = localStorage.getItem("rpd__uuid");
+  //     if (!storedUserId) {
+  //       // Generate a new user_id and store it in local storage
+  //       storedUserId = RandomString(); // Generate a 12-character random string
+  //       localStorage.setItem("rpd__uuid", storedUserId);
+  //     }
+
+  //     setUserId(storedUserId);
+  //   }, []);
+
+  const userId = useCallback((userId?: string): string => {
     // Check if the user_id exists in local storage
+    if (userId) return userId;
     let storedUserId = localStorage.getItem("rpd__uuid");
     if (!storedUserId) {
       // Generate a new user_id and store it in local storage
       storedUserId = RandomString(); // Generate a 12-character random string
       localStorage.setItem("rpd__uuid", storedUserId);
     }
-
-    setUserId(storedUserId);
+    return storedUserId;
   }, []);
 
   const defaultMeta = (meta?: Record<string, string>) => {
@@ -75,7 +93,9 @@ export const EnvironmentProvider: React.FC<{
         user: {
           ...window.chatbotConfig?.user,
           name: window.chatbotConfig?.user?.name || "Guest",
-          user_id: window.chatbotConfig?.user?.user_id || userId,
+          user_id:
+            window.chatbotConfig?.user?.user_id ||
+            userId(window.chatbotConfig?.user?.user_id),
           meta: defaultMeta(window.chatbotConfig?.user?.meta),
         },
       }}

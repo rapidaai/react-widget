@@ -4,6 +4,8 @@ import {
   GetAllConversactionMessageResponse,
   RAGStage,
   CreateAssistantMessageResponse,
+  GetAllAssistantConversactionResponse,
+  GetAllAssistantConversactionRequest,
 } from "@/app/clients/protos/talk-api_pb";
 import * as grpcWeb from "grpc-web";
 import { AssistantServiceClient } from "@/app/clients/protos/Assistant-apiServiceClientPb";
@@ -79,11 +81,18 @@ export function CreateAssistantMessage(
  * @param authHeader
  */
 export function GetAllAssistantConversactionMessage(
-  assistantId: string,
+  assistant: { assistantId: string },
   assistantConversactionId: string,
-  page: number,
-  pageSize: number,
-  criteria: { key: string; value: string }[],
+  query: {
+    page: number;
+    pageSize: number;
+    criteria: { key: string; value: string }[];
+  },
+  identifier: {
+    identifier: string;
+    source: Source;
+    owner: Owner;
+  },
   authHeader: {
     "x-api-key": string;
   },
@@ -93,18 +102,27 @@ export function GetAllAssistantConversactionMessage(
   ) => void
 ) {
   const req = new GetAllConversactionMessageRequest();
-  req.setAssistantid(assistantId);
+  req.setAssistantid(assistant.assistantId);
   req.setAssistantconversactionid(assistantConversactionId);
   const paginate = new Paginate();
-  criteria.forEach((x) => {
+  query.criteria.forEach((x) => {
     let ctr = new Criteria();
     ctr.setKey(x.key);
     ctr.setValue(x.value);
     req.addCriterias(ctr);
   });
-  paginate.setPage(page);
-  paginate.setPagesize(pageSize);
+  paginate.setPage(query.page);
+  paginate.setPagesize(query.pageSize);
   req.setPaginate(paginate);
+
+  //
+  let _ri = new ResourceIdentifier();
+  _ri.setSource(identifier.source);
+  _ri.setIdentifier(identifier.identifier);
+  _ri.setOwner(identifier.owner);
+
+  req.setSource(identifier.source);
+  req.setIdentifier(_ri);
   conversactionClient.getAllConversactionMessage(req, authHeader, cb);
 }
 
@@ -132,4 +150,58 @@ export function GetStageMessage(stage: RAGStage) {
     default:
       return "Unknown stage. Please wait...";
   }
+}
+
+/**
+ *
+ * @param assistantId
+ * @param page
+ * @param pageSize
+ * @param criteria
+ * @param cb
+ * @param authHeader
+ */
+export function GetAllAssistantConversaction(
+  assistantId: string,
+  query: {
+    page: number;
+    pageSize: number;
+    criteria: { key: string; value: string }[];
+  },
+  identifier: {
+    identifier: string;
+    source: Source;
+    owner: Owner;
+  },
+  authHeader: {
+    "x-api-key": string;
+  },
+  cb: (
+    err: grpcWeb.RpcError | null,
+    uvcr: GetAllAssistantConversactionResponse | null
+  ) => void
+) {
+  const req = new GetAllAssistantConversactionRequest();
+  req.setAssistantid(assistantId);
+  const paginate = new Paginate();
+  query.criteria.forEach((x) => {
+    let ctr = new Criteria();
+    ctr.setKey(x.key);
+    ctr.setValue(x.value);
+    req.addCriterias(ctr);
+  });
+  paginate.setPage(query.page);
+  paginate.setPagesize(query.pageSize);
+  req.setPaginate(paginate);
+
+  //
+  let _ri = new ResourceIdentifier();
+  _ri.setSource(identifier.source);
+  _ri.setIdentifier(identifier.identifier);
+  _ri.setOwner(identifier.owner);
+
+  req.setSource(identifier.source);
+  req.setIdentifier(_ri);
+
+  conversactionClient.getAllAssistantConversaction(req, authHeader, cb);
 }

@@ -78,6 +78,7 @@ const initialChatApiCallState = {
   onGetConversactionMessages: function (
     assistantId: string,
     conversactionId: string,
+    userId: string,
     token: string,
     onError: (err: string) => void,
     onSuccess: (e: AssistantConversactionMessage[]) => void
@@ -135,6 +136,7 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
   onGetConversactionMessages: (
     assistantId: string,
     conversactionId: string,
+    userId: string,
     token: string,
     onError: (err: string) => void,
     onSuccess: (e: AssistantConversactionMessage[]) => void
@@ -162,11 +164,18 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
     };
 
     GetAllAssistantConversactionMessage(
-      assistantId,
+      { assistantId: assistantId },
       conversactionId,
-      get().page,
-      get().pageSize,
-      get().criteria,
+      {
+        page: get().page,
+        pageSize: get().pageSize,
+        criteria: get().criteria,
+      },
+      {
+        identifier: userId,
+        source: Source.WEB_PLUGIN,
+        owner: Owner.CLIENT,
+      },
       {
         "x-api-key": token,
       },
