@@ -29,7 +29,7 @@ export const FloatingChatButton = () => {
   const aftergetassistant = useCallback(
     (err: any | null, gur: GetAssistantResponse | null) => {
       dir(err);
-      dir(gur);
+      dir(gur?.toObject());
       setLoadingAssistant(false);
       if (gur?.getSuccess()) {
         log(gur.getData());
@@ -94,7 +94,7 @@ export const FloatingChatButton = () => {
           isOpen={isOpen}
           loadingAssistant={loadingAssistant}
           appIcon={ctx.currentAssistant
-            ?.getAppappearance()
+            ?.getWebappearance()
             ?.getFieldsMap()
             ?.get("appIcon")
             ?.getStringValue()}

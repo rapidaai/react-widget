@@ -75,12 +75,12 @@ export const SystemChatMessage: FC<{
         <SystemMessageAction />
       </div>
       <div className="pks_h-9 pks_w-9 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700">
-        {assistant?.getAppappearance()?.getFieldsMap().get("appIcon") ? (
+        {assistant?.getWebappearance()?.getFieldsMap().get("appIcon") ? (
           <img
             className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
             alt="Assistant Icon"
             src={assistant
-              ?.getAppappearance()
+              ?.getWebappearance()
               ?.getFieldsMap()
               .get("appIcon")
               ?.getStringValue()}
@@ -92,9 +92,9 @@ export const SystemChatMessage: FC<{
       <div className="pks_ml-2 pks_min-w-0">
         <div className="pks_-mt-1.5">
           <span className="pks_font-semibold dark:pks_text-white pks_capitalize pks_text-[14px]">
-            {assistant?.getAppappearance()?.getFieldsMap().get("assistantName")
+            {assistant?.getWebappearance()?.getFieldsMap().get("assistantName")
               ? assistant
-                  ?.getAppappearance()
+                  ?.getWebappearance()
                   ?.getFieldsMap()
                   .get("assistantName")
                   ?.getStringValue()

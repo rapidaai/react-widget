@@ -262,13 +262,13 @@ export const ChatterBox: FC<ChatterBoxProps> = ({
           <DotLoader />
           <span className="pks_font-semibold">
             {assistant
-              .getAppappearance()
+              .getWebappearance()
               ?.getFieldsMap()
               .get("assistantName")
               ?.getStringValue()
               ? toTitleCase(
                   assistant
-                    .getAppappearance()
+                    .getWebappearance()
                     ?.getFieldsMap()
                     .get("assistantName")
                     ?.getStringValue()
@@ -360,7 +360,7 @@ const ChatInterface: FC<{
               className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
               alt="Assistant Icon"
               src={assistant
-                ?.getAppappearance()
+                ?.getWebappearance()
                 ?.getFieldsMap()
                 ?.get("appIcon")
                 ?.getStringValue()}
@@ -370,7 +370,7 @@ const ChatInterface: FC<{
             <h1 className="pks_text-xl pks_font-bold">Hello there.</h1>
             <p className="pks_text-lg pks_opacity-70">
               {assistant
-                .getAppappearance()
+                .getWebappearance()
                 ?.getFieldsMap()
                 ?.get("openingStatement")
                 ?.getStringValue()}
@@ -406,7 +406,7 @@ const ChatInterface: FC<{
         )}
 
         {assistant
-          .getAppappearance()
+          .getWebappearance()
           ?.getFieldsMap()
           ?.get("suggestedQuestions")
           ?.getListValue() && (
@@ -415,7 +415,7 @@ const ChatInterface: FC<{
               Quick Suggestions
             </div>
             {assistant
-              .getAppappearance()
+              .getWebappearance()
               ?.getFieldsMap()
               ?.get("suggestedQuestions")
               ?.getListValue()

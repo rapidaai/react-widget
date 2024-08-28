@@ -1,3 +1,4 @@
+import { assistantApiUrl } from "@/app/configs/constant";
 import React, {
   createContext,
   useCallback,
@@ -82,9 +83,7 @@ export const EnvironmentProvider: React.FC<{
     <EnvironmentContext.Provider
       value={{
         assistantId: window.chatbotConfig?.assistant_id,
-        apiBase: window.chatbotConfig?.api_base
-          ? window.chatbotConfig?.api_base
-          : "https://assistant.rapida.ai",
+        apiBase: assistantApiUrl,
         assistantVersion: window.chatbotConfig?.assistant_version
           ? window.chatbotConfig?.assistant_version
           : null,
