@@ -1,6 +1,8 @@
 syntax = "proto3";
 package talk_api;
 option go_package = "github.com/lexatic/web-backend/protos/lexatic-backend";
+option java_package = "ai.rapida.sdk.artifacts";
+
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";
 import "common.proto";
@@ -9,9 +11,9 @@ import "common.proto";
 //
 //
 
-message AssistantConversactionMessage {
+message AssistantConversationMessage {
   uint64 id = 1 [ jstype = JS_STRING ];
-  uint64 assistantConversactionId = 2 [ jstype = JS_STRING ];
+  uint64 assistantConversationId = 2 [ jstype = JS_STRING ];
   string requestRole = 4;
   Message request = 5;
   string responseRole = 6;
@@ -29,15 +31,21 @@ message AssistantConversactionMessage {
   google.protobuf.Timestamp updatedDate = 27;
 }
 
-message CreateAssistantMessageRequest {
+message AssistantDefinition {
+  uint64 assistantId = 1 [ jstype = JS_STRING ];
+  string version = 2;
+}
+
+message AssistantMessagingRequest {
 
   // assistant parameter
-  uint64 assistantId = 1 [ jstype = JS_STRING ];
-  uint64 assistantProviderModelId = 2 [ jstype = JS_STRING ];
+  //   uint64 assistantId = 1 [ jstype = JS_STRING ];
+  //   uint64 assistantProviderModelId = 2 [ jstype = JS_STRING ];
+  AssistantDefinition assistant = 2;
 
   //   actual message
   Message message = 3;
-  optional uint64 assistantConversactionId = 4 [ jstype = JS_STRING ];
+  optional uint64 assistantConversationId = 4 [ jstype = JS_STRING ];
 
   // metadata
   map<string, google.protobuf.Any> metadata = 6;
@@ -47,6 +55,9 @@ message CreateAssistantMessageRequest {
 
   // identifier
   optional ResourceIdentifier identifier = 5;
+
+  map<string, google.protobuf.Any> args = 10;
+  map<string, google.protobuf.Any> options = 11;
 }
 
 enum RAGStage {
@@ -64,14 +75,14 @@ message AssistantMessageStage {
   map<string, string> additionalData = 2;
   uint64 timetaken = 3;
 }
-message CreateAssistantMessageResponse {
+message AssistantMessagingResponse {
   int32 code = 1;
   bool success = 2;
-  AssistantConversactionMessage data = 3;
+  AssistantConversationMessage data = 3;
   Error error = 4;
 }
 
-message AssistantConversaction {
+message AssistantConversation {
   uint64 id = 1 [ jstype = JS_STRING ];
   uint64 userId = 2 [ jstype = JS_STRING ];
   uint64 assistantId = 3 [ jstype = JS_STRING ];
@@ -83,7 +94,7 @@ message AssistantConversaction {
   uint64 updatedBy = 9 [ jstype = JS_STRING ];
   User user = 10;
   uint64 assistantProviderModelId = 12 [ jstype = JS_STRING ];
-  repeated AssistantConversactionMessage assistantConversactionMessage = 13;
+  repeated AssistantConversationMessage assistantConversationMessage = 13;
 
   google.protobuf.Timestamp createdDate = 26;
   google.protobuf.Timestamp updatedDate = 27;
@@ -92,7 +103,7 @@ message AssistantConversaction {
 //
 //
 //
-message GetAllAssistantConversactionRequest {
+message GetAllAssistantConversationRequest {
   uint64 assistantId = 1 [ jstype = JS_STRING ];
   Paginate paginate = 2;
   repeated Criteria criterias = 3;
@@ -104,10 +115,10 @@ message GetAllAssistantConversactionRequest {
   optional ResourceIdentifier identifier = 8;
 }
 
-message GetAllAssistantConversactionResponse {
+message GetAllAssistantConversationResponse {
   int32 code = 1;
   bool success = 2;
-  repeated AssistantConversaction data = 3;
+  repeated AssistantConversation data = 3;
   Error error = 4;
   Paginated paginated = 5;
 }
@@ -115,9 +126,9 @@ message GetAllAssistantConversactionResponse {
 //
 //
 //
-message GetAllConversactionMessageRequest {
+message GetAllConversationMessageRequest {
   uint64 assistantId = 1 [ jstype = JS_STRING ];
-  uint64 assistantConversactionId = 2 [ jstype = JS_STRING ];
+  uint64 assistantConversationId = 2 [ jstype = JS_STRING ];
   Paginate paginate = 3;
   repeated Criteria criterias = 4;
   Ordering order = 5;
@@ -129,10 +140,10 @@ message GetAllConversactionMessageRequest {
   optional ResourceIdentifier identifier = 8;
 }
 
-message GetAllConversactionMessageResponse {
+message GetAllConversationMessageResponse {
   int32 code = 1;
   bool success = 2;
-  repeated AssistantConversactionMessage data = 3;
+  repeated AssistantConversationMessage data = 3;
   Error error = 4;
   Paginated paginated = 5;
 }
@@ -142,10 +153,14 @@ message GetAllConversactionMessageResponse {
 //
 
 service TalkService {
-  rpc CreateAssistantMessage(CreateAssistantMessageRequest)
-      returns (stream CreateAssistantMessageResponse);
-  rpc GetAllAssistantConversaction(GetAllAssistantConversactionRequest)
-      returns (GetAllAssistantConversactionResponse);
-  rpc GetAllConversactionMessage(GetAllConversactionMessageRequest)
-      returns (GetAllConversactionMessageResponse);
+  rpc AssistantMessaging(AssistantMessagingRequest)
+      returns (stream AssistantMessagingResponse);
+
+  rpc AssistantTalk(stream AssistantMessagingRequest)
+      returns (stream AssistantMessagingResponse);
+
+  rpc GetAllAssistantConversation(GetAllAssistantConversationRequest)
+      returns (GetAllAssistantConversationResponse);
+  rpc GetAllConversationMessage(GetAllConversationMessageRequest)
+      returns (GetAllConversationMessageResponse);
 }

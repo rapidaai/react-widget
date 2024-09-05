@@ -44,15 +44,16 @@ message Assistant {
 
 message AssistantProviderModel {
   uint64 id = 1 [ jstype = JS_STRING ];
-  string instruction = 2;
+  AgentPromptTemplate template = 2;
+  //   string instruction = 2;
 
   string description = 3;
   uint64 providerId = 4 [ jstype = JS_STRING ];
-
+  string modelModeType = 5;
   uint64 providerModelId = 8 [ jstype = JS_STRING ];
   ProviderModel providerModel = 9;
   repeated ProviderModelParameter assistantProviderModelParameters = 10;
-  repeated Variable assistantProviderModelVariables = 11;
+  //   repeated Variable assistantProviderModelVariables = 11;
 
   //
   string status = 12;
@@ -78,12 +79,15 @@ message AssistantKnowledgeConfiguration {
 
 message AssistantProviderModelAttribute {
   string description = 2;
-  string instruction = 3;
+  AgentPromptTemplate template = 3;
+  //   string instruction = 3;
   uint64 providerId = 4 [ jstype = JS_STRING ];
   uint64 providerModelId = 5 [ jstype = JS_STRING ];
   ProviderModel providerModel = 6;
   repeated ProviderModelParameter assistantProviderModelParameters = 7;
-  repeated Variable assistantProviderModelVariables = 8;
+
+  string modelModeType = 8;
+  //   repeated Variable assistantProviderModelVariables = 8;
 }
 
 message AssistantAttribute {
@@ -93,10 +97,10 @@ message AssistantAttribute {
   string description = 4;
   string visibility = 5;
   string language = 6;
-  //   string openingStatement = 7;
+  //   optional string openingStatement = 7;
   //   repeated string suggestedQuestions = 8;
-  //   Content assistantIcon = 9;
-  //   string assistantName = 10;
+  //   optional Content assistantIcon = 9;
+  //   optional string assistantName = 10;
 }
 
 message AssistantKnowledgeConfigurationAttribute {
@@ -149,7 +153,7 @@ message CreateAssistantTagRequest {
 // get request
 message GetAssistantRequest {
   uint64 id = 1 [ jstype = JS_STRING ];
-  uint64 assistantProviderModelId = 4 [ jstype = JS_STRING ];
+  optional uint64 assistantProviderModelId = 4 [ jstype = JS_STRING ];
 }
 message GetAssistantResponse {
   int32 code = 1;
@@ -219,17 +223,17 @@ message FileUploadConfig { repeated string enabledFileSource = 1; }
 message PersonalizeAssistantRequest {
   uint64 assistantId = 1 [ jstype = JS_STRING ];
   string deploymentType = 8;
-  string openingStatement = 2;
+  optional string openingStatement = 2;
   repeated string suggestedQuestions = 3;
-  string assistantIconUrl = 4;
+  optional string assistantIconUrl = 4;
   //
-  TextToSpeechConfig textToSpeechConfig = 5;
-  SpeechToTextConfig speechToTextConfig = 6;
-  FileUploadConfig fileUploadConfig = 7;
+  optional TextToSpeechConfig textToSpeechConfig = 5;
+  optional SpeechToTextConfig speechToTextConfig = 6;
+  optional FileUploadConfig fileUploadConfig = 7;
   //
 
-  Content assistantIcon = 9;
-  string assistantName = 10;
+  optional Content assistantIcon = 9;
+  optional string assistantName = 10;
 }
 service AssistantService {
   rpc GetAssistant(GetAssistantRequest) returns (GetAssistantResponse);

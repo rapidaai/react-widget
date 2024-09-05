@@ -1,12 +1,12 @@
 import {
   CreateAssistantMessage,
-  GetAllAssistantConversactionMessage,
+  GetAllAssistantConversationMessage,
 } from "@/app/clients/talk";
 import { create } from "zustand";
 import {
-  AssistantConversactionMessage,
-  CreateAssistantMessageResponse,
-  GetAllConversactionMessageResponse,
+  AssistantConversationMessage,
+  AssistantMessagingResponse,
+  GetAllConversationMessageResponse,
 } from "@/app/clients/protos/talk-api_pb";
 import { Message, Owner, Source } from "@/app/clients/protos/common_pb";
 
@@ -18,6 +18,7 @@ import { initialPaginated } from "@/app/types/types.paginated";
 import React from "react";
 import * as grpcWeb from "grpc-web";
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
+import { HEADER_API_KEY } from "@/app/configs/constant";
 
 const initialState: AssistantChatProperty = {
   /**
@@ -28,7 +29,7 @@ const initialState: AssistantChatProperty = {
   /**
    *
    */
-  currentAssistantConversactionId: null,
+  currentAssistantConversationId: null,
 
   /**
    *
@@ -49,16 +50,16 @@ const initialChatActionState = {
    * @param message
    * @returns
    */
-  onChangeConversactionMessages: (
-    message: Array<AssistantConversactionMessage>
+  onChangeConversationMessages: (
+    message: Array<AssistantConversationMessage>
   ) => {},
 
   /**
    *
-   * @param assistantConversactionId
+   * @param assistantConversationId
    * @returns
    */
-  onChangeAssistantConversactionId: (assistantConversactionId: string) => {},
+  onChangeAssistantConversationId: (assistantConversationId: string) => {},
 };
 
 const initialChatApiCallState = {
@@ -67,21 +68,21 @@ const initialChatApiCallState = {
       assistantId: string;
       assistantProviderModelId: string;
     },
-    currentAssistantConversactionId: string | null,
+    currentAssistantConversationId: string | null,
     message: Message,
     //
     userId: string,
     token: string
-  ): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> {
+  ): grpcWeb.ClientReadableStream<AssistantMessagingResponse> {
     throw new Error("Function not implemented.");
   },
-  onGetConversactionMessages: function (
+  onGetConversationMessages: function (
     assistantId: string,
     conversactionId: string,
     userId: string,
     token: string,
     onError: (err: string) => void,
-    onSuccess: (e: AssistantConversactionMessage[]) => void
+    onSuccess: (e: AssistantConversationMessage[]) => void
   ): void {
     throw new Error("Function not implemented.");
   },
@@ -106,9 +107,9 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
   ...initialChatActionState,
   ...initialChatApiCallState,
 
-  onChangeAssistantConversactionId: (assistantConversactionId: string) => {
+  onChangeAssistantConversationId: (assistantConversationId: string) => {
     set({
-      currentAssistantConversactionId: assistantConversactionId,
+      currentAssistantConversationId: assistantConversationId,
     });
   },
 
@@ -116,8 +117,8 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
    *
    * @param message
    */
-  onChangeConversactionMessages: (
-    message: Array<AssistantConversactionMessage>
+  onChangeConversationMessages: (
+    message: Array<AssistantConversationMessage>
   ) => {
     set({
       conversactions: message,
@@ -133,17 +134,17 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
    * @param onError
    * @param onSuccess
    */
-  onGetConversactionMessages: (
+  onGetConversationMessages: (
     assistantId: string,
     conversactionId: string,
     userId: string,
     token: string,
     onError: (err: string) => void,
-    onSuccess: (e: AssistantConversactionMessage[]) => void
+    onSuccess: (e: AssistantConversationMessage[]) => void
   ) => {
-    const afterGetAllAssistantConversactionMessage = (
+    const afterGetAllAssistantConversationMessage = (
       err: any | null,
-      epmr: GetAllConversactionMessageResponse | null
+      epmr: GetAllConversationMessageResponse | null
     ) => {
       if (epmr?.getSuccess()) {
         let message = epmr.getDataList();
@@ -163,7 +164,7 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
       }
     };
 
-    GetAllAssistantConversactionMessage(
+    GetAllAssistantConversationMessage(
       { assistantId: assistantId },
       conversactionId,
       {
@@ -177,9 +178,9 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
         owner: Owner.CLIENT,
       },
       {
-        "x-api-key": token,
+        [HEADER_API_KEY]: token,
       },
-      afterGetAllAssistantConversactionMessage
+      afterGetAllAssistantConversationMessage
     );
   },
 
@@ -193,17 +194,17 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
       assistantId: string;
       assistantProviderModelId: string;
     },
-    currentAssistantConversactionId: string | null,
+    currentAssistantConversationId: string | null,
     message: Message,
     //
     userId: string,
     token: string
-  ): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> => {
+  ): grpcWeb.ClientReadableStream<AssistantMessagingResponse> => {
     return CreateAssistantMessage(
       assistant,
       {
         message: message,
-        assistantConversactionId: currentAssistantConversactionId,
+        assistantConversationId: currentAssistantConversationId,
       },
       {
         identifier: userId,
@@ -211,7 +212,7 @@ const useAssistantChat = create<AssistantChatType>((set, get) => ({
         owner: Owner.CLIENT,
       },
       {
-        "x-api-key": token,
+        [HEADER_API_KEY]: token,
       }
     );
   },

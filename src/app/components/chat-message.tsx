@@ -7,7 +7,7 @@ import { IconButton } from "@/app/app/components/buttons";
 import { cn } from "@/app/styles/media";
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 import {
-  AssistantConversactionMessage,
+  AssistantConversationMessage,
   AssistantMessageStage,
 } from "@/app/clients/protos/talk-api_pb";
 import MarkdownRenderer from "@/app/app/components/markdown-renderer";
@@ -57,18 +57,12 @@ export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
  */
 export const SystemChatMessage: FC<{
   assistant: Assistant;
-  assistantConversactionId: string;
-  assistantConversactionMessage: AssistantConversactionMessage;
+  assistantConversationId: string;
+  assistantConversationMessage: AssistantConversationMessage;
   messageContent: Message;
   time?: string;
   stages: Array<AssistantMessageStage>;
-}> = ({
-  assistant,
-  assistantConversactionId,
-  messageContent,
-  time,
-  stages,
-}) => {
+}> = ({ assistant, assistantConversationId, messageContent, time, stages }) => {
   return (
     <div className="pks_flex pks_px-2 pks_py-3 pks_group hover:pks_bg-gray-100/50 pks_relative dark:hover:pks_bg-gray-950/20">
       <div className="pks_absolute pks_-top-5 pks_right-2 pks_invisible group-hover:pks_visible">

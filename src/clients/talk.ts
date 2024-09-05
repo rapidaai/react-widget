@@ -1,14 +1,14 @@
 import {
-  CreateAssistantMessageRequest,
-  GetAllConversactionMessageRequest,
-  GetAllConversactionMessageResponse,
+  AssistantMessagingRequest,
   RAGStage,
-  CreateAssistantMessageResponse,
-  GetAllAssistantConversactionResponse,
-  GetAllAssistantConversactionRequest,
+  AssistantMessagingResponse,
+  AssistantDefinition,
+  GetAllConversationMessageResponse,
+  GetAllConversationMessageRequest,
+  GetAllAssistantConversationResponse,
+  GetAllAssistantConversationRequest,
 } from "@/app/clients/protos/talk-api_pb";
 import * as grpcWeb from "grpc-web";
-import { AssistantServiceClient } from "@/app/clients/protos/Assistant-apiServiceClientPb";
 import { TalkServiceClient } from "@/app/clients/protos/Talk-apiServiceClientPb";
 import {
   Criteria,
@@ -18,9 +18,15 @@ import {
   ResourceIdentifier,
   Owner,
 } from "@/app/clients/protos/common_pb";
-import { assistantApiUrl } from "@/app/configs/constant";
+import {
+  assistantApiUrl,
+  HEADER_API_KEY,
+  HEADER_SOURCE_KEY,
+  HEADER_ENVIRONMENT_KEY,
+  HEADER_REGION_KEY,
+} from "@/app/configs/constant";
 
-const conversactionClient = new TalkServiceClient(assistantApiUrl);
+const ConversationClient = new TalkServiceClient(assistantApiUrl);
 
 /**
  *
@@ -35,9 +41,9 @@ export function CreateAssistantMessage(
     assistantId: string;
     assistantProviderModelId: string;
   },
-  conversaction: {
+  Conversation: {
     message: Message;
-    assistantConversactionId?: string | null;
+    assistantConversationId?: string | null;
   },
 
   identifier: {
@@ -47,16 +53,19 @@ export function CreateAssistantMessage(
   },
   //
   authHeader: {
-    "x-api-key": string;
+    [HEADER_API_KEY]: string;
   }
-): grpcWeb.ClientReadableStream<CreateAssistantMessageResponse> {
-  const req = new CreateAssistantMessageRequest();
-  req.setAssistantid(assistant.assistantId);
-  if (conversaction.assistantConversactionId) {
-    req.setAssistantconversactionid(conversaction.assistantConversactionId);
+): grpcWeb.ClientReadableStream<AssistantMessagingResponse> {
+  const req = new AssistantMessagingRequest();
+  const _assistant = new AssistantDefinition();
+  _assistant.setAssistantid(assistant.assistantId);
+  _assistant.setVersion(assistant.assistantProviderModelId);
+
+  req.setAssistant(_assistant);
+  if (Conversation.assistantConversationId) {
+    req.setAssistantconversationid(Conversation.assistantConversationId);
   }
-  req.setMessage(conversaction.message);
-  req.setAssistantprovidermodelid(assistant.assistantProviderModelId);
+  req.setMessage(Conversation.message);
   req.setSource(identifier.source);
 
   let _ri = new ResourceIdentifier();
@@ -66,23 +75,27 @@ export function CreateAssistantMessage(
 
   req.setSource(identifier.source);
   req.setIdentifier(_ri);
-  const metadata = { ...authHeader };
-  return conversactionClient.createAssistantMessage(req, metadata);
+  return ConversationClient.assistantMessaging(req, {
+    ...authHeader,
+    [HEADER_SOURCE_KEY]: Source.WEB_PLUGIN.toString(),
+    [HEADER_ENVIRONMENT_KEY]: "production",
+    [HEADER_REGION_KEY]: "all",
+  });
 }
 
 /**
  *
  * @param assistantId
- * @param assistantConversactionId
+ * @param assistantConversationId
  * @param page
  * @param pageSize
  * @param criteria
  * @param cb
  * @param authHeader
  */
-export function GetAllAssistantConversactionMessage(
+export function GetAllAssistantConversationMessage(
   assistant: { assistantId: string },
-  assistantConversactionId: string,
+  assistantConversationId: string,
   query: {
     page: number;
     pageSize: number;
@@ -94,16 +107,16 @@ export function GetAllAssistantConversactionMessage(
     owner: Owner;
   },
   authHeader: {
-    "x-api-key": string;
+    [HEADER_API_KEY]: string;
   },
   cb: (
     err: grpcWeb.RpcError | null,
-    uvcr: GetAllConversactionMessageResponse | null
+    uvcr: GetAllConversationMessageResponse | null
   ) => void
 ) {
-  const req = new GetAllConversactionMessageRequest();
+  const req = new GetAllConversationMessageRequest();
   req.setAssistantid(assistant.assistantId);
-  req.setAssistantconversactionid(assistantConversactionId);
+  req.setAssistantconversationid(assistantConversationId);
   const paginate = new Paginate();
   query.criteria.forEach((x) => {
     let ctr = new Criteria();
@@ -123,7 +136,16 @@ export function GetAllAssistantConversactionMessage(
 
   req.setSource(identifier.source);
   req.setIdentifier(_ri);
-  conversactionClient.getAllConversactionMessage(req, authHeader, cb);
+  ConversationClient.getAllConversationMessage(
+    req,
+    {
+      ...authHeader,
+      [HEADER_SOURCE_KEY]: Source.WEB_PLUGIN.toString(),
+      [HEADER_ENVIRONMENT_KEY]: "production",
+      [HEADER_REGION_KEY]: "all",
+    },
+    cb
+  );
 }
 
 /**
@@ -161,7 +183,7 @@ export function GetStageMessage(stage: RAGStage) {
  * @param cb
  * @param authHeader
  */
-export function GetAllAssistantConversaction(
+export function GetAllAssistantConversation(
   assistantId: string,
   query: {
     page: number;
@@ -174,14 +196,14 @@ export function GetAllAssistantConversaction(
     owner: Owner;
   },
   authHeader: {
-    "x-api-key": string;
+    [HEADER_API_KEY]: string;
   },
   cb: (
     err: grpcWeb.RpcError | null,
-    uvcr: GetAllAssistantConversactionResponse | null
+    uvcr: GetAllAssistantConversationResponse | null
   ) => void
 ) {
-  const req = new GetAllAssistantConversactionRequest();
+  const req = new GetAllAssistantConversationRequest();
   req.setAssistantid(assistantId);
   const paginate = new Paginate();
   query.criteria.forEach((x) => {
@@ -203,5 +225,14 @@ export function GetAllAssistantConversaction(
   req.setSource(identifier.source);
   req.setIdentifier(_ri);
 
-  conversactionClient.getAllAssistantConversaction(req, authHeader, cb);
+  ConversationClient.getAllAssistantConversation(
+    req,
+    {
+      ...authHeader,
+      [HEADER_SOURCE_KEY]: Source.WEB_PLUGIN.toString(),
+      [HEADER_ENVIRONMENT_KEY]: "production",
+      [HEADER_REGION_KEY]: "all",
+    },
+    cb
+  );
 }

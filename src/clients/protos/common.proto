@@ -1,5 +1,7 @@
 syntax = "proto3";
 option go_package = "github.com/lexatic/web-backend/protos/lexatic-backend";
+option java_package = "ai.rapida.sdk.artifacts";
+
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 message Criteria {
@@ -96,7 +98,6 @@ message ProviderModelVariable {
   repeated Metadata metadatas = 9;
 }
 
-message ModelEndpoint { string endpoint = 1; }
 message ProviderModel {
   uint64 id = 1 [ jstype = JS_STRING ];
   string name = 2;
@@ -109,7 +110,7 @@ message ProviderModel {
   repeated ProviderModelVariable parameters = 9;
   repeated Metadata metadatas = 10;
   uint64 providerId = 11 [ jstype = JS_STRING ];
-  repeated ModelEndpoint endpoints = 12;
+  string endpoint = 12;
 }
 
 message Tag {
@@ -186,6 +187,11 @@ enum Source {
   RAPIDA_APP = 1;
   PYTHON_SDK = 2;
   NODE_SDK = 3;
+  GO_SDK = 4;
+  TYPESCRIPT_SDK = 5;
+  JAVA_SDK = 6;
+  PHP_SDK = 7;
+  RUST_SDK = 8;
 }
 
 enum Owner {
@@ -198,4 +204,42 @@ message ResourceIdentifier {
   string identifier = 1;
   Source source = 2;
   Owner owner = 3;
+}
+
+message AgentPromptTemplate {
+  string type = 1;
+  string prompt = 2;
+  repeated Variable promptVariables = 3;
+}
+// Define message for TextPrompt
+message TextPrompt {
+  string role = 1;
+  string content = 2;
+}
+
+message FilePrompt {
+  string name = 1;
+  string accepts = 2;
+}
+
+// Define message for TextChatCompletePrompt
+message TextChatCompletePrompt {
+  repeated TextPrompt prompt = 1;
+  repeated Variable promptVariables = 2;
+}
+message TextCompletePrompt {
+  TextPrompt prompt = 1;
+  repeated Variable promptVariables = 2;
+}
+message TextToImagePrompt {
+  TextPrompt prompt = 1;
+  repeated Variable promptVariables = 2;
+}
+message TextToSpeechPrompt {
+  TextPrompt prompt = 1;
+  repeated Variable promptVariables = 2;
+}
+message SpeechToTextPrompt {
+  FilePrompt prompt = 1;
+  repeated Variable promptVariables = 2;
 }

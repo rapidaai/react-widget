@@ -1,6 +1,6 @@
 import {
-  AssistantConversactionMessage,
-  CreateAssistantMessageResponse,
+  AssistantConversationMessage,
+  AssistantMessagingResponse,
 } from "@/app/clients/protos/talk-api_pb";
 import { PaginatedType } from "@/app/types/types.paginated";
 import { Message } from "@/app/clients/protos/common_pb";
@@ -19,12 +19,12 @@ export type AssistantChatProperty = {
   /**
    * assistant conversaction
    */
-  currentAssistantConversactionId: string | null;
+  currentAssistantConversationId: string | null;
 
   /**
    *
    */
-  conversactions: AssistantConversactionMessage[];
+  conversactions: AssistantConversationMessage[];
 };
 
 /**
@@ -41,12 +41,12 @@ type AssistantChatApiCallAction = {
       assistantId: string;
       assistantProviderModelId: string;
     },
-    currentAssistantConversactionId: string | null,
+    currentAssistantConversationId: string | null,
     message: Message,
     //
     userId: string,
     token: string
-  ) => grpcWeb.ClientReadableStream<CreateAssistantMessageResponse>;
+  ) => grpcWeb.ClientReadableStream<AssistantMessagingResponse>;
 
   /**
    *
@@ -59,13 +59,13 @@ type AssistantChatApiCallAction = {
    * @param onSuccess
    * @returns
    */
-  onGetConversactionMessages: (
+  onGetConversationMessages: (
     assistantId: string,
     conversactionId: string,
     userId: string,
     token: string,
     onError: (err: string) => void,
-    onSuccess: (e: AssistantConversactionMessage[]) => void
+    onSuccess: (e: AssistantConversationMessage[]) => void
   ) => void;
 
   /**
@@ -88,16 +88,16 @@ export type AssistantChatType = {
    * @param message
    * @returns
    */
-  onChangeConversactionMessages: (
-    message: Array<AssistantConversactionMessage>
+  onChangeConversationMessages: (
+    message: Array<AssistantConversationMessage>
   ) => void;
 
   /**
    *
-   * @param assistantConversactionId
+   * @param assistantConversationId
    * @returns
    */
-  onChangeAssistantConversactionId: (assistantConversactionId: string) => void;
+  onChangeAssistantConversationId: (assistantConversationId: string) => void;
 } & PaginatedType &
   AssistantChatProperty &
   AssistantChatApiCallAction;

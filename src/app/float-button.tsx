@@ -2,6 +2,7 @@ import { ChatterBox } from "@/app/app/components/chatter-box";
 import { Spinner } from "@/app/app/components/loaders/spinner";
 import { GetAssistant } from "@/app/clients/assistant";
 import { GetAssistantResponse } from "@/app/clients/protos/assistant-api_pb";
+import { HEADER_API_KEY } from "@/app/configs/constant";
 import { useAssistantChat } from "@/app/hooks/use-assistant-chat";
 import { useEnvironment } from "@/app/hooks/use-environment";
 import { useDebugger, useLogger } from "@/app/hooks/use-logger";
@@ -72,7 +73,7 @@ export const FloatingChatButton = () => {
     }
     // x-api-key
     GetAssistant(assistantId, assistantProviderModelId, aftergetassistant, {
-      "x-api-key": token,
+      [HEADER_API_KEY]: token,
     });
   }, [assistantId]);
 

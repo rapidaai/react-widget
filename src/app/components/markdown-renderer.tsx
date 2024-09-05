@@ -1,6 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Markdown from "markdown-to-jsx"; // Importing Markdown-to-JSX library
 import { cn } from "@/app/styles/media"; // Importing utility function for conditional class names
+import { angular } from "@codemirror/lang-angular";
+import { cpp } from "@codemirror/lang-cpp";
+import { css } from "@codemirror/lang-css";
+import { go } from "@codemirror/lang-go";
+import { html } from "@codemirror/lang-html";
+import { java } from "@codemirror/lang-java";
+import { javascript } from "@codemirror/lang-javascript";
+import { json } from "@codemirror/lang-json";
+import { less } from "@codemirror/lang-less";
+import { liquid } from "@codemirror/lang-liquid";
+import { markdown } from "@codemirror/lang-markdown";
+import { php } from "@codemirror/lang-php";
+import { python } from "@codemirror/lang-python";
+import { rust } from "@codemirror/lang-rust";
+import { sass } from "@codemirror/lang-sass";
+import { sql } from "@codemirror/lang-sql";
+import { vue } from "@codemirror/lang-vue";
+import { wast } from "@codemirror/lang-wast";
+import { xml } from "@codemirror/lang-xml";
+import { yaml } from "@codemirror/lang-yaml";
+import { Extension } from "@uiw/react-codemirror";
+import { CodeHighlighting } from "@/app/app/components/code-highlighting";
 
 // Define the props interface for the MarkdownRenderer component
 interface MarkdownRendererProps {
@@ -113,6 +135,87 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ children }) => {
         {children}
       </Markdown>
     </div>
+  );
+};
+
+const CodeBlock = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children: string;
+}) => {
+  const [languageExtension, setLanguageExtension] = useState<Extension[]>([]);
+
+  useEffect(() => {
+    let le;
+    if (className?.toLowerCase().includes("lang-angular")) {
+      le = angular();
+    } else if (className?.toLowerCase().includes("lang-cpp")) {
+      le = cpp();
+    } else if (className?.toLowerCase().includes("lang-css")) {
+      le = css();
+    } else if (className?.toLowerCase().includes("lang-go")) {
+      le = go();
+    } else if (className?.toLowerCase().includes("lang-html")) {
+      le = html();
+    } else if (className?.toLowerCase().includes("lang-java")) {
+      le = java();
+    } else if (className?.toLowerCase().includes("lang-javascript")) {
+      le = javascript();
+    } else if (className?.toLowerCase().includes("lang-json")) {
+      le = json();
+    } else if (className?.toLowerCase().includes("lang-less")) {
+      le = less();
+    } else if (className?.toLowerCase().includes("lang-liquid")) {
+      le = liquid();
+    } else if (className?.toLowerCase().includes("lang-markdown")) {
+      le = markdown();
+    } else if (className?.toLowerCase().includes("lang-php")) {
+      le = php();
+    } else if (className?.toLowerCase().includes("lang-python")) {
+      le = python();
+    } else if (className?.toLowerCase().includes("lang-rust")) {
+      le = rust();
+    } else if (className?.toLowerCase().includes("lang-sass")) {
+      le = sass();
+    } else if (className?.toLowerCase().includes("lang-sql")) {
+      le = sql();
+    } else if (className?.toLowerCase().includes("lang-vue")) {
+      le = vue();
+    } else if (className?.toLowerCase().includes("lang-wast")) {
+      le = wast();
+    } else if (className?.toLowerCase().includes("lang-xml")) {
+      le = xml();
+    } else if (className?.toLowerCase().includes("lang-yaml")) {
+      le = yaml();
+    } else {
+      le = undefined;
+    }
+
+    if (le) setLanguageExtension([le]);
+  }, [children, className]);
+
+  if (languageExtension.length > 0)
+    return (
+      <CodeHighlighting
+        className={cn("my-3", className)}
+        code={children}
+        lineNumbers={false}
+        foldGutter={false}
+        extensions={languageExtension}
+      />
+    );
+
+  return (
+    <span
+      className={cn(
+        className,
+        "pks_font-mono pks_text-sm pks_text-red-600 pks_underline"
+      )}
+    >
+      {children}
+    </span>
   );
 };
 
