@@ -1,30 +1,21 @@
+import { AssistantMessagingResponse } from "@/app/clients/protos/talk-api_pb";
+import { ColumnarType } from "./types.columnar";
+import { PaginatedType } from "./types.paginated";
 import {
   AssistantConversationMessage,
-  AssistantMessagingResponse,
-} from "@/app/clients/protos/talk-api_pb";
-import { PaginatedType } from "@/app/types/types.paginated";
-import { Message } from "@/app/clients/protos/common_pb";
-import * as grpcWeb from "grpc-web";
-import { Assistant } from "@/app/clients/protos/assistant-api_pb";
+  Message,
+} from "@/app/clients/protos/common_pb";
+import { ResponseStream } from "@/app/clients/protos/endpoint-api_pb_service";
+import { ClientAuthInfo, UserAuthInfo } from "@/app/clients";
 
 /**
  *
  */
 export type AssistantChatProperty = {
   /**
-   * current assistant
-   */
-  currentAssistant: Assistant | null;
-
-  /**
-   * assistant conversaction
-   */
-  currentAssistantConversationId: string | null;
-
-  /**
    *
    */
-  conversactions: AssistantConversationMessage[];
+  conversations: AssistantConversationMessage[];
 };
 
 /**
@@ -37,21 +28,19 @@ type AssistantChatApiCallAction = {
    * @returns
    */
   onSend: (
-    assistant: {
+    assistantDefinition: {
       assistantId: string;
       assistantProviderModelId: string;
     },
     currentAssistantConversationId: string | null,
     message: Message,
-    //
-    userId: string,
-    token: string
-  ) => grpcWeb.ClientReadableStream<AssistantMessagingResponse>;
+    auth: UserAuthInfo | ClientAuthInfo
+  ) => ResponseStream<AssistantMessagingResponse>;
 
   /**
    *
    * @param assistantId
-   * @param conversactionId
+   * @param conversationId
    * @param projectId
    * @param token
    * @param userId
@@ -61,9 +50,11 @@ type AssistantChatApiCallAction = {
    */
   onGetConversationMessages: (
     assistantId: string,
-    conversactionId: string,
-    userId: string,
-    token: string,
+    conversationId: string,
+    auth: UserAuthInfo | ClientAuthInfo,
+    // projectId: string,
+    // token: string,
+    // userId: string,
     onError: (err: string) => void,
     onSuccess: (e: AssistantConversationMessage[]) => void
   ) => void;
@@ -78,26 +69,13 @@ type AssistantChatApiCallAction = {
 export type AssistantChatType = {
   /**
    *
-   * @param assistant
-   * @returns
-   */
-  onChangeCurrentAssistant: (assistant: Assistant) => void;
-
-  /**
-   *
    * @param message
    * @returns
    */
   onChangeConversationMessages: (
     message: Array<AssistantConversationMessage>
   ) => void;
-
-  /**
-   *
-   * @param assistantConversationId
-   * @returns
-   */
-  onChangeAssistantConversationId: (assistantConversationId: string) => void;
 } & PaginatedType &
+  ColumnarType &
   AssistantChatProperty &
   AssistantChatApiCallAction;

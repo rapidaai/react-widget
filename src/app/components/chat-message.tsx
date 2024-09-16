@@ -1,17 +1,17 @@
-import { Message } from "@/app/clients/protos/common_pb";
-import { FC, useContext, useState } from "react";
-import { toContentText } from "@/app/utils";
-import { CopyIcon } from "@/app/icons/copy";
-import { RapidaIcon } from "@/app/icons/rapida";
-import { IconButton } from "@/app/app/components/buttons";
-import { cn } from "@/app/styles/media";
-import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 import {
   AssistantConversationMessage,
   AssistantMessageStage,
-} from "@/app/clients/protos/talk-api_pb";
-import MarkdownRenderer from "@/app/app/components/markdown-renderer";
-import { useEnvironment } from "@/app/hooks/use-environment";
+  Message,
+} from "@/app/clients/protos/common_pb";
+import { FC, useContext, useState } from "react";
+import { toContentText } from "@/utils";
+import { CopyIcon } from "@/icons/copy";
+import { RapidaIcon } from "@/icons/rapida";
+import { IconButton } from "@/app/components/buttons";
+import { cn } from "@/styles/media";
+import { Assistant } from "@/app/clients/protos/assistant-api_pb";
+import MarkdownRenderer from "@/app/components/markdown-renderer";
+import { useEnvironment } from "@/hooks/use-environment";
 
 /**
  *
@@ -28,23 +28,27 @@ export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
   const { user } = useEnvironment();
   //
   return (
-    <div className="pks_flex pks_px-2 pks_py-3 hover:pks_bg-gray-100/50 dark:hover:pks_bg-gray-950/20 pks_w-full">
-      <div className="pks_h-9 pks_w-9 pks_rounded-full pks_flex-shrink-0 pks_bg-zinc-200/80 dark:pks_bg-zinc-800/80 pks_border-[0.5px] pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700">
+    <div
+      className={cn("pks_flex pks_px-2 pks_py-3 pks_w-full pks_justify-start")}
+    >
+      {/* <div className="pks_h-9 pks_w-9 pks_rounded-full pks_flex-shrink-0 pks_bg-zinc-200/80 dark:pks_bg-zinc-800/80 pks_border-[0.5px] pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700">
         <span className="pks_font-bold pks_text-lg pks_opacity-80">
           {user.name.charAt(0)}
         </span>
-      </div>
+      </div> */}
       <div className="pks_ml-2 pks_min-w-0">
-        <div className="pks_-mt-2">
-          <span className="pks_font-semibold dark:pks_text-white pks_text-[14px]">
+        {/* <div className="pks_-mt-2">
+          <span className="pks_font-semibold dark:pks_text-white pks_text-lg">
             {user.name}
           </span>
-          <span className="pks_ml-1 pks_text-xs pks_text-gray-500">{time}</span>
-        </div>
+          <span className="pks_ml-1 pks_text-sm pks_text-gray-500">{time}</span>
+        </div> */}
 
-        <MarkdownRenderer>
-          {toContentText(message.getContentsList().at(0))}
-        </MarkdownRenderer>
+        <div className="pks_border pks_opacity-80 pks_mr-2 pks_py-3 pks_px-4 pks_bg-gray-50 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-tr-xl ">
+          <MarkdownRenderer>
+            {toContentText(message.getContentsList().at(0))}
+          </MarkdownRenderer>
+        </div>
       </div>
     </div>
   );
@@ -64,11 +68,8 @@ export const SystemChatMessage: FC<{
   stages: Array<AssistantMessageStage>;
 }> = ({ assistant, assistantConversationId, messageContent, time, stages }) => {
   return (
-    <div className="pks_flex pks_px-2 pks_py-3 pks_group hover:pks_bg-gray-100/50 pks_relative dark:hover:pks_bg-gray-950/20">
-      <div className="pks_absolute pks_-top-5 pks_right-2 pks_invisible group-hover:pks_visible">
-        <SystemMessageAction />
-      </div>
-      <div className="pks_h-9 pks_w-9 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700">
+    <div className="pks_flex pks_px-2 pks_group dark:hover:pks_bg-gray-950/20 pks_justify-end pks_items-start">
+      <div className="pks_h-9 pks_w-9 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700 pks_order-2">
         {assistant?.getWebappearance()?.getFieldsMap().get("appIcon") ? (
           <img
             className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
@@ -83,9 +84,9 @@ export const SystemChatMessage: FC<{
           <RapidaIcon className="pks_h-8 pks_w-8 pks_text-blue-600 pks_rounded-full" />
         )}
       </div>
-      <div className="pks_ml-2 pks_min-w-0">
-        <div className="pks_-mt-1.5">
-          <span className="pks_font-semibold dark:pks_text-white pks_capitalize pks_text-[14px]">
+      <div className="pks_ml-2 pks_min-w-0 pks_order-1">
+        {/* <div className="pks_-mt-1.5">
+          <span className="pks_font-semibold dark:pks_text-white pks_capitalize pks_text-lg">
             {assistant?.getWebappearance()?.getFieldsMap().get("assistantName")
               ? assistant
                   ?.getWebappearance()
@@ -95,10 +96,15 @@ export const SystemChatMessage: FC<{
               : "Rapida"}
           </span>
           <span className="pks_ml-1 pks_text-xs pks_text-gray-500">{time}</span>
+        </div> */}
+        <div className="pks_relative pks_border pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-bl-xl ">
+          <div className="pks_absolute pks_-top-5 pks_right-2 pks_invisible group-hover:pks_visible">
+            <SystemMessageAction />
+          </div>
+          <MarkdownRenderer>
+            {toContentText(messageContent.getContentsList().at(0))}
+          </MarkdownRenderer>
         </div>
-        <MarkdownRenderer>
-          {toContentText(messageContent.getContentsList().at(0))}
-        </MarkdownRenderer>
       </div>
     </div>
   );
@@ -106,10 +112,10 @@ export const SystemChatMessage: FC<{
 
 export const SystemMessageAction: FC = () => {
   return (
-    <div className="pks_flex pks_w-fit pks_border pks_shadow-md pks_p-1 pks_rounded-lg pks_space-x-2 dark:pks_bg-gray-950/50 dark:pks_border-gray-800">
+    <div className="pks_flex pks_w-fit pks_border pks_shadow-md pks_p-0.5 pks_rounded-lg pks_space-x-1 dark:pks_bg-gray-950/50 dark:pks_border-gray-800 pks_bg-white pks_backdrop-blur">
       <IconButton className="!pks_h-fit !pks_p-1 pks_text-green-600 hover:!pks_bg-green-400/50 dark:hover:!pks_bg-green-800/50">
         <svg
-          className="pks_h-4 pks_w-4"
+          className="pks_h-3.5 pks_w-3.5"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -125,7 +131,7 @@ export const SystemMessageAction: FC = () => {
       </IconButton>
       <IconButton className="!pks_h-fit !pks_p-1 pks_text-rose-600  hover:!pks_bg-rose-400/50 dark:hover:!pks_bg-rose-800/50">
         <svg
-          className="pks_h-4 pks_w-4"
+          className="pks_h-3.5 pks_w-3.5"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"

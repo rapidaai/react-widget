@@ -15,7 +15,13 @@ module.exports = {
     colors: {
       primary: "#0046D5",
     },
+
     extend: {
+      colors: {
+        "custom-gray": "rgba(31, 31, 31, 0.10)",
+        "custom-pink": "rgba(200, 153, 241, 0.10)",
+        "custom-blue": "rgba(159, 194, 238, 0.10)",
+      },
       backgroundImage: {
         "gradient-1": "linear-gradient(1deg, var(--tw-gradient-stops))",
       },

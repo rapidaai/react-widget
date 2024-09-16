@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { cn } from "@/app/styles/media";
+import { cn } from "@/styles/media";
 
 interface TextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -42,6 +42,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
 interface TextAreaWithActionProps extends TextAreaProps {
   actions?: React.ReactElement;
 }
+
 export const ScalableTextarea = React.forwardRef<
   HTMLTextAreaElement,
   TextAreaWithActionProps
@@ -94,17 +95,16 @@ export const ScalableTextarea = React.forwardRef<
         style={{ height: textareaHeight }} // Dynamically set height
         className={cn(
           "pks_p-2 pks_rounded-lg",
-          "pks_block pks_resize-none pks_w-full pks_min-h-[3rem] pks_max-h-80",
+          "pks_block pks_resize-none pks_w-full min-h-[3rem] pks_max-h-80",
           "dark:pks_placeholder-gray-600 pks_placeholder-gray-400",
           "focus:pks_ring-0 focus:pks_outline-none",
-          "pks_bg-gray-50 dark:pks_bg-slate-900",
+          "pks_bg-gray-50 dark:bg-slate-900",
           "focus:pks_bg-white",
           props.className
         )}
         rows={props.row}
         placeholder={props.placeholder}
       ></textarea>
-
       {props.actions && props.actions}
     </div>
   );

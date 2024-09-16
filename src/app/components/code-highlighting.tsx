@@ -1,8 +1,8 @@
 import React, { FC, HTMLAttributes } from "react";
 import CodeMirror, { EditorView } from "@uiw/react-codemirror";
 import type { Extension } from "@codemirror/state";
-import { cn } from "@/app/styles/media";
-import { useDarkMode } from "@/app/contexts/dark-mode-context";
+import { cn } from "@/styles/media";
+import { useDarkMode } from "@/contexts/dark-mode-context";
 
 export interface CodeHighlightingProps extends HTMLAttributes<HTMLDivElement> {
   code: string;

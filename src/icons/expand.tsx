@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/app/styles/media";
+import { cn } from "@/styles/media";
 
 export function ExpandIcon(props: React.SVGProps<SVGSVGElement>) {
   return (

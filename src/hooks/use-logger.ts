@@ -1,4 +1,4 @@
-import { useEnvironment } from "@/app/hooks/use-environment";
+import { useEnvironment } from "@/hooks/use-environment";
 import React from "react";
 
 export const useLogger = () => {

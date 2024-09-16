@@ -1,12 +1,12 @@
-import { ScalableTextarea } from "@/app/app/components/textareas";
+import { ScalableTextarea } from "@/app/components/textareas";
 import { useForm } from "react-hook-form";
-import { Button, HoverButton, IconButton } from "@/app/app/components/buttons";
-import { UpArrowIcon } from "@/app/icons/up-arrow";
-import { Spinner } from "@/app/app/components/loaders/spinner";
-import { cn } from "@/app/styles/media";
+import { Button, HoverButton, IconButton } from "@/app/components/buttons";
+import { UpArrowIcon } from "@/icons/up-arrow";
+import { Spinner } from "@/app/components/loaders/spinner";
+import { cn } from "@/styles/media";
 import { FC, HTMLAttributes, useContext, useState } from "react";
 import { Message } from "@/app/clients/protos/common_pb";
-import { toTextContent, toTitleCase } from "@/app/utils";
+import { toTextContent, toTitleCase } from "@/utils";
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 /**
  *

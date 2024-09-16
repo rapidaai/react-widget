@@ -1,4 +1,4 @@
-export const assistantApiUrl: string =
+export const ASSISTANT_API: string =
   window.chatbotConfig?.api_base || "https://assistant-01.rapida.ai";
 
 export const HEADER_API_KEY = "x-api-key";

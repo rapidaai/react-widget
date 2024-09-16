@@ -1,11 +1,5 @@
-import { assistantApiUrl } from "@/app/configs/constant";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ASSISTANT_API } from "@/configs";
+import React, { createContext, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 interface EnvironmentContextProps {
@@ -32,7 +26,7 @@ export const EnvironmentContext = createContext<EnvironmentContextProps>({
   assistantId: window.chatbotConfig?.assistant_id,
   apiBase: window.chatbotConfig?.api_base
     ? window.chatbotConfig?.api_base
-    : "https://assistant.rapida.ai",
+    : "https://assistant-01.rapida.ai",
   assistantVersion: window.chatbotConfig?.assistant_version
     ? window.chatbotConfig?.assistant_version
     : null,
@@ -83,7 +77,7 @@ export const EnvironmentProvider: React.FC<{
     <EnvironmentContext.Provider
       value={{
         assistantId: window.chatbotConfig?.assistant_id,
-        apiBase: assistantApiUrl,
+        apiBase: ASSISTANT_API,
         assistantVersion: window.chatbotConfig?.assistant_version
           ? window.chatbotConfig?.assistant_version
           : null,

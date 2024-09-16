@@ -1,4 +1,6 @@
 import { Content } from "@/app/clients/protos/common_pb";
+import { RapidaEnvironment } from "@/utils/rapida_environment";
+import { RapidaSource, WEB_PLUGIN_SOURCE } from "@/utils/rapida_source";
 
 export const toContentText = (cnt?: Content) => {
   if (!cnt) return "";
@@ -25,4 +27,19 @@ export const toTextContent = (str: string) => {
 export const toTitleCase = (str?: string) => {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+/**
+ *
+ * @returns
+ */
+export const GetSource = (): RapidaSource => {
+  return WEB_PLUGIN_SOURCE;
+};
+
+export const GetEnvironment = (): RapidaEnvironment => {
+  if (window.chatbotConfig?.debug == true) return RapidaEnvironment.DEVELOPMENT;
+  return process.env.NODE_ENV !== "development"
+    ? RapidaEnvironment.PRODUCTION
+    : RapidaEnvironment.DEVELOPMENT;
 };
