@@ -5,22 +5,16 @@ on:
       - main # Trigger the workflow on push to the main branch
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Grants write access to the repository contents, including submodules
 
     steps:
-      - name: Checkout main repository
+      - name: Checkout main repository and submodules
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_TOKEN }} # Use PAT for the main repo
-
-      - name: Checkout submodules with PAT
-        run: |
-          git submodule sync
-          git submodule update --init --recursive
-        env:
-          GIT_ASKPASS: /bin/echo
-          GIT_USERNAME: ${{ secrets.GITHUB_ACTOR }}
-          GIT_PASSWORD: ${{ secrets.GH_TOKEN }}
+          submodules: recursive # Ensure submodules are cloned
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
