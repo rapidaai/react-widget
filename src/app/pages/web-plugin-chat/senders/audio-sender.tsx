@@ -10,15 +10,6 @@ import { SenderProps } from "@/app/pages/web-plugin-chat/senders/sender";
 import { useAssistantChatContext } from "@/contexts/assistant-chat-context";
 
 /**
- * Props for audio sender
- */
-// interface AudioSenderProps extends HTMLAttributes<HTMLFormElement> {
-//   assistant: Assistant;
-//   assistantConversationId?: string | null;
-//   onCreateConversation: (msg: AssistantConversationMessage) => void;
-// }
-
-/**
  * AudioSender component
  * @param param0
  * @returns
@@ -52,7 +43,12 @@ export const AudioSender: FC<SenderProps> = ({
   return (
     <>
       {notificationMessage && (
-        <div className="pks_border-0.5 pks_relative pks_px-3.5 pks_text-text-200 pks_border-blue-100/20 pks_bg-blue-600/10 dark:pks_bg-blue-600/20 pks_-mb-1 pks_rounded-t-xl pks_border-b-0 pks_pb-2.5 pks_pt-2">
+        <div
+          className={cn(
+            "pks_mx-2 pks_border-0.5 pks_relative pks_px-2 pks_-mb-1 pks_rounded-t-xl pks_border-b-0 pks_pb-2.5 pks_pt-2",
+            "pks_border-blue-100/20 pks_bg-blue-600/10 dark:pks_bg-blue-600/20"
+          )}
+        >
           <div className="pks_font-normal pks_text-sm pks_w-full pks_flex pks_items-center pks_justify-between">
             <div className="pks_flex pks_items-center">
               <DotLoader />
@@ -92,7 +88,7 @@ export const AudioSender: FC<SenderProps> = ({
           </div>
         </div>
       )}
-      <div className="pks_flex pks_flex-col pks_items-center pks_relative pks_pb-4 pks_px-4 pks_z-10">
+      <div className="pks_flex pks_flex-col pks_items-center pks_relative pks_z-10">
         <div
           className={cn(
             "pks_border-[1px] pks_border-gray-300 dark:pks_border-gray-600/50",

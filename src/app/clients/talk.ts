@@ -31,6 +31,8 @@ import {
   GetAllAssistantConversationRequest,
   AssistantDefinition,
   AssistantMessagingResponse,
+  MessageFeedbackRequest,
+  MessageFeedbackResponse,
 } from "@/app/clients/protos/talk-api_pb";
 // import { ClientAuthInfo, WithAuthContext } from "@/utils/index";
 import { ServiceError } from "@/app/clients/protos/web-api_pb_service";
@@ -211,8 +213,38 @@ export function GetAllAssistantConversationMessage(
   );
 }
 
+/**
+ *
+ * @param authHeader
+ * @returns
+ */
 export function AssistantTalk(
   authHeader: ClientAuthInfo | UserAuthInfo
 ): BidirectionalStream<AssistantMessagingRequest, AssistantMessagingResponse> {
   return conversationStreamClient.assistantTalk(WithAuthContext(authHeader));
+}
+
+/**
+ *
+ * @param assistantId
+ * @param assistantConversationId
+ * @param assistantConverstaionMessageId
+ * @param feedback
+ * @param authHeader
+ * @param cb
+ */
+export function MessageFeedback(
+  assistantId: string,
+  assistantConversationId: string,
+  assistantConverstaionMessageId: string,
+  feedback: string,
+  authHeader: ClientAuthInfo | UserAuthInfo,
+  cb: (err: ServiceError | null, uvcr: MessageFeedbackResponse | null) => void
+) {
+  const req = new MessageFeedbackRequest();
+  req.setAssistantid(assistantId);
+  req.setAssistantconversationid(assistantConversationId);
+  req.setAssistantconversationmessageid(assistantConverstaionMessageId);
+  req.setFeedback(feedback);
+  conversationClient.messageFeedback(req, WithAuthContext(authHeader), cb);
 }

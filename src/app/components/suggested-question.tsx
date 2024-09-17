@@ -64,8 +64,8 @@ export const SuggestedQuestion: FC<{
                     className="hover:pks_shadow pks_relative pks_cursor-pointer pks_flex pks_items-center pks_py-2 pks_px-3 pks_overflow-hidden pks_text-lg pks_rounded-lg pks_group pks_w-full pks_bg-gray-300/20 hover:pks_bg-blue-600/10 hover:pks_text-blue-600"
                     key={idx}
                     onClick={() => {
-                      showLoader();
                       onSendingTextMessage(x.getStringValue());
+                      showLoader();
                     }}
                   >
                     <span className="pks_absolute pks_right-0 pks_flex pks_items-center pks_justify-start pks_w-10 pks_h-10 pks_duration-300 pks_transform group-hover:pks_translate-x-full pks_translate-x-0 pks_ease pks_text-blue-600">

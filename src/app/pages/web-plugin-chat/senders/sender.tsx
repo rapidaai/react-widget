@@ -36,6 +36,12 @@ export interface SenderProps extends HTMLAttributes<HTMLFormElement> {
 export const Sender: FC<SenderProps> = (props) => {
   const [inputType, setInputType] = useState("text");
   if (inputType === "text")
-    return <TextSender textAreaClassName="pks_text-lg pks_p-3" {...props} />;
-  return <AudioSender {...props} />;
+    return (
+      <TextSender
+        textAreaClassName="pks_text-lg pks_p-3"
+        {...props}
+        onChangeInputType={setInputType}
+      />
+    );
+  return <AudioSender {...props} onChangeInputType={setInputType} />;
 };

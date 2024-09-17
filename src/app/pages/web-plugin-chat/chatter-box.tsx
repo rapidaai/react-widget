@@ -22,6 +22,8 @@ import { HEADER_AUTH_ID } from "@/utils/rapida_header";
 import { useParams } from "react-router-dom";
 import { useAssistantChatContext } from "@/contexts/assistant-chat-context";
 import { Spinner } from "@/app/components/loaders/spinner";
+import { AnimatePresence, motion } from "framer-motion";
+import { useMessageAction } from "@/app/pages/web-plugin-chat/hooks/use-message-action";
 
 /**
  * Chatter box props
@@ -66,7 +68,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
   } = useAssistantChatContext();
 
   const { token, user } = useEnvironment();
-  const { showLoader, hideLoader } = useRapidaStore();
+  const { loading, showLoader, hideLoader } = useRapidaStore();
   const ctrRef = useRef<HTMLDivElement>(null);
 
   //
@@ -109,45 +111,88 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
       777
     );
   };
+  const variants = {
+    open: {
+      transition: { staggerChildren: 0.07, delayChildren: 0.2 },
+    },
+    closed: {
+      transition: { staggerChildren: 0.05, staggerDirection: -1 },
+    },
+  };
+
+  const messageAction = useMessageAction({
+    assistantId: assistant.getId(),
+    assistantConversationId: conversationId,
+    auth: {
+      [HEADER_API_KEY]: token!,
+      [HEADER_AUTH_ID]: user.user_id,
+    },
+  });
 
   return (
-    <>
-      <div className="pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_bg-white">
-        {conversations.map((x, idx) => {
-          return (
-            <div
-              key={idx}
-              className={cn(
-                "pks_max-w-full",
-                x.getCreateddate() &&
-                  `pks_day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
-              )}
-            >
-              {x.getRequest() && (
-                <UserChatMessage
-                  message={x.getRequest()!}
-                  time={
-                    x.getCreateddate() && getTimeFromDate(x.getCreateddate()!)
-                  }
-                />
-              )}
-              {x.getResponse() && (
-                <SystemChatMessage
-                  assistant={assistant}
-                  assistantConversationId={conversationId!}
-                  assistantConversationMessage={x}
-                  messageContent={x.getResponse()!}
-                  time={
-                    x.getCreateddate() && getTimeFromDate(x.getCreateddate()!)
-                  }
-                  stages={x.getStagesList()}
-                />
-              )}
-            </div>
-          );
-        })}
-        <div ref={ctrRef} />
-      </div>
+    <AnimatePresence>
+      {loading ? (
+        <div className="pks_flex-1 pks_pb-4 pks_flex pks_justify-center pks_items-center">
+          <Spinner size="md" />
+        </div>
+      ) : (
+        <motion.ul
+          variants={variants}
+          className="pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_bg-white pks_pb-4"
+        >
+          {conversations.map((x, idx) => {
+            return (
+              <motion.li
+                key={idx}
+                className={cn(
+                  "pks_max-w-full",
+                  x.getCreateddate() &&
+                    `pks_day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
+                )}
+                variants={{
+                  open: {
+                    y: 0,
+                    opacity: 1,
+                    transition: {
+                      y: { stiffness: 1000, velocity: -100 },
+                    },
+                  },
+                  closed: {
+                    y: 50,
+                    opacity: 0,
+                    transition: {
+                      y: { stiffness: 1000 },
+                    },
+                  },
+                }}
+              >
+                {x.getRequest() && (
+                  <UserChatMessage
+                    message={x.getRequest()!}
+                    time={
+                      x.getCreateddate() && getTimeFromDate(x.getCreateddate()!)
+                    }
+                  />
+                )}
+                {x.getResponse() && (
+                  <SystemChatMessage
+                    assistant={assistant}
+                    assistantConversationId={conversationId!}
+                    assistantConversationMessage={x}
+                    messageActions={messageAction}
+                    messageContent={x.getResponse()!}
+                    time={
+                      x.getCreateddate() && getTimeFromDate(x.getCreateddate()!)
+                    }
+                    stages={x.getStagesList()}
+                  />
+                )}
+              </motion.li>
+            );
+          })}
+          <div ref={ctrRef} />
+        </motion.ul>
+      )}
       <div className="pks_px-2.5 pks_pb-2.5 pks_bg-white pks_rounded-b-xl">
         <Sender
           assistant={assistant}
@@ -160,6 +205,6 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
           }}
         />
       </div>
-    </>
+    </AnimatePresence>
   );
 };

@@ -139,7 +139,7 @@ export const TextSender: FC<SenderProps> = ({
           }}
           actions={
             <div className="pks_flex pks_shrink-0 pks_grow-0 pks_items-center pks_rounded-b-xl pks_px-2 pks_py-1 pks_border-t-[0.5px]">
-              <div className="pks_flex-1 pks_flex pks_items-center pks_gap-1">
+              <div className="pks_flex-1 pks_flex pks_items-center pks_gap-1 pks_invisible">
                 <TooltipPlus
                   popupContent={"Send a file"}
                   className="dark:!pks_bg-slate-700"
@@ -181,7 +181,7 @@ export const TextSender: FC<SenderProps> = ({
                     type="button"
                     className={`pks_border-none pks_rounded-lg !pks_p-1.5 pks_h-fit pks_text-gray-400 dark:pks_text-gray-600`}
                     onClick={() => {
-                      //   onChangeInputType("audio");
+                      if (onChangeInputType) onChangeInputType("audio");
                     }}
                   >
                     <svg

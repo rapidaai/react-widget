@@ -110,6 +110,8 @@ export const WebPluginChat = () => {
                       layout
                       animate={isExpand}
                       className={cn(
+                        "pks_shadow pks_border-[0.5px]",
+
                         isExpand
                           ? "pks_w-1/2 pks_h-[700px] pks_max-h-full"
                           : "pks_w-[500px] pks_h-[700px] pks_max-h-full",

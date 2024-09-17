@@ -1,44 +1,47 @@
-import React, { FC, HTMLAttributes } from "react";
-import CodeMirror, { EditorView } from "@uiw/react-codemirror";
-import type { Extension } from "@codemirror/state";
+import React, { FC, HTMLAttributes, useEffect, useState } from "react";
+import hljs from "highlight.js";
 import { cn } from "@/styles/media";
-import { useDarkMode } from "@/contexts/dark-mode-context";
-
+import "highlight.js/styles/default.css";
 export interface CodeHighlightingProps extends HTMLAttributes<HTMLDivElement> {
   code: string;
-  lineNumbers?: boolean;
-  foldGutter?: boolean;
+  language?: string;
 }
 
-export const CodeHighlighting: FC<
-  CodeHighlightingProps & { extensions: Extension[] }
-> = React.memo(({ code, foldGutter, lineNumbers, className, extensions }) => {
-  //
-  const { isDarkMode } = useDarkMode();
+export const CodeHighlighting: FC<CodeHighlightingProps> = ({
+  language,
+  code,
+  className,
+}) => {
+  const [highlightedCode, setHighlightedCode] = useState<string>("");
+
+  useEffect(() => {
+    // Highlight the code using highlight.js with auto language detection
+    try {
+      const result = hljs.highlightAuto(code).value;
+      setHighlightedCode(result);
+    } catch (error) {
+      setHighlightedCode(code);
+    }
+  }, [code]);
+
   return (
-    <pre
-      className={cn(
-        "!prose-base relative border rounded-md dark:border-gray-800",
-        "p-0 m-0",
-        className
-      )}
-    >
-      <code>
-        <CodeMirror
-          value={code}
-          editable={false}
-          readOnly={true}
-          basicSetup={{
-            highlightActiveLine: false,
-            highlightActiveLineGutter: false,
-            lineNumbers: lineNumbers,
-            foldGutter: foldGutter,
-          }}
-          theme={isDarkMode ? "dark" : "light"}
-          extensions={[...extensions, EditorView.lineWrapping]}
-          // [cpp()]}
-        />
-      </code>
+    <pre className={cn("!pks_overflow-visible !pks_text-base", className)}>
+      <div className="pks_bg-white pks_rounded-lg pks_border-[0.5px] pks_relative">
+        <div className="pks_border-b flex pks_bg-gray-50 pks_rounded-t-lg">
+          <div className="pks_px-4 pks_py-2 pks_opacity-70">{language}</div>
+        </div>
+
+        <div className="pks_overflow-y-auto pks_p-4" dir="ltr">
+          <pre
+            className={cn(
+              "!pks_prose-sm pks_relative",
+              "!pks_whitespace-pre",
+              className
+            )}
+            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+          />
+        </div>
+      </div>
     </pre>
   );
-});
+};
