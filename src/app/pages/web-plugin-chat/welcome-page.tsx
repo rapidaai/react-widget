@@ -99,7 +99,7 @@ const AssistantPage: FC<{
             <h1 className="">Hello there.</h1>
             <h1 className="pks_opacity-60">
               {assistant
-                ?.getAppappearance()
+                ?.getWebappearance()
                 ?.getFieldsMap()
                 ?.get("openingStatement")
                 ?.getStringValue()}

@@ -1,6 +1,7 @@
 import { Spinner } from "@/app/components/loaders/spinner";
 import React, { FC } from "react";
 import { cn } from "@/styles/media";
+import { motion } from "framer-motion";
 
 /**
  *
@@ -88,9 +89,15 @@ export function BlueBorderButton(props: ButtonProps) {
 
 export function BorderButton(props: ButtonProps) {
   return (
-    <button
+    <motion.button
+      whileHover={{
+        scale: 1.2,
+        transition: { duration: 1 },
+      }}
+      whileTap={{ scale: 0.9 }}
       type="button"
-      {...props}
+      //   {...props}
+      onClick={props.onClick}
       className={cn(
         "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center",
         "pks_text-gray-500 dark:pks_text-gray-400 pks_font-medium",
@@ -103,7 +110,7 @@ export function BorderButton(props: ButtonProps) {
       )}
     >
       {props.children}
-    </button>
+    </motion.button>
   );
 }
 
@@ -187,8 +194,15 @@ export function LinkButton(props: LinkProps) {
 export function HoverButton(props: ButtonProps) {
   const { isLoading, ...btnProps } = props;
   return (
-    <button
-      {...btnProps}
+    <motion.button
+      whileHover={{
+        scale: 1.2,
+        transition: { duration: 0.4 },
+      }}
+      whileTap={{ scale: 0.9 }}
+      type="button"
+      //   {...props}
+      onClick={props.onClick}
       className={cn(
         "pks_flex pks_h-9 pks_leading-7 pks_truncate pks_w-fit pks_justify-center pks_items-center pks_relative pks_border-none",
         "pks_font-medium pks_py-1.5 pks_px-3 pks_rounded-full dark:hover:pks_bg-gray-900 hover:pks_bg-gray-100",
@@ -205,7 +219,7 @@ export function HoverButton(props: ButtonProps) {
       ) : (
         props.children
       )}
-    </button>
+    </motion.button>
   );
 }
 

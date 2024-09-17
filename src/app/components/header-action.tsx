@@ -37,8 +37,7 @@ export const Header: FC<{
   return (
     <div
       className={cn(
-        //   "pks_bg-[linear-gradient(103deg,_var(--tw-gradient-stops))] pks_from-custom-gray pks_via-custom-pink pks_to-custom-blue",
-        "pks_flex pks_justify-between pks_space-x-1.5 pks_sticky pks_top-0 pks_z-20 pks_rounded-t-xl pks_border-b pks_border-gray-300 pks_ease-in-out dark:pks_border-gray-700"
+        "pks_flex pks_justify-between pks_space-x-1.5 pks_sticky pks_top-0 pks_z-20 pks_rounded-t-xl pks_border-b pks_border-gray-300 pks_ease-in-out dark:pks_border-gray-800"
       )}
     >
       {/* {!pathname.includes(currentPath) && (

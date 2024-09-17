@@ -97,8 +97,8 @@ export const WebPluginChat = () => {
             exit={{ opacity: 0 }}
             className={cn(
               isExpand
-                ? "pks_bg-gray-500/5 pks_dark:bg-slate-400/5 pks_backdrop-blur-sm pks_p-8 pks_fixed pks_inset-0 pks_z-50 pks_grid pks_place-items-center pks_overflow-y-scroll"
-                : "pks_fixed pks_bottom-0 pks_right-0 dark:pks_text-gray-300 pks_text-gray-700 pks_h-fit pks_w-fit pks_p-3 pks_bg-gradient-to-br pks_from-white pks_via-transparent pks_to-gray-600/10 pks_bg-opacity-8"
+                ? "pks_bg-gray-500/5 pks_dark:bg-slate-400/5 pks_backdrop-blur-sm pks_p-8 pks_fixed pks_inset-0 pks_z-50 pks_grid pks_place-items-center pks_overflow-y-scroll dark:pks_text-gray-300 pks_text-gray-700"
+                : "pks_fixed pks_bottom-0 pks_right-0 dark:pks_text-gray-300 pks_text-gray-700 pks_h-fit pks_w-fit pks_p-3 pks_bg-gradient-to-br pks_from-transparent pks_via-transparent pks_to-gray-600/10 pks_bg-opacity-8"
             )}
           >
             <MemoryRouter initialEntries={["/messages"]}>
@@ -110,17 +110,12 @@ export const WebPluginChat = () => {
                       layout
                       animate={isExpand}
                       className={cn(
-                        "pks_shadow pks_border-[0.5px]",
-
+                        "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800",
                         isExpand
                           ? "pks_w-1/2 pks_h-[700px] pks_max-h-full"
                           : "pks_w-[500px] pks_h-[700px] pks_max-h-full",
                         "pks_flex pks_flex-col",
-                        "pks_bg-[linear-gradient(103deg,_var(--tw-gradient-stops))]",
-                        " pks_from-gray-200/50 dark:pks_from-gray-950",
-                        "pks_via-blue-600/5 dark:pks_via-slate-800",
-                        "pks_via-blue-600/10 dark:pks_to-slate-950/80",
-
+                        "pks_backdrop-blur-xl pks_bg-white dark:pks_bg-gray-900",
                         "pks_mb-28 pks_mr-4",
                         "pks_shadow-lg",
                         "pks_border pks_rounded-xl"

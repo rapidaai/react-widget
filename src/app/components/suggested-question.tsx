@@ -40,7 +40,7 @@ export const SuggestedQuestion: FC<{
   return (
     <>
       {assistant
-        .getAppappearance()
+        .getWebappearance()
         ?.getFieldsMap()
         ?.get("suggestedQuestions")
         ?.getListValue()
