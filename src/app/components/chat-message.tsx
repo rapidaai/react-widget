@@ -45,7 +45,7 @@ export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
           <span className="pks_ml-1 pks_text-sm pks_text-gray-500">{time}</span>
         </div> */}
 
-        <div className="pks_border pks_opacity-80 pks_mr-2 pks_py-3 pks_px-4 pks_bg-gray-50 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-tr-xl ">
+        <div className="pks_border pks_opacity-80 pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 dark:pks_bg-zinc-700 dark:pks_border-zinc-600 pks_border-zinc-200 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-tr-xl ">
           <MarkdownRenderer>
             {toContentText(message.getContentsList())}
           </MarkdownRenderer>
@@ -81,7 +81,7 @@ export const SystemChatMessage: FC<{
   messageActions,
 }) => {
   return (
-    <div className="pks_flex pks_px-2 pks_group dark:hover:pks_bg-gray-950/20 pks_justify-end pks_items-start">
+    <div className="pks_flex pks_px-2 pks_group pks_justify-end pks_items-start">
       <div className="pks_h-9 pks_w-9 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700 pks_order-2">
         {assistant?.getWebappearance()?.getFieldsMap().get("appIcon") ? (
           <img
@@ -98,7 +98,7 @@ export const SystemChatMessage: FC<{
         )}
       </div>
       <div className="pks_ml-2 pks_min-w-0 pks_order-1">
-        <div className="pks_relative pks_border pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-bl-xl ">
+        <div className="pks_relative pks_border pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 dark:pks_bg-zinc-800 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-bl-xl dark:pks_border-zinc-700">
           <div className="pks_absolute pks_-top-5 pks_right-2 pks_invisible group-hover:pks_visible">
             <div className="pks_flex pks_w-fit pks_border pks_shadow-md pks_p-0.5 pks_rounded-lg pks_space-x-1 dark:pks_bg-gray-950/50 dark:pks_border-gray-800 pks_bg-white pks_backdrop-blur">
               <CopyButton

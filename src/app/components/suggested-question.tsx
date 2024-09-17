@@ -45,8 +45,8 @@ export const SuggestedQuestion: FC<{
         ?.get("suggestedQuestions")
         ?.getListValue()
         ?.getValuesList() && (
-        <div className="pks_bg-white/80 dark:pks_bg-slate-800/50 pks_rounded-lg pks_border pks_backdrop-blur">
-          <div className="pks_w-full pks_border-b pks_px-2 pks_py-2">
+        <div className="pks_bg-white/80 dark:pks_bg-slate-950/50 pks_rounded-lg pks_border pks_backdrop-blur dark:pks_border-gray-700">
+          <div className="pks_w-full pks_border-b pks_px-2 pks_py-2 dark:pks_border-gray-700">
             <h1 className="pks_text-lg pks_font-medium pks_opacity-50">
               You could ask
             </h1>

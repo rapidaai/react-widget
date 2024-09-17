@@ -86,7 +86,7 @@ const AssistantPage: FC<{
         <div className={cn("pks_p-3 pks_flex pks_flex-col")}>
           <div className={cn("pks_h-16 pks_w-16 pks_my-[32px]")}>
             <img
-              className="pks_w-full pks_h-full pks_object-cover pks_rounded-xl pks_border-[0.5px] pks_p-1 pks_bg-gray-100/50"
+              className="pks_w-full pks_h-full pks_object-cover pks_rounded-xl pks_border-[0.5px] pks_p-1 pks_bg-gray-100/50 dark:pks_border-gray-700 dark:pks_bg-gray-700/50"
               alt="Assistant Icon"
               src={assistant
                 ?.getWebappearance()

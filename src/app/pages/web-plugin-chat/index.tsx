@@ -116,7 +116,10 @@ export const WebPluginChat = () => {
                           ? "pks_w-1/2 pks_h-[700px] pks_max-h-full"
                           : "pks_w-[500px] pks_h-[700px] pks_max-h-full",
                         "pks_flex pks_flex-col",
-                        "pks_bg-[linear-gradient(103deg,_var(--tw-gradient-stops))] pks_from-custom-gray pks_via-custom-pink pks_to-custom-blue",
+                        "pks_bg-[linear-gradient(103deg,_var(--tw-gradient-stops))]",
+                        " pks_from-gray-200/50 dark:pks_from-gray-950",
+                        "pks_via-blue-600/5 dark:pks_via-slate-800",
+                        "pks_via-blue-600/10 dark:pks_to-slate-950/80",
 
                         "pks_mb-28 pks_mr-4",
                         "pks_shadow-lg",

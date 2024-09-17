@@ -65,7 +65,7 @@ export const TextSender: FC<SenderProps> = ({
       {notificationMessage && (
         <div
           className={cn(
-            "pks_mx-2 pks_border-0.5 pks_relative pks_px-2 pks_-mb-1 pks_rounded-t-xl pks_border-b-0 pks_pb-2.5 pks_pt-2",
+            "pks_mx-2 pks_border-0.5 pks_relative pks_px-2 pks_-mb-1 pks_rounded-t-xl pks_border-b-0 pks_pb-2.5 pks_pt-2 dark:pks_text-white/60",
             notificationType !== "error"
               ? "pks_border-blue-100/20 pks_bg-blue-600/10 dark:pks_bg-blue-600/20"
               : "pks_border-red-100/20 pks_bg-red-600/10 dark:pks_bg-red-600/20  !pks_text-red-600 dark:!pks_text-red-600"
@@ -93,7 +93,7 @@ export const TextSender: FC<SenderProps> = ({
             </div>
             <div
               className={cn(
-                "dark:pks_text-gray-400 pks_text-gray-600 pks_truncate pks_opacity-60 pks_invisible",
+                "dark:pks_text-white/80 pks_text-gray-600 pks_truncate pks_opacity-60 pks_invisible",
                 notificationType !== "error" && "pks_visible"
               )}
             >
@@ -138,7 +138,7 @@ export const TextSender: FC<SenderProps> = ({
             }
           }}
           actions={
-            <div className="pks_flex pks_shrink-0 pks_grow-0 pks_items-center pks_rounded-b-xl pks_px-2 pks_py-1 pks_border-t-[0.5px]">
+            <div className="pks_flex pks_shrink-0 pks_grow-0 pks_items-center pks_rounded-b-xl pks_px-2 pks_py-1 pks_border-t-[0.5px] dark:pks_border-gray-700">
               <div className="pks_flex-1 pks_flex pks_items-center pks_gap-1 pks_invisible">
                 <TooltipPlus
                   popupContent={"Send a file"}

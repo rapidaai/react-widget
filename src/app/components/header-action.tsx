@@ -38,7 +38,7 @@ export const Header: FC<{
     <div
       className={cn(
         //   "pks_bg-[linear-gradient(103deg,_var(--tw-gradient-stops))] pks_from-custom-gray pks_via-custom-pink pks_to-custom-blue",
-        "pks_flex pks_justify-between pks_space-x-1.5 pks_sticky pks_top-0 pks_z-20 pks_rounded-t-xl pks_border-b pks_border-gray-300 pks_ease-in-out"
+        "pks_flex pks_justify-between pks_space-x-1.5 pks_sticky pks_top-0 pks_z-20 pks_rounded-t-xl pks_border-b pks_border-gray-300 pks_ease-in-out dark:pks_border-gray-700"
       )}
     >
       {/* {!pathname.includes(currentPath) && (
@@ -63,7 +63,7 @@ export const Header: FC<{
             whileTap={{ scale: 0.95 }}
           >
             <ChevronDownIcon
-              className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-400 group-hover:pks_text-gray-600 pks_rotate-90"
+              className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-500 dark:pks_text-gray-300 group-hover:pks_text-gray-600 pks_rotate-90"
               strokeWidth={3}
             />
           </motion.button>
@@ -77,7 +77,7 @@ export const Header: FC<{
             whileTap={{ scale: 0.95 }}
           >
             <CloseIcon
-              className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-400 group-hover:pks_text-red-600 "
+              className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-500 dark:pks_text-gray-300 group-hover:pks_text-red-600 "
               strokeWidth={2.8}
             />
           </motion.button>
@@ -92,12 +92,12 @@ export const Header: FC<{
           >
             {isMaximize ? (
               <ChevronsRightLeftIcon
-                className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-400 group-hover:pks_text-blue-600  pks_-rotate-45"
+                className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-500 dark:pks_text-gray-300 group-hover:pks_text-blue-600  pks_-rotate-45"
                 strokeWidth={2.5}
               />
             ) : (
               <ChevronsLeftRightIcon
-                className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-400 group-hover:pks_text-blue-600  pks_-rotate-45"
+                className="pks_w-5 pks_h-5 pks_flex pks_items-center pks_justify-center pks_rounded-full pks_text-gray-500 dark:pks_text-gray-300 group-hover:pks_text-blue-600  pks_-rotate-45"
                 strokeWidth={2.5}
               />
             )}

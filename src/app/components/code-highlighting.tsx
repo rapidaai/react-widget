@@ -26,8 +26,8 @@ export const CodeHighlighting: FC<CodeHighlightingProps> = ({
 
   return (
     <pre className={cn("!pks_overflow-visible !pks_text-base", className)}>
-      <div className="pks_bg-white pks_rounded-lg pks_border-[0.5px] pks_relative">
-        <div className="pks_border-b flex pks_bg-gray-50 pks_rounded-t-lg">
+      <div className="pks_bg-white dark:pks_bg-slate-950 pks_rounded-lg pks_border-[0.5px] pks_relative dark:pks_border-slate-700">
+        <div className="pks_border-b flex pks_bg-gray-50 dark:pks_bg-slate-800 pks_rounded-t-lg dark:pks_border-slate-700">
           <div className="pks_px-4 pks_py-2 pks_opacity-70">{language}</div>
         </div>
 
