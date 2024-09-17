@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout main repository
         uses: actions/checkout@v3
         with:
-          submodules: recursive # This ensures that submodules are initialized and updated
+          token: ${{ secrets.GH_TOKEN }} # Use PAT for the main repo
 
       - name: Checkout submodules with PAT
         run: |
