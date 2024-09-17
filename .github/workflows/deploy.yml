@@ -13,6 +13,15 @@ jobs:
         with:
           submodules: recursive # This ensures that submodules are initialized and updated
 
+      - name: Checkout submodules with PAT
+        run: |
+          git submodule sync
+          git submodule update --init --recursive
+        env:
+          GIT_ASKPASS: /bin/echo
+          GIT_USERNAME: ${{ secrets.GITHUB_ACTOR }}
+          GIT_PASSWORD: ${{ secrets.GH_TOKEN }}
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
