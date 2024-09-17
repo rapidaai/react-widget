@@ -16,6 +16,11 @@ jobs:
         with:
           node-version: "18" # Specify the Node.js version
 
+      - name: Initialize and Update Submodule
+        run: |
+          git submodule init
+          git submodule update
+
       - name: Install dependencies
         run: npm install
 
@@ -28,13 +33,11 @@ jobs:
           sudo mv protoc3/include/* /usr/local/include/
           rm -rf protoc-3.20.3-linux-x86_64.zip protoc3
 
-      - name: Generate gRPC-Web and TypeScript Stubs
-        run: |
-          PROTOC_GEN_TS_PATH="./node_modules/.bin/protoc-gen-ts"
-          PROTOC_GEN_WEB_PATH="./node_modules/.bin/protoc-gen-grpc-web"
-          OUT_DIR="./src/app/clients/protos"
-          PROTO_DIR="./src/app/clients/protos"
-          protoc --plugin="protoc-gen-ts=${PROTOC_GEN_TS_PATH}" --js_out=import_style=commonjs,binary:$OUT_DIR --ts_out=service=grpc-web:$OUT_DIR -I=$PROTO_DIR "${PROTO_DIR}"/*.proto
+      - name: Make gRPC Client Script Executable
+        run: chmod +x scripts/grpc-client.sh
+
+      - name: Run gRPC Client Script
+        run: bash scripts/grpc-client.sh
 
       - name: Build the project
         run: npm run build
