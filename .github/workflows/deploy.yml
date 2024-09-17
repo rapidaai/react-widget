@@ -14,13 +14,8 @@ jobs:
       - name: Checkout main repository and submodules
         uses: actions/checkout@v3
         with:
-          submodules: false # Disable automatic submodule handling
-
-      - name: Update submodule URL to HTTPS
-        run: |
-          git submodule sync --recursive
-          git submodule foreach 'git config --local url."https://github.com/".insteadOf "git@github.com:"'
-          git submodule update --init --recursive
+          submodules: recursive # Ensure submodules are cloned
+          token: ${{ secrets.GH_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
