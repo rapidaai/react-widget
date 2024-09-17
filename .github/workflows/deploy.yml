@@ -5,10 +5,9 @@ on:
       - main # Trigger the workflow on push to the main branch
 
 jobs:
-  build:
-    name: Build and Test
+  checkout:
+    name: Checkout Repository
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout main repository and submodules
         uses: actions/checkout@v3
@@ -16,14 +15,24 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GH_TOKEN }}
 
+  install_dependencies:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    needs: checkout
+    steps:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18" # Specify the Node.js version
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
+  setup_protoc:
+    name: Install Protobuf Compiler
+    runs-on: ubuntu-latest
+    needs: install_dependencies
+    steps:
       - name: Install Protobuf Compiler (protoc) Version 3.20.3
         run: |
           sudo apt-get update
@@ -33,15 +42,30 @@ jobs:
           sudo mv protoc3/include/* /usr/local/include/
           rm -rf protoc-3.20.3-linux-x86_64.zip protoc3
 
+  run_grpc_script:
+    name: Run gRPC Script
+    runs-on: ubuntu-latest
+    needs: setup_protoc
+    steps:
       - name: Make gRPC Client Script Executable
         run: chmod +x scripts/grpc-client.sh
 
       - name: Run gRPC Client Script
         run: bash scripts/grpc-client.sh
 
+  build:
+    name: Build the Project
+    runs-on: ubuntu-latest
+    needs: run_grpc_script
+    steps:
       - name: Build the project
         run: npm run build
 
+  upload_to_s3:
+    name: Upload to S3
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Upload to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -51,6 +75,11 @@ jobs:
           aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/app.min.js \
             --region $AWS_REGION --acl public-read
 
+  invalidate_cache:
+    name: Invalidate CloudFront Cache
+    runs-on: ubuntu-latest
+    needs: upload_to_s3
+    steps:
       - name: Invalidate CloudFront cache
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
