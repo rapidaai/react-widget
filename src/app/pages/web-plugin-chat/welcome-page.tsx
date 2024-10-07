@@ -147,7 +147,13 @@ const AssistantPage: FC<{
         <p className="pks_w-full pks_flex pks_items-center pks_justify-center pks_py-2 pks_text-xs pks_space-x-[1.5px]">
           <span className="pks_opacity-60">Powered by</span>
           <RapidaIcon className="pks_w-3.5 pks_h-3.5 pks_text-blue-500 pks_opacity-90" />
-          <span className="pks_font-medium pks_text-blue-500">Rapida</span>
+          <a
+            className="pks_font-medium pks_text-blue-500 hover:pks_underline"
+            target="_blank"
+            href="https://rapida.ai"
+          >
+            Rapida
+          </a>
         </p>
       </div>
     </>

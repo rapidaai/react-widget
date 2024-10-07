@@ -143,7 +143,8 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
           {conversations.map((x, idx) => {
             return (
               <motion.li
-                key={idx}
+                data-key={`conversation-chat-${x.getId()}`}
+                key={`conversation-chat-${x.getId()}`}
                 className={cn(
                   "pks_max-w-full",
                   x.getCreateddate() &&

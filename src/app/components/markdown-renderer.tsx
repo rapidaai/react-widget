@@ -30,7 +30,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
                   <h1
                     className={cn(
                       className,
-                      "pks_pt-2.5 pks_pb-1",
+                      "pks_pt-2.5 pks_pb-2",
                       "pks_prose pks_prose-gray pks_prose-lg dark:pks_prose-invert pks_break-words !pks_max-w-none prose-img:pks_rounded-xl prose-headings:pks_underline prose-a:pks_text-blue-600",
                       "dark:prose-code:!pks_bg-slate-900 dark:prose-pre:!pks_bg-slate-900",
                       "prose-code:!pks_bg-slate-100 prose-pre:!pks_bg-slate-100 pks_leading-normal pks_font-bold"
@@ -51,7 +51,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
                   <h2
                     className={cn(
                       className,
-                      "pks_pt-2.5 pks_pb-1",
+                      "pks_pt-2.5 pks_pb-2",
                       "pks_prose prose-gray pks_prose-lg dark:pks_prose-invert pks_break-words !pks_max-w-none prose-img:pks_rounded-xl prose-headings:pks_underline prose-a:pks_text-blue-600",
                       "dark:prose-code:!pks_bg-slate-900 dark:prose-pre:!pks_bg-slate-900",
                       "prose-code:!pks_bg-slate-100 prose-pre:!pks_bg-slate-100 pks_leading-normal pks_font-semibold"
@@ -72,7 +72,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
                   <h3
                     className={cn(
                       className,
-                      "pks_pt-2.5 pks_pb-1",
+                      "pks_pt-2.5 pks_pb-2",
                       "pks_prose prose-gray pks_prose-lg dark:pks_prose-invert pks_break-words !pks_max-w-none prose-img:pks_rounded-xl prose-headings:pks_underline prose-a:pks_text-blue-600",
                       "dark:prose-code:!pks_bg-slate-900 dark:prose-pre:!pks_bg-slate-900",
                       "prose-code:!pks_bg-slate-100 prose-pre:!pks_bg-slate-100 pks_leading-normal pks_font-semibold"
@@ -93,7 +93,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
                   <h4
                     className={cn(
                       className,
-                      "pks_pt-2.5 pks_pb-1",
+                      "pks_pt-2.5 pks_pb-2",
                       "pks_prose prose-gray pks_prose-lg dark:pks_prose-invert pks_break-words !pks_max-w-none prose-img:pks_rounded-xl prose-headings:pks_underline prose-a:pks_text-blue-600",
                       "dark:prose-code:!pks_bg-slate-900 dark:prose-pre:!pks_bg-slate-900",
                       "prose-code:!pks_bg-slate-100 prose-pre:!pks_bg-slate-100 pks_leading-normal pks_font-semibold"
@@ -119,7 +119,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
               // Custom rendering for <ul> (unordered list) elements
               ul: {
                 component: ({ children }: { children: React.ReactNode }) => (
-                  <ul className="pks_list-disc pks_pl-5 pks_space-y-2 pks_prose pks_prose-gray pks_prose-base dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600 dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900 pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal">
+                  <ul className="pks_list-decimal pks_pl-5 pks_space-y-2 pks_prose pks_prose-gray pks_prose-base dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600 dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900 pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal">
                     {children}
                   </ul>
                 ),
@@ -127,7 +127,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
               // Custom rendering for <ol> (ordered list) elements
               ol: {
                 component: ({ children }: { children: React.ReactNode }) => (
-                  <ol className="pks_list-item pks_pl-5 pks_space-y-2 pks_prose pks_prose-gray pks_prose-base dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600 dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900 pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal">
+                  <ol className="pks_list-disc pks_pl-5 pks_space-y-2 pks_prose pks_prose-gray pks_prose-base dark:pks_prose-invert break-words !max-w-none pks_prose-img:rounded-xl pks_prose-headings:underline pks_prose-a:text-blue-600 dark:pks_prose-code:!bg-slate-900 dark:pks_prose-pre:!bg-slate-900 pks_prose-code:!bg-slate-100 pks_prose-pre:!bg-slate-100 leading-normal">
                     {children}
                   </ol>
                 ),
