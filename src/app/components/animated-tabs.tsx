@@ -1,24 +1,22 @@
 import { cn } from "@/styles/media";
 import { motion } from "framer-motion";
 import { FC, ReactElement } from "react";
-import { NavLink } from "react-router-dom";
 
 export const AnimatedTabs: FC<{
-  tabs: { name: string; icon: ReactElement }[];
+  tabs: { name: string; icon?: ReactElement }[];
   activeTab: string;
   setActiveTab: (n: string) => void;
 }> = ({ tabs, activeTab, setActiveTab }) => {
   return (
-    <div className="pks_flex">
+    <div className="pks_flex pks_border-b-[0.5px] pks_sticky pks_top-0 pks_z-10 pks_bg-white">
       {tabs.map((tab) => (
-        <NavLink
-          to={`/${tab.name}`}
+        <div
           key={tab.name}
           onClick={() => setActiveTab(tab.name)}
           className={cn(
             activeTab === tab.name ? "pks_text-blue-600" : "pks_text-gray-500",
-            "pks_px-4 pks_py-4 pks_flex pks_items-center pks_font-medium pks_text-lg pks_relative pks_capitalize",
-            "pks_font-semibold pks_opacity-90"
+            "pks_px-4 pks_py-3 pks_flex pks_items-center pks_text-lg pks_relative pks_capitalize pks_cursor-pointer",
+            "pks_opacity-90"
           )}
           style={{
             WebkitTapHighlightColor: "transparent",
@@ -35,7 +33,7 @@ export const AnimatedTabs: FC<{
           )}
           <span className="pks_mr-1.5">{tab.icon}</span>
           <span className="pks_z-20 pks_capitalize">{tab.name}</span>
-        </NavLink>
+        </div>
       ))}
     </div>
   );

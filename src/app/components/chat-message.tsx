@@ -3,7 +3,7 @@ import {
   AssistantMessageStage,
   Message,
 } from "@/app/clients/protos/common_pb";
-import { FC, useContext, useState } from "react";
+import { FC } from "react";
 import { RapidaIcon } from "@/icons/rapida";
 import { cn } from "@/styles/media";
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
@@ -45,7 +45,7 @@ export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
           <span className="pks_ml-1 pks_text-sm pks_text-gray-500">{time}</span>
         </div> */}
 
-        <div className="pks_border pks_opacity-80 pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 dark:pks_bg-zinc-700 dark:pks_border-zinc-600 pks_border-zinc-200 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-tr-xl ">
+        <div className="pks_border pks_opacity-80 pks_mr-2 pks_py-3 pks_px-4 pks_rounded-[18px] pks_bg-gray-100">
           <MarkdownRenderer>
             {toContentText(message.getContentsList())}
           </MarkdownRenderer>
@@ -81,11 +81,11 @@ export const SystemChatMessage: FC<{
   messageActions,
 }) => {
   return (
-    <div className="pks_flex pks_px-2 pks_group pks_justify-end pks_items-start">
-      <div className="pks_h-9 pks_w-9 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center dark:pks_border-gray-700 pks_order-2">
+    <div className="pks_flex pks_px-2 pks_group pks_justify-end pks_items-start pks_gap-2">
+      <div className="pks_h-12 pks_w-12 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center pks_bg-gray-100/50 pks_order-2 pks_border-[0.5px] pks_rounded-full">
         {assistant?.getWebappearance()?.getFieldsMap().get("appIcon") ? (
           <img
-            className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
+            className="pks_w-full pks_h-full pks_object-cover pks_rounded-full pks_p-2"
             alt="Assistant Icon"
             src={assistant
               ?.getWebappearance()
@@ -94,42 +94,47 @@ export const SystemChatMessage: FC<{
               ?.getStringValue()}
           />
         ) : (
-          <RapidaIcon className="pks_h-8 pks_w-8 pks_text-blue-600 pks_rounded-full" />
+          <RapidaIcon className="pks_h-8 pks_w-8 pks_rounded-full" />
         )}
       </div>
       <div className="pks_ml-2 pks_min-w-0 pks_order-1">
-        <div className="pks_relative pks_border pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 dark:pks_bg-zinc-800 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-bl-xl dark:pks_border-zinc-700">
-          <div className="pks_absolute pks_-top-5 pks_right-2 pks_invisible group-hover:pks_visible">
-            <div className="pks_flex pks_w-fit pks_border pks_shadow-md pks_p-0.5 pks_rounded-lg pks_space-x-1 dark:pks_bg-gray-950/50 dark:pks_border-gray-800 pks_bg-white pks_backdrop-blur">
-              <CopyButton
-                iconClassName="!pks_h-3.5 !pks_w-3.5"
-                className="!pks_h-fit !pks_p-1 pks_text-gray-600  hover:!pks_bg-gray-400/50 dark:hover:!pks_bg-gray-800/50 !pks_border-none !pks_rounded-md"
-              >
-                {toContentText(messageContent.getContentsList())}
-              </CopyButton>
-              <LikeButton
-                onClick={() => {
-                  messageActions.onLikeMessage(
-                    assistantConversationMessage.getId()
-                  );
-                }}
-                iconClassName="!pks_h-3.5 !pks_w-3.5"
-                className="!pks_h-fit !pks_p-1 pks_text-green-600  hover:!pks_bg-green-400/50 dark:hover:!pks_bg-green-800/50 !pks_border-none !pks_rounded-md"
-              />
-              <DislikeButton
-                onClick={() => {
-                  messageActions.onDislikeMessage(
-                    assistantConversationMessage.getId()
-                  );
-                }}
-                iconClassName="!pks_h-3.5 !pks_w-3.5"
-                className="!pks_h-fit !pks_p-1 pks_text-rose-600  hover:!pks_bg-rose-400/50 dark:hover:!pks_bg-rose-800/50 !pks_border-none !pks_rounded-md"
-              />
-            </div>
+        {/* <div className="pks_relative pks_border pks_mr-2 pks_py-3 pks_px-4 pks_bg-zinc-100 dark:pks_bg-zinc-800 pks_rounded-br-3xl pks_rounded-tl-3xl pks_rounded-bl-xl dark:pks_border-zinc-700"> */}
+        <div className="pks_border pks_rounded-[18px]">
+          <div className="pks_opacity-80 pks_mr-2 pks_px-5 pks_pt-5 ">
+            <MarkdownRenderer>
+              {toContentText(messageContent.getContentsList())}
+            </MarkdownRenderer>
           </div>
-          <MarkdownRenderer>
-            {toContentText(messageContent.getContentsList())}
-          </MarkdownRenderer>
+
+          <div className="pks_flex pks_w-full pks_py-2 pks_px-4 pks_space-x-1 pks_mt-4 pks_bg-gray-200/20 pks_rounded-b-[18px] pks_justify-end pks_border-t-[0.5px]">
+            <CopyButton
+              iconClassName="!pks_h-3.5 !pks_w-3.5"
+              className="!pks_border-[0.5px] !pks_h-fit !pks_p-1 !pks_px-2 pks_text-gray-600  hover:!pks_bg-white dark:hover:!pks_bg-gray-800/50 !pks_rounded-md"
+              withLabel={true}
+            >
+              {toContentText(messageContent.getContentsList())}
+            </CopyButton>
+            <LikeButton
+              onClick={() => {
+                messageActions.onLikeMessage(
+                  assistantConversationMessage.getId()
+                );
+              }}
+              withLabel={true}
+              iconClassName="!pks_h-3.5 !pks_w-3.5"
+              className="!pks_h-fit !pks_p-1 !pks_px-2 pks_text-green-600  hover:!pks_bg-white dark:hover:!pks_bg-green-800/50 !pks_border-[0.5px] !pks_rounded-md"
+            />
+            <DislikeButton
+              onClick={() => {
+                messageActions.onDislikeMessage(
+                  assistantConversationMessage.getId()
+                );
+              }}
+              withLabel={true}
+              iconClassName="!pks_h-3.5 !pks_w-3.5"
+              className="!pks_h-fit !pks_p-1 !pks_px-2 pks_text-rose-600  hover:!pks_bg-white dark:hover:!pks_bg-rose-800/50 !pks_border-[0.5px] !pks_rounded-md"
+            />
+          </div>
         </div>
       </div>
     </div>

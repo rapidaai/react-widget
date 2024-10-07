@@ -138,7 +138,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
       ) : (
         <motion.ul
           variants={variants}
-          className="pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_bg-white dark:pks_bg-gray-950 pks_pb-4"
+          className="pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_text-gray-600 dark:pks_text-gray-500 pks_pb-4"
         >
           {conversations.map((x, idx) => {
             return (
@@ -193,7 +193,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
           <div ref={ctrRef} />
         </motion.ul>
       )}
-      <div className="pks_px-2.5 pks_pb-2.5 pks_bg-white dark:pks_bg-gray-950 pks_rounded-b-xl">
+      <div className="pks_p-2 pks_bg-white dark:pks_bg-gray-950 pks_rounded-b-[26px]">
         <Sender
           assistant={assistant}
           assistantConversationId={conversationId}

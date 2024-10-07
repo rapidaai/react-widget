@@ -45,44 +45,37 @@ export const SuggestedQuestion: FC<{
         ?.get("suggestedQuestions")
         ?.getListValue()
         ?.getValuesList() && (
-        <div className="pks_bg-white/80 dark:pks_bg-slate-950/50 pks_rounded-lg pks_border pks_backdrop-blur dark:pks_border-gray-700">
-          <div className="pks_w-full pks_border-b pks_px-2 pks_py-2 dark:pks_border-gray-700">
-            <h1 className="pks_text-lg pks_font-medium pks_opacity-50">
-              You could ask
-            </h1>
-          </div>
-          <div className="pks_flex pks_flex-col pks_gap-2 pks_opacity-80 pks_p-2">
-            {assistant
-              .getWebappearance()
-              ?.getFieldsMap()
-              ?.get("suggestedQuestions")
-              ?.getListValue()
-              ?.getValuesList()
-              .map((x, idx) => {
-                return (
-                  <MotionDiv
-                    className="hover:pks_shadow pks_relative pks_cursor-pointer pks_flex pks_items-center pks_py-2 pks_px-3 pks_overflow-hidden pks_text-lg pks_rounded-lg pks_group pks_w-full pks_bg-gray-300/20 hover:pks_bg-blue-600/10 hover:pks_text-blue-600"
-                    key={idx}
-                    onClick={() => {
-                      onSendingTextMessage(x.getStringValue());
-                      showLoader();
-                    }}
-                  >
-                    <span className="pks_absolute pks_right-0 pks_flex pks_items-center pks_justify-start pks_w-10 pks_h-10 pks_duration-300 pks_transform group-hover:pks_translate-x-full pks_translate-x-0 pks_ease pks_text-blue-600">
-                      {sending ? (
-                        <Spinner />
-                      ) : (
-                        <ChevronUpIcon
-                          className="pks_rotate-45"
-                          strokeWidth={3}
-                        />
-                      )}
-                    </span>
-                    <span className="pks_relative"> {x.getStringValue()}</span>
-                  </MotionDiv>
-                );
-              })}
-          </div>
+        <div className="pks_flex pks_flex-col pks_gap-2 pks_opacity-80 pks_px-2">
+          {assistant
+            .getWebappearance()
+            ?.getFieldsMap()
+            ?.get("suggestedQuestions")
+            ?.getListValue()
+            ?.getValuesList()
+            .map((x, idx) => {
+              return (
+                <MotionDiv
+                  className="hover:pks_shadow pks_relative pks_cursor-pointer pks_flex pks_items-center pks_py-2 pks_px-3 pks_overflow-hidden pks_text-lg pks_rounded-lg pks_group pks_w-full pks_bg-gray-300/20 hover:pks_bg-blue-600/10 hover:pks_text-blue-600"
+                  key={idx}
+                  onClick={() => {
+                    onSendingTextMessage(x.getStringValue());
+                    showLoader();
+                  }}
+                >
+                  <span className="pks_absolute pks_right-0 pks_flex pks_items-center pks_justify-start pks_w-10 pks_h-10 pks_duration-300 pks_transform group-hover:pks_translate-x-full pks_translate-x-0 pks_ease pks_text-blue-600">
+                    {sending ? (
+                      <Spinner />
+                    ) : (
+                      <ChevronUpIcon
+                        className="pks_rotate-45"
+                        strokeWidth={3}
+                      />
+                    )}
+                  </span>
+                  <span className="pks_relative"> {x.getStringValue()}</span>
+                </MotionDiv>
+              );
+            })}
         </div>
       )}
     </>

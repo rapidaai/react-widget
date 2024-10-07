@@ -5,39 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatbot Integration</title>
   </head>
-  <body style="background-color: rgb(30 64 175)">
-    <!-- <h1>Chatbot Integration</h1> -->
+  <body style="">
     <script>
       window.chatbotConfig = {
-        assistant_id: "2098019702168092672",
+        debug: true,
         api_base: "http://assistant.rapida.local",
+        assistant_id: "2104890391609212928",
         token:
           "05064a056f0a60f309ff1d5cc66cb6bb5ecd1d79238e048b2594b51bfb9d4610",
         user: {
-          name: "Guest",
-          user_id: "Prashant",
+          name: "Prashant",
+          id: "prashant",
         },
-        debug: true,
       };
     </script>
+    <!-- src="https://cdn-01.rapida.ai/public/scripts/app.min.js" -->
 
-    <!-- <script>
-      window.chatbotConfig = {
-        debug: true,
-        assistant_id: "2078722754365882368",
-        token:
-          "f2a6ea1dbf34a6c3549f4a837f898635b53885be612dfa5cc558b51abdb10202",
-        debug: true,
-        user: {
-          name: "Guest",
-        },
-      };
-    </script> -->
-    <script src="dist/app.min.js" defer></script>
-    <!-- <script
-      src="https://cdn-01.rapida.ai/public/scripts/app.min.js"
-      defer
-    ></script> -->
-    <!-- <script src="https://cdn-01.rapida.ai/public/scripts/app.min.js"></script> -->
+    <script defer src="./dist/app.min.js"></script>
   </body>
 </html>

@@ -1,7 +1,12 @@
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 import { FC, HTMLAttributes } from "react";
 import { motion } from "framer-motion";
-import { cn, toHumanReadableRelativeDay } from "@/styles/media";
+import {
+  cn,
+  toHumanReadableRelativeDay,
+  toHumanReadableRelativeTime,
+  toRelativeTime,
+} from "@/styles/media";
 import { ChevronUpIcon } from "@/icons/chevron-up";
 import { AssistantConversation } from "@/app/clients/protos/talk-api_pb";
 import { useChatNavigation } from "@/app/pages/web-plugin-chat/hooks/use-navigate";
@@ -11,38 +16,30 @@ export const RecentConversation: FC<{
 }> = ({ conversations }) => {
   const { goToConversation } = useChatNavigation();
   return (
-    <div className="pks_bg-white/80 dark:pks_bg-slate-950/50 pks_rounded-lg pks_border pks_backdrop-blur dark:pks_border-gray-700">
-      <div className="pks_w-full pks_border-b pks_px-2 pks_py-2 dark:pks_border-gray-700">
-        <h1 className="pks_text-lg pks_font-medium pks_opacity-50">
-          Recent Conversations
-        </h1>
-      </div>
-      <div className="pks_flex pks_flex-col pks_divide-y dark:pks_divide-gray-800">
-        {conversations.map((x, idx) => {
-          return (
-            <MotionDiv
-              className="last:pks_rounded-b-lg pks_flex-col hover:pks_shadow pks_relative pks_cursor-pointer pks_flex  pks_py-2 pks_px-3 pks_overflow-hidden pks_group pks_w-full pks_bg-white hover:pks_bg-gray-50 dark:pks_bg-gray-950 dark:hover:pks_bg-gray-900"
-              key={idx}
-              onClick={() => {
-                goToConversation(x.getId());
-              }}
-            >
-              <div className="pks_flex pks_w-full">
-                <span className="pks_my-auto  pks_absolute pks_right-4 pks_flex pks_justify-center pks_w-auto pks_h-fit pks_opacity-70 pks_top-0 pks_bottom-0">
-                  <ChevronUpIcon className="pks_rotate-90" strokeWidth={2} />
-                </span>
-                <span className="pks_relative pks_text-lg pks_mr-8 pks_text-gray-500 pks_font-normal">
-                  {x.getName()}
-                </span>
-              </div>
-              <div className="pks_text-base pks_flex dark:pks_text-gray-600 pks_text-gray-400">
-                {x.getCreateddate() &&
-                  toHumanReadableRelativeDay(x.getCreateddate()!)}
-              </div>
-            </MotionDiv>
-          );
-        })}
-      </div>
+    <div className="pks_flex pks_flex-col pks_px-2 pks_space-y-2">
+      {conversations.map((x, idx) => {
+        return (
+          <MotionDiv
+            className="pks_rounded-xl pks_flex-col pks_relative pks_cursor-pointer pks_flex pks_py-2 pks_px-3 pks_overflow-hidden pks_group pks_w-full pks_bg-gray-300/10 hover:pks_bg-gray-300/20 pks_border-[0.1px]"
+            key={idx}
+            onClick={() => {
+              goToConversation(x.getId());
+            }}
+          >
+            <div className="pks_flex pks_w-full">
+              <span className="pks_my-auto  pks_absolute pks_right-4 pks_flex pks_justify-center pks_w-auto pks_h-fit pks_opacity-70 pks_top-0 pks_bottom-0">
+                <ChevronUpIcon className="pks_rotate-90" strokeWidth={2.5} />
+              </span>
+              <span className="pks_relative pks_text-lg pks_mr-8 pks_text-gray-500 dark:pks_text-gray-400 pks_font-medium pks_op">
+                {x.getName()}
+              </span>
+            </div>
+            <div className="pks_text-base pks_flex dark:pks_text-gray-600 pks_text-gray-400 pks_opacity-60">
+              {x.getCreateddate() && toRelativeTime(x.getCreateddate()!)}
+            </div>
+          </MotionDiv>
+        );
+      })}
     </div>
   );
 };

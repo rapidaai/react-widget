@@ -17,6 +17,8 @@ import { RecentConversation } from "@/app/components/recent-conversation";
 import { useChatNavigation } from "@/app/pages/web-plugin-chat/hooks/use-navigate";
 import { Spinner } from "@/app/components/loaders/spinner";
 import { useAssistantChatContext } from "@/contexts/assistant-chat-context";
+import { AnimatedTabs } from "@/app/components/animated-tabs";
+import { RapidaIcon } from "@/icons/rapida";
 
 export const WelcomePage: FC<{
   currentAssistant: Assistant | null;
@@ -42,6 +44,8 @@ const AssistantPage: FC<{
   const [conversactions, setConversations] = useState<AssistantConversation[]>(
     []
   );
+
+  const [activeOpt, setActiveOpt] = useState("You could ask");
 
   const { goToConversation } = useChatNavigation();
   const afterGetAllConversation = useCallback(
@@ -107,16 +111,27 @@ const AssistantPage: FC<{
           </div>
         </div>
 
-        <div className="pks_mx-3">
+        <AnimatedTabs
+          tabs={[
+            {
+              name: "You could ask",
+            },
+            {
+              name: "Recent Conversations",
+            },
+          ]}
+          setActiveTab={setActiveOpt}
+          activeTab={activeOpt}
+        />
+
+        {activeOpt === "You could ask" && (
           <SuggestedQuestion assistant={assistant} />
-        </div>
-        {conversactions.length > 0 && (
-          <div className="pks_mx-3">
-            <RecentConversation conversations={conversactions} />
-          </div>
+        )}
+        {activeOpt === "Recent Conversations" && (
+          <RecentConversation conversations={conversactions} />
         )}
       </div>
-      <div className="pks_mx-2.5 pks_mb-2.5">
+      <div className="pks_mx-2.5 pks_mt-2.5">
         <Sender
           assistant={assistant}
           onMessaging={(msg: AssistantConversationMessage) => {
@@ -129,6 +144,11 @@ const AssistantPage: FC<{
             [HEADER_AUTH_ID]: user.user_id,
           }}
         />
+        <p className="pks_w-full pks_flex pks_items-center pks_justify-center pks_py-2 pks_text-xs pks_space-x-[1.5px]">
+          <span className="pks_opacity-60">Powered by</span>
+          <RapidaIcon className="pks_w-3.5 pks_h-3.5 pks_text-blue-500 pks_opacity-90" />
+          <span className="pks_font-medium pks_text-blue-500">Rapida</span>
+        </p>
       </div>
     </>
   );

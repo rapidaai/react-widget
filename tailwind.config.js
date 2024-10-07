@@ -4,13 +4,7 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [],
   mode: "jit",
-  darkMode: [
-    "variant",
-    [
-      "@media (prefers-color-scheme: dark) { &:not(.light *) }",
-      "&:is(.dark *)",
-    ],
-  ],
+  darkMode: "class",
   theme: {
     colors: {
       primary: "#0046D5",

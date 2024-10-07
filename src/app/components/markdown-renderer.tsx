@@ -31,7 +31,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
                     className={cn(
                       className,
                       "pks_pt-2.5 pks_pb-1",
-                      "pks_prose prose-gray pks_prose-lg dark:pks_prose-invert pks_break-words !pks_max-w-none prose-img:pks_rounded-xl prose-headings:pks_underline prose-a:pks_text-blue-600",
+                      "pks_prose pks_prose-gray pks_prose-lg dark:pks_prose-invert pks_break-words !pks_max-w-none prose-img:pks_rounded-xl prose-headings:pks_underline prose-a:pks_text-blue-600",
                       "dark:prose-code:!pks_bg-slate-900 dark:prose-pre:!pks_bg-slate-900",
                       "prose-code:!pks_bg-slate-100 prose-pre:!pks_bg-slate-100 pks_leading-normal pks_font-bold"
                     )}

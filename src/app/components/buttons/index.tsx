@@ -90,13 +90,7 @@ export function BlueBorderButton(props: ButtonProps) {
 export function BorderButton(props: ButtonProps) {
   return (
     <motion.button
-      whileHover={{
-        scale: 1.2,
-        transition: { duration: 1 },
-      }}
-      whileTap={{ scale: 0.9 }}
       type="button"
-      //   {...props}
       onClick={props.onClick}
       className={cn(
         "pks_flex pks_h-9 pks_truncate pks_w-fit pks_justify-center pks_items-center",

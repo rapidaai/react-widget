@@ -12,15 +12,6 @@ export function toDate(timestamp: Timestamp): Date {
   const seconds = timestamp.getSeconds();
   const nanos = timestamp.getNanos();
 
-  // Calculate milliseconds since Unix epoch
-  // const milliseconds = seconds * 1000 + Math.round(nanos / 1e6);
-
-  // // Create Moment.js object from milliseconds
-  // return moment.utc(milliseconds).toDate();
-
-  // // Extract seconds and nanos from the gRPC timestamp
-  // const { seconds, nanos } = timestamp;
-
   // Convert seconds to milliseconds
   const millisecondsFromSeconds = seconds * 1000;
 
@@ -36,10 +27,28 @@ export function toDate(timestamp: Timestamp): Date {
   // The Date object automatically handles conversion to local time
   return utcDate;
 }
-
+/**
+ *
+ * @param timestamp
+ * @returns
+ */
 export function toHumanReadableRelativeTime(timestamp: Timestamp): string {
   return moment(toDate(timestamp).toUTCString()).fromNow();
 }
+
+/**
+ *
+ * @param timestamp
+ * @returns
+ */
+export function toRelativeTime(timestamp: Timestamp): string {
+  return moment(toDate(timestamp).toUTCString()).format("M/D/YYYY h:mm A");
+}
+/**
+ *
+ * @param timestamp
+ * @returns
+ */
 export function daysAgoFromTimestamp(timestamp: Timestamp): number {
   const givenDate = moment(toDate(timestamp).toUTCString());
   const today = moment().utc();
