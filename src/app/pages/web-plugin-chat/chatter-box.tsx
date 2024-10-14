@@ -130,7 +130,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
   });
 
   return (
-    <AnimatePresence>
+    <>
       {loading ? (
         <div className="pks_flex-1 pks_pb-4 pks_flex pks_justify-center pks_items-center pks_bg-white">
           <Spinner size="md" />
@@ -142,10 +142,10 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
         >
           {conversations.map((x, idx) => {
             return (
-              <>
+              <div key={idx}>
                 {x.getRequest() && (
                   <motion.li
-                    data-key={`conversation-chat-${x.getId()}`}
+                    data-key={`conversation-chat-user-${x.getId()}`}
                     key={`user-${idx}`}
                     className={cn(
                       "pks_max-w-full",
@@ -180,7 +180,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
                 )}
                 {x.getResponse() && (
                   <motion.li
-                    data-key={`conversation-chat-${x.getId()}`}
+                    data-key={`conversation-chat-system-${x.getId()}`}
                     key={`system-${idx}`}
                     className={cn(
                       "pks_max-w-full",
@@ -218,7 +218,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
                     />
                   </motion.li>
                 )}
-              </>
+              </div>
             );
           })}
           <div ref={ctrRef} />
@@ -236,6 +236,6 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
           }}
         />
       </div>
-    </AnimatePresence>
+    </>
   );
 };

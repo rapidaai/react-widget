@@ -21,7 +21,6 @@ export const useMessageNotification = () => {
   const onUpdateNotificationStageMessage = (
     stages: Array<AssistantMessageStage>
   ) => {
-    console.dir(stages);
     let stage = stages.at(stages.length - 1);
     setNotificationMessage(
       stage ? GetStageMessage(stage.getStage()) : "Please wait..."

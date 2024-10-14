@@ -39,6 +39,10 @@
         display: none;
     }
 
+    .bg-custom-gray {
+        background-color: rgb(242, 242, 242);
+    }
+
     .no-scrollbar {
         -ms-overflow-style: none;
         /* IE and Edge */

@@ -113,7 +113,7 @@ export const WebPluginChat = () => {
                         "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800",
                         isExpand
                           ? "pks_w-1/2 pks_min-w-[500px] pks_h-[700px] pks_max-h-full"
-                          : "pks_w-[500px] pks_h-[700px] pks_max-h-full",
+                          : "pks_w-[450px] pks_h-[700px] pks_max-h-full",
                         "pks_flex pks_flex-col",
                         "pks_backdrop-blur-xl  dark:pks_bg-gray-900",
                         "pks_bg-gradient-to-b pks_from-blue-600 pks_via-blue-500 pks_from-10% pks_via-20% pks_to-40% pks_to-white",

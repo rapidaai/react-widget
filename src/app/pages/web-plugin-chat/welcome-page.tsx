@@ -100,8 +100,8 @@ const AssistantPage: FC<{
             />
           </div>
           <div className="pks_flex pks_flex-col pks_text-2xl pks_font-semibold pks_space-y-1">
-            <h1 className="pks_text-[28px]">{useLanguageLabel("welcome")}</h1>
-            <h1 className="pks_text-[28px]">
+            <h1 className="pks_text-[26px]">{useLanguageLabel("welcome")}</h1>
+            <h1 className="pks_text-[26px]">
               {useLanguageLabel("how_can_i_help")}
               {/* {assistant
                 ?.getWebappearance()

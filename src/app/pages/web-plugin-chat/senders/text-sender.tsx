@@ -82,13 +82,13 @@ export const TextSender: FC<SenderProps> = ({
               {notificationType !== "error" && <DotLoader />}
               <span className="pks_font-semibold pks_ml-1.5">
                 {assistant
-                  .getAppappearance()
+                  .getWebappearance()
                   ?.getFieldsMap()
                   .get("assistantName")
                   ?.getStringValue()
                   ? toTitleCase(
                       assistant
-                        .getAppappearance()
+                        .getWebappearance()
                         ?.getFieldsMap()
                         .get("assistantName")
                         ?.getStringValue()
@@ -104,13 +104,13 @@ export const TextSender: FC<SenderProps> = ({
               )}
             >
               {assistant
-                .getAppappearance()
+                .getWebappearance()
                 ?.getFieldsMap()
                 .get("assistantName")
                 ?.getStringValue()
                 ? toTitleCase(
                     assistant
-                      .getAppappearance()
+                      .getWebappearance()
                       ?.getFieldsMap()
                       .get("assistantName")
                       ?.getStringValue()

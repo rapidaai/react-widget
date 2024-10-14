@@ -50,7 +50,7 @@ export const Header: FC<{
 
       <div
         className={cn(
-          "pks_flex pks_items-center pks_space-x-2 pks_px-4 pks_py-4 pks_w-full"
+          "pks_flex pks_items-center pks_space-x-2 pks_px-4 pks_py-5 pks_w-full"
         )}
       >
         {pathname.includes(currentPath) && (
