@@ -3,6 +3,7 @@ interface ChatbotConfig {
   assistant_version?: string;
   api_base?: string;
   token?: string;
+  language?: string;
   user?: {
     name: string;
     user_id?: string;

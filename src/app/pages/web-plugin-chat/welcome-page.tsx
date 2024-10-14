@@ -19,6 +19,7 @@ import { Spinner } from "@/app/components/loaders/spinner";
 import { useAssistantChatContext } from "@/contexts/assistant-chat-context";
 import { AnimatedTabs } from "@/app/components/animated-tabs";
 import { RapidaIcon } from "@/icons/rapida";
+import useLanguageLabel from "@/hooks/use-language";
 
 export const WelcomePage: FC<{
   currentAssistant: Assistant | null;
@@ -44,8 +45,6 @@ const AssistantPage: FC<{
   const [conversactions, setConversations] = useState<AssistantConversation[]>(
     []
   );
-
-  const [activeOpt, setActiveOpt] = useState("You could ask");
 
   const { goToConversation } = useChatNavigation();
   const afterGetAllConversation = useCallback(
@@ -77,6 +76,7 @@ const AssistantPage: FC<{
     onGetAllConversation(token, assistant.getId());
   }, [assistant]);
 
+  //   const {} = useLanguageLabel();
   useEffect(() => {
     ctx.clear();
   }, []);
@@ -84,10 +84,10 @@ const AssistantPage: FC<{
     <>
       <div
         className={cn(
-          "pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_space-y-4 pks_pb-4"
+          "pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_space-y-2 pks_pb-4"
         )}
       >
-        <div className={cn("pks_p-3 pks_flex pks_flex-col")}>
+        <div className={cn("pks_p-3 pks_px-8 pks_flex pks_flex-col")}>
           <div className={cn("pks_h-16 pks_w-16 pks_my-[32px]")}>
             <img
               className="pks_w-full pks_h-full pks_object-cover pks_rounded-xl pks_border-[0.5px] pks_p-1 pks_bg-gray-100/50 dark:pks_border-gray-700 dark:pks_bg-gray-700/50"
@@ -99,37 +99,21 @@ const AssistantPage: FC<{
                 ?.getStringValue()}
             />
           </div>
-          <div className="pks_flex pks_flex-col pks_text-2xl pks_font-semibold">
-            <h1 className="">Hello there.</h1>
-            <h1 className="pks_opacity-60">
-              {assistant
+          <div className="pks_flex pks_flex-col pks_text-2xl pks_font-semibold pks_space-y-1">
+            <h1 className="pks_text-[28px]">{useLanguageLabel("welcome")}</h1>
+            <h1 className="pks_text-[28px]">
+              {useLanguageLabel("how_can_i_help")}
+              {/* {assistant
                 ?.getWebappearance()
                 ?.getFieldsMap()
                 ?.get("openingStatement")
-                ?.getStringValue()}
+                ?.getStringValue()} */}
             </h1>
           </div>
         </div>
-
-        <AnimatedTabs
-          tabs={[
-            {
-              name: "You could ask",
-            },
-            {
-              name: "Recent Conversations",
-            },
-          ]}
-          setActiveTab={setActiveOpt}
-          activeTab={activeOpt}
-        />
-
-        {activeOpt === "You could ask" && (
+        <div className="pks_px-3 pks_pt-4">
           <SuggestedQuestion assistant={assistant} />
-        )}
-        {activeOpt === "Recent Conversations" && (
-          <RecentConversation conversations={conversactions} />
-        )}
+        </div>
       </div>
       <div className="pks_mx-2.5 pks_mt-2.5">
         <Sender

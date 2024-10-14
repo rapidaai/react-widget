@@ -73,11 +73,10 @@ export const ScalableTextarea = React.forwardRef<
   return (
     <div
       className={cn(
-        // "pks_relative",
         "pks_w-full",
         "dark:pks_placeholder-gray-600 pks_placeholder-gray-400",
-        "pks_border-[0.5px] pks_border-gray-200 dark:pks_border-gray-600/50 pks_rounded-md",
-        "focus-within:pks_border-[1px] dark:focus-within:pks_border-blue-600 focus-within:pks_border-blue-600",
+        "pks_border-[1px] pks_border-gray-200/50 dark:pks_border-gray-600/50 pks_rounded-md",
+        " dark:focus-within:pks_border-blue-600 focus-within:pks_border-blue-600",
         "dark:pks_text-slate-300 pks_text-slate-600",
         "focus:pks_ring-0 focus:pks_outline-none",
         "pks_bg-gray-50 dark:pks_bg-slate-900",

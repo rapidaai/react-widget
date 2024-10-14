@@ -5,7 +5,7 @@ import { AssistantChatContextProvider } from "@/contexts/assistant-chat-context"
 
 export const App: FC<{}> = memo(() => {
   return (
-    <div className="pks_font-sans pks_antialiased">
+    <div className="pks_font-sans">
       <AssistantChatContextProvider>
         <WebPluginChat />
       </AssistantChatContextProvider>

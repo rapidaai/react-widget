@@ -13,6 +13,7 @@
         ],
         "target": "es6",
         "module": "commonjs",
+        "resolveJsonModule": true,
         "jsx": "react-jsx",
         "moduleResolution": "node",
         "strict": true,

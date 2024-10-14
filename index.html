@@ -1,26 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatbot Integration</title>
   </head>
   <body style="">
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 16px">
+      <label for="languageSelect">Language:</label>
+      <select
+        id="languageSelect"
+        style="
+          padding: 5px 10px;
+          font-size: 16px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        "
+        onchange="changeLanguage(this)"
+      >
+        <option value="en" selected>English</option>
+        <option value="id">Bahasa Indonesia</option>
+      </select>
+    </div>
     <script>
       window.chatbotConfig = {
-        debug: true,
-        api_base: "http://assistant.rapida.local",
-        assistant_id: "2104890391609212928",
+        assistant_id: "2107712501754888192",
+        language: "id",
         token:
-          "05064a056f0a60f309ff1d5cc66cb6bb5ecd1d79238e048b2594b51bfb9d4610",
+          "fe0727dd45acf2efce0752c4ff0783f232e559575bbfca059365333f2df2819a",
         user: {
           name: "Prashant",
           id: "prashant",
         },
       };
     </script>
-    <!-- src="https://cdn-01.rapida.ai/public/scripts/app.min.js" -->
 
+    <script>
+      // Function to change the language in the chatbot config and update the <html> tag
+      function changeLanguage(selectElement) {
+        const selectedLanguage = selectElement.value;
+        console.warn("on change");
+        // Update the language in chatbotConfig
+        if (window.chatbotConfig) {
+          window.chatbotConfig.language = selectedLanguage;
+        } else {
+          console.warn("chatbotConfig is not defined!");
+        }
+
+        // Update the <html> lang attribute
+        document.documentElement.lang = selectedLanguage;
+
+        console.log(`Language switched to: ${selectedLanguage}`);
+        console.dir(window.chatbotConfig);
+      }
+    </script>
     <script defer src="./dist/app.min.js"></script>
+
+    <!-- <script
+      defer
+      src="https://cdn-01.rapida.ai/public/scripts/app.min.js"
+    ></script> -->
   </body>
 </html>

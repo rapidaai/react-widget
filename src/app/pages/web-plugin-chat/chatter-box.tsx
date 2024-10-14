@@ -132,63 +132,93 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
   return (
     <AnimatePresence>
       {loading ? (
-        <div className="pks_flex-1 pks_pb-4 pks_flex pks_justify-center pks_items-center">
+        <div className="pks_flex-1 pks_pb-4 pks_flex pks_justify-center pks_items-center pks_bg-white">
           <Spinner size="md" />
         </div>
       ) : (
         <motion.ul
           variants={variants}
-          className="pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_text-gray-600 dark:pks_text-gray-500 pks_pb-4"
+          className="pks_bg-white pks_flex-1 pks_overflow-y-auto pks_flex-grow message-container pks_text-gray-600 dark:pks_text-gray-500 pks_pb-4 pks_space-y-2 pks_pt-3"
         >
           {conversations.map((x, idx) => {
             return (
-              <motion.li
-                data-key={`conversation-chat-${x.getId()}`}
-                key={`conversation-chat-${x.getId()}`}
-                className={cn(
-                  "pks_max-w-full",
-                  x.getCreateddate() &&
-                    `pks_day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
-                )}
-                variants={{
-                  open: {
-                    y: 0,
-                    opacity: 1,
-                    transition: {
-                      y: { stiffness: 1000, velocity: -100 },
-                    },
-                  },
-                  closed: {
-                    y: 50,
-                    opacity: 0,
-                    transition: {
-                      y: { stiffness: 1000 },
-                    },
-                  },
-                }}
-              >
+              <>
                 {x.getRequest() && (
-                  <UserChatMessage
-                    message={x.getRequest()!}
-                    time={
-                      x.getCreateddate() && getTimeFromDate(x.getCreateddate()!)
-                    }
-                  />
+                  <motion.li
+                    data-key={`conversation-chat-${x.getId()}`}
+                    key={`user-${idx}`}
+                    className={cn(
+                      "pks_max-w-full",
+                      x.getCreateddate() &&
+                        `pks_day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
+                    )}
+                    variants={{
+                      open: {
+                        y: 0,
+                        opacity: 1,
+                        transition: {
+                          y: { stiffness: 1000, velocity: -100 },
+                        },
+                      },
+                      closed: {
+                        y: 50,
+                        opacity: 0,
+                        transition: {
+                          y: { stiffness: 1000 },
+                        },
+                      },
+                    }}
+                  >
+                    <UserChatMessage
+                      message={x.getRequest()!}
+                      time={
+                        x.getCreateddate() &&
+                        getTimeFromDate(x.getCreateddate()!)
+                      }
+                    />
+                  </motion.li>
                 )}
                 {x.getResponse() && (
-                  <SystemChatMessage
-                    assistant={assistant}
-                    assistantConversationId={conversationId!}
-                    assistantConversationMessage={x}
-                    messageActions={messageAction}
-                    messageContent={x.getResponse()!}
-                    time={
-                      x.getCreateddate() && getTimeFromDate(x.getCreateddate()!)
-                    }
-                    stages={x.getStagesList()}
-                  />
+                  <motion.li
+                    data-key={`conversation-chat-${x.getId()}`}
+                    key={`system-${idx}`}
+                    className={cn(
+                      "pks_max-w-full",
+                      x.getCreateddate() &&
+                        `pks_day-${daysAgoFromTimestamp(x.getCreateddate()!)}`
+                    )}
+                    variants={{
+                      open: {
+                        y: 0,
+                        opacity: 1,
+                        transition: {
+                          y: { stiffness: 1000, velocity: -100 },
+                        },
+                      },
+                      closed: {
+                        y: 50,
+                        opacity: 0,
+                        transition: {
+                          y: { stiffness: 1000 },
+                        },
+                      },
+                    }}
+                  >
+                    <SystemChatMessage
+                      assistant={assistant}
+                      assistantConversationId={conversationId!}
+                      assistantConversationMessage={x}
+                      messageActions={messageAction}
+                      messageContent={x.getResponse()!}
+                      time={
+                        x.getCreateddate() &&
+                        getTimeFromDate(x.getCreateddate()!)
+                      }
+                      stages={x.getStagesList()}
+                    />
+                  </motion.li>
                 )}
-              </motion.li>
+              </>
             );
           })}
           <div ref={ctrRef} />

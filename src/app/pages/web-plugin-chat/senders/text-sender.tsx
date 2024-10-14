@@ -16,6 +16,7 @@ import {
 } from "@/app/components/buttons";
 import { ScalableTextarea } from "@/app/components/textareas";
 import TooltipPlus from "@/app/components/tooltips";
+import useLanguageLabel from "@/hooks/use-language";
 
 /**
  *
@@ -129,7 +130,7 @@ export const TextSender: FC<SenderProps> = ({
         )}
       >
         <ScalableTextarea
-          placeholder="How can i help you today?"
+          placeholder={useLanguageLabel("chat_input_placeholder")}
           spellCheck="false"
           wrapperClassName="!pks_rounded-[26px] pks_shadow"
           className={cn("pks_text-base !pks_rounded-[26px]", textAreaClassName)}

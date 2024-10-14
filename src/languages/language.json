@@ -1,0 +1,12 @@
+{
+    "en": {
+        "welcome": "Hello there.",
+        "how_can_i_help": "How can i help?",
+        "chat_input_placeholder": "How can i help you today?"
+    },
+    "id": {
+        "welcome": "Halo",
+        "how_can_i_help": "Apa yang bisa saya bantu?",
+        "chat_input_placeholder": "Bagaimana saya bisa membantu Anda hari ini?"
+    }
+}

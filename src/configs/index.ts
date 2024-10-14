@@ -5,3 +5,4 @@ export const HEADER_API_KEY = "x-api-key";
 export const HEADER_SOURCE_KEY = "x-client-source";
 export const HEADER_ENVIRONMENT_KEY = "x-rapida-environment";
 export const HEADER_REGION_KEY = "x-rapida-region";
+export const DEFAULT_LANGUAGE = "en";

@@ -16,7 +16,7 @@ export const AnimatedTabs: FC<{
           className={cn(
             activeTab === tab.name ? "pks_text-blue-600" : "pks_text-gray-500",
             "pks_px-4 pks_py-3 pks_flex pks_items-center pks_text-lg pks_relative pks_capitalize pks_cursor-pointer",
-            "pks_opacity-90"
+            "pks_opacity-90 pks_font-medium"
           )}
           style={{
             WebkitTapHighlightColor: "transparent",
