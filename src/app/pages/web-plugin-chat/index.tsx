@@ -110,10 +110,11 @@ export const WebPluginChat = () => {
                       layout
                       animate={isExpand}
                       style={{
-                        background: `linear-gradient(to bottom, ${theme.color} 10%, ${theme.color}80 20%, white 40%)`,
+                        background: `linear-gradient(to bottom, ${theme.color} 0%, white 100%);`,
+                        // `linear-gradient(to bottom, ${theme.color}  white)`,
                       }}
                       className={cn(
-                        "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800",
+                        "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800 pks_z-[9999]",
                         isExpand
                           ? "pks_w-1/2 pks_min-w-[500px] pks_h-[700px] pks_max-h-full"
                           : "pks_w-[450px] pks_h-[700px] pks_max-h-full",
