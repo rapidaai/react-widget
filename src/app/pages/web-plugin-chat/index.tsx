@@ -20,7 +20,7 @@ import { ChatPage } from "@/app/pages/web-plugin-chat/chatter-box";
 export const WebPluginChat = () => {
   const [isOpen, toggleOpen] = useCycle(false, true);
   const [isExpand, toggelScreen] = useCycle(false, true);
-  const { assistantId, assistantVersion, token, user, debug } =
+  const { assistantId, assistantVersion, token, user, debug, theme } =
     useEnvironment();
   const [loadingAssistant, setLoadingAssistant] = useState<boolean>(true);
 
@@ -109,6 +109,9 @@ export const WebPluginChat = () => {
                     <motion.div
                       layout
                       animate={isExpand}
+                      style={{
+                        background: `linear-gradient(to bottom, ${theme.color} 10%, ${theme.color}80 20%, white 40%)`,
+                      }}
                       className={cn(
                         "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800",
                         isExpand

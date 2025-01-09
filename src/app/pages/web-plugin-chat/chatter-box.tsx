@@ -1,5 +1,10 @@
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
-import { cn, daysAgoFromTimestamp, getTimeFromDate } from "@/styles/media";
+import {
+  cn,
+  daysAgoFromTimestamp,
+  getTimeFromDate,
+  toHumanReadableRelativeTime,
+} from "@/styles/media";
 import {
   FC,
   HTMLAttributes,
@@ -142,7 +147,7 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
         >
           {conversations.map((x, idx) => {
             return (
-              <div key={idx}>
+              <div key={idx} className="pks_space-y-4">
                 {x.getRequest() && (
                   <motion.li
                     data-key={`conversation-chat-user-${x.getId()}`}
@@ -170,10 +175,10 @@ const ChatterBox: FC<ChatterBoxProps> = ({ assistant, conversationId }) => {
                     }}
                   >
                     <UserChatMessage
-                      message={x.getRequest()!}
+                      messageContent={x.getRequest()!}
                       time={
                         x.getCreateddate() &&
-                        getTimeFromDate(x.getCreateddate()!)
+                        toHumanReadableRelativeTime(x.getCreateddate()!)
                       }
                     />
                   </motion.li>

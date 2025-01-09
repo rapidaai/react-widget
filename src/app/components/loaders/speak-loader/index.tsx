@@ -3,12 +3,12 @@ import React, { FC } from "react";
 
 export const SpeakLoader: FC<{ isRecording: boolean }> = ({ isRecording }) => {
   return (
-    <div className="pks_h-16 pks_loader pks_relative pks_aspect-[1]">
+    <div className=" pks_loader pks_relative pks_aspect-[1]">
       <div className="pks_absolute pks_z-[10] pks_top-0 pks_right-0 pks_left-0 pks_bottom-0 pks_flex pks_justify-center pks_items-center">
         <div
           className={cn(
             "pks_flex pks_items-center pks_justify-center",
-            "pks_h-10 pks_w-10 pks_rounded-full pks_p-2",
+            "pks_h-20 pks_w-10 pks_rounded-full pks_p-2",
             "pks_text-white",
             isRecording
               ? "pks_bg-blue-500 pks_text-white"

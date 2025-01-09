@@ -8,7 +8,7 @@ import {
   toRelativeTime,
 } from "@/styles/media";
 import { ChevronUpIcon } from "@/icons/chevron-up";
-import { AssistantConversation } from "@/app/clients/protos/talk-api_pb";
+import { AssistantConversation } from "@/app/clients/protos/common_pb";
 import { useChatNavigation } from "@/app/pages/web-plugin-chat/hooks/use-navigate";
 
 export const RecentConversation: FC<{

@@ -38,7 +38,7 @@ export const Sender: FC<SenderProps> = (props) => {
   if (inputType === "text")
     return (
       <TextSender
-        textAreaClassName="pks_text-lg pks_px-4 pks_p-3"
+        textAreaClassName="pks_px-4 pks_align-middle pks_h-full pks_leading-8"
         {...props}
         onChangeInputType={setInputType}
       />

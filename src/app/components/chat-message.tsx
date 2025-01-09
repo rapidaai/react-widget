@@ -5,7 +5,7 @@ import {
 } from "@/app/clients/protos/common_pb";
 import { FC } from "react";
 import { RapidaIcon } from "@/icons/rapida";
-import { cn } from "@/styles/media";
+import { cn, toHumanReadableRelativeTime } from "@/styles/media";
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 import MarkdownRenderer from "@/app/components/markdown-renderer";
 import { useEnvironment } from "@/hooks/use-environment";
@@ -20,22 +20,19 @@ import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
  * @param param0
  * @returns
  */
-export const UserChatMessage: FC<{ message: Message; time?: string }> = ({
-  message,
-}) => {
+export const UserChatMessage: FC<{
+  messageContent: Message;
+  time?: string;
+}> = ({ messageContent, time }) => {
   /**
    * current user
    */
   return (
-    <div
-      className={cn("pks_flex pks_px-2 pks_py-3 pks_w-full pks_justify-end")}
-    >
-      <div className="pks_ml-2 pks_min-w-0">
-        <div className="pks_mr-2 pks_py-3 pks_px-4 pks_rounded-[18px] bg-custom-gray">
-          <MarkdownRenderer>
-            {toContentText(message.getContentsList())}
-          </MarkdownRenderer>
-        </div>
+    <div className="pks_flex pks_items-end pks_justify-end pks_gap-2.5 pks_px-4">
+      <div className="pks_flex pks_flex-col pks_w-fit pks_max-w-[320px] pks_leading-1.5 pks_p-2.5 pks_px-3 pks_border-gray-200 pks_bg-gray-100 pks_rounded-s-xl  pks_rounded-ee-xl pks_rounded-ss-xl dark:pks_bg-gray-700">
+        <MarkdownRenderer>
+          {toContentText(messageContent.getContentsList())}
+        </MarkdownRenderer>
       </div>
     </div>
   );
@@ -67,11 +64,11 @@ export const SystemChatMessage: FC<{
   messageActions,
 }) => {
   return (
-    <div className="pks_flex pks_px-2 pks_group pks_justify-start pks_items-start pks_gap-2">
-      <div className="pks_h-12 pks_w-12 pks_flex-shrink-0 pks_flex pks_items-center pks_justify-center bg-custom-gray pks_order-1 pks_border-[0.5px] pks_rounded-full">
+    <div className="pks_flex pks_items-start pks_gap-2.5 pks_px-4">
+      <div className="pks_w-[40px] pks_h-[40px] pks_rounded-full">
         {assistant?.getWebappearance()?.getFieldsMap().get("appIcon") ? (
           <img
-            className="pks_w-full pks_h-full pks_object-cover pks_rounded-full pks_p-2"
+            className="pks_w-full pks_h-full pks_object-cover pks_rounded-full"
             alt="Assistant Icon"
             src={assistant
               ?.getWebappearance()
@@ -83,34 +80,43 @@ export const SystemChatMessage: FC<{
           <RapidaIcon className="pks_h-8 pks_w-8 pks_rounded-full" />
         )}
       </div>
-      <div className="pks_min-w-0 pks_order-2 group">
-        <motion.div className="pks_rounded-[18px] bg-custom-gray" layout>
-          <div className="pks_mr-2 pks_px-3 pks_pt-3 pks_pb-3">
-            <MarkdownRenderer>
-              {toContentText(messageContent.getContentsList())}
-            </MarkdownRenderer>
+      <div className="pks_flex pks_flex-col pks_gap-1 pks_w-full pks_max-w-[320px] pks_group pks_relative">
+        <div className="pks_flex pks_items-center pks_space-x-2 rtl:pks_space-x-reverse">
+          <div className="pks_flex">
+            <span className="pks_text-sm pks_font-semibold pks_text-gray-900 dark:pks_text-white">
+              {assistant
+                .getWebappearance()
+                ?.getFieldsMap()
+                .get("assistantName")
+                ?.getStringValue()
+                ? toTitleCase(
+                    assistant
+                      .getWebappearance()
+                      ?.getFieldsMap()
+                      .get("assistantName")
+                      ?.getStringValue()
+                  )
+                : "Rapida"}
+            </span>
+            <span className="pks_text-sm pks_font-normal pks_text-gray-500 dark:pks_text-gray-400">
+              {time}
+            </span>
           </div>
           <AnimatePresence>
             <motion.div
               layout
-              className="pks_hidden pks_transition-all pks_ease-in-out pks_delay-150 pks_duration-300 group-hover:pks_flex pks_w-full pks_py-2 pks_px-4 pks_space-x-1 pks_rounded-b-[18px] pks_justify-end pks_border-t-[0.5px]"
+              className="pks_absolute pks_top-0 pks_right-0 pks_flex"
+              //   className="pks_hidden pks_transition-all pks_ease-in-out pks_delay-150 pks_duration-300 group-hover:pks_flex pks_w-full pks_py-2 pks_px-4 pks_space-x-1 pks_rounded-b-[18px] pks_justify-end pks_border-t-[0.5px]"
             >
-              <CopyButton
-                iconClassName="!pks_h-3.5 !pks_w-3.5"
-                className="!pks_border-[0.5px] !pks_h-fit !pks_p-1 !pks_px-2 pks_text-gray-600  hover:!pks_bg-white dark:hover:!pks_bg-gray-800/50 !pks_rounded-md"
-                withLabel={true}
-              >
-                {toContentText(messageContent.getContentsList())}
-              </CopyButton>
               <LikeButton
                 onClick={() => {
                   messageActions.onLikeMessage(
                     assistantConversationMessage.getId()
                   );
                 }}
-                withLabel={true}
+                withLabel={false}
                 iconClassName="!pks_h-3.5 !pks_w-3.5"
-                className="!pks_h-fit !pks_p-1 !pks_px-2 pks_text-green-600  hover:!pks_bg-white dark:hover:!pks_bg-green-800/50 !pks_border-[0.5px] !pks_rounded-md"
+                className="!pks_bg-none !pks_h-fit !pks_p-1 !pks_px-2 pks_text-green-600  hover:!pks_bg-white dark:hover:!pks_bg-green-800/50 !pks_border-none"
               />
               <DislikeButton
                 onClick={() => {
@@ -118,19 +124,27 @@ export const SystemChatMessage: FC<{
                     assistantConversationMessage.getId()
                   );
                 }}
-                withLabel={true}
+                withLabel={false}
                 iconClassName="!pks_h-3.5 !pks_w-3.5"
-                className="!pks_h-fit !pks_p-1 !pks_px-2 pks_text-rose-600  hover:!pks_bg-white dark:hover:!pks_bg-rose-800/50 !pks_border-[0.5px] !pks_rounded-md"
+                className="!pks_bg-none !pks_h-fit !pks_p-1 !pks_px-2 pks_text-rose-600  hover:!pks_bg-white dark:hover:!pks_bg-rose-800/50 !pks_border-none"
               />
             </motion.div>
           </AnimatePresence>
-        </motion.div>
+        </div>
+        <div className="pks_flex pks_flex-col pks_leading-1.5 pks_p-4 pks_border-gray-200 pks_bg-gray-100 pks_rounded-e-xl pks_rounded-es-xl dark:pks_bg-gray-700">
+          <p className="pks_text-sm pks_font-normal pks_text-gray-900 dark:pks_text-white">
+            <MarkdownRenderer>
+              {toContentText(messageContent.getContentsList())}
+            </MarkdownRenderer>
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 import { useRef, useState } from "react";
+import { toTitleCase } from "@/utils";
 
 interface ExpandableTagProps {
   unhoveredText: string;

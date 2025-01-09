@@ -8,15 +8,10 @@ import { UpArrowIcon } from "@/icons/up-arrow";
 import { SenderProps } from "@/app/pages/web-plugin-chat/senders/sender";
 import { useMessageTextStream } from "@/app/pages/web-plugin-chat/hooks/use-message-text-stream";
 import { DotLoader } from "@/app/components/loaders/dot-loader";
-import {
-  BorderButton,
-  Button,
-  HoverButton,
-  IconButton,
-} from "@/app/components/buttons";
+import { BorderButton, Button } from "@/app/components/buttons";
 import { ScalableTextarea } from "@/app/components/textareas";
-import TooltipPlus from "@/app/components/tooltips";
 import useLanguageLabel from "@/hooks/use-language";
+import { useEnvironment } from "@/hooks/use-environment";
 
 /**
  *
@@ -66,6 +61,7 @@ export const TextSender: FC<SenderProps> = ({
     onSendingTextMessage(data.message);
   };
 
+  const { theme } = useEnvironment();
   return (
     <>
       {notificationMessage && (
@@ -125,7 +121,7 @@ export const TextSender: FC<SenderProps> = ({
       <form
         onSubmit={handleSubmit(onSubmitForm)}
         className={cn(
-          "pks_flex pks_flex-col pks_items-center pks_relative pks_z-10",
+          "pks_flex pks_flex-col pks_items-center pks_relative pks_z-10 pks_m-0",
           className
         )}
       >
@@ -133,7 +129,7 @@ export const TextSender: FC<SenderProps> = ({
           placeholder={useLanguageLabel("chat_input_placeholder")}
           spellCheck="false"
           wrapperClassName="!pks_rounded-[26px] pks_shadow"
-          className={cn("pks_text-base !pks_rounded-[26px]", textAreaClassName)}
+          className={cn("!pks_rounded-[26px]", textAreaClassName)}
           {...register("message", {
             required: "Please write your message.",
           })}
@@ -145,8 +141,13 @@ export const TextSender: FC<SenderProps> = ({
           }}
           actions={
             <>
-              {isValid ? (
-                <Button className="pks_border-none pks_rounded-full !pks_p-1.5 pks_h-fit">
+              {isValid && !sending ? (
+                <Button
+                  style={{
+                    background: theme.color,
+                  }}
+                  className="pks_border-none pks_rounded-full !pks_p-1.5 pks_h-fit"
+                >
                   {loading || sending ? (
                     <Spinner size="sm" />
                   ) : (

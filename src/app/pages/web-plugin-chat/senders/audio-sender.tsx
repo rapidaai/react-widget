@@ -8,6 +8,7 @@ import { MicLoader } from "@/app/components/loaders/mic-loader";
 import { toContentText } from "@/utils/rapida_content";
 import { SenderProps } from "@/app/pages/web-plugin-chat/senders/sender";
 import { useAssistantChatContext } from "@/contexts/assistant-chat-context";
+import { BorderButton } from "@/app/components/buttons";
 
 /**
  * AudioSender component
@@ -16,12 +17,9 @@ import { useAssistantChatContext } from "@/contexts/assistant-chat-context";
  */
 export const AudioSender: FC<SenderProps> = ({
   assistant,
-  assistantConversationId,
   onMessaging,
-  className,
   auth,
   onSend,
-  //   onChangeInputType,
 }) => {
   const { conversations, onChangeConversationMessages } =
     useAssistantChatContext();
@@ -88,32 +86,35 @@ export const AudioSender: FC<SenderProps> = ({
           </div>
         </div>
       )}
-      <div className="pks_flex pks_flex-col pks_items-center pks_relative pks_z-10">
-        <div
-          className={cn(
-            "pks_border-[1px] pks_border-gray-300 dark:pks_border-gray-600/50",
-            "pks_shadow pks_flex pks_items-start pks_w-full pks_rounded-xl pks_p-2 pks_bg-gray-50 dark:pks_bg-slate-900",
-            "pks_relative"
-          )}
+      {/* <div className="pks_flex pks_flex-col pks_items-center pks_relative pks_z-10"> */}
+      <div
+        className={cn(
+          "!pks_rounded-full pks_shadow",
+          "pks_border-[1px] pks_border-gray-300 dark:pks_border-gray-600/50",
+          "pks_shadow pks_flex pks_items-start pks_w-full pks_p-2 pks_bg-gray-50 dark:pks_bg-slate-900",
+          "pks_relative"
+        )}
+      >
+        <BorderButton
+          type="button"
+          className="pks_rounded-full !pks_p-1.5 pks_h-fit pks_text-gray-400 dark:pks_text-gray-600 !pks_border-[0.5px] pks_shadow-sm !pks_bg-white"
         >
-          <button onClick={() => isRecording && stopRecording()}>
-            {doingWhat === "speaking" && (
-              <SpeakLoader isRecording={isRecording} />
-            )}
-            {doingWhat === "listening" && (
-              <MicLoader isRecording={isRecording} />
-            )}
-          </button>
+          {/* <button onClick={() => isRecording && stopRecording()}> */}
+          {doingWhat === "speaking" && (
+            <SpeakLoader isRecording={isRecording} />
+          )}
+          {doingWhat === "listening" && <MicLoader isRecording={isRecording} />}
+        </BorderButton>
 
-          <div className="pks_ml-2 pks_text-lg pks_font-medium pks_my-auto">
-            {currentTranscribeContent.length > 0 ? (
-              toContentText(currentTranscribeContent)
-            ) : (
-              <p className="pks_opacity-40">try saying hi....</p>
-            )}
-          </div>
+        <div className="pks_ml-2 pks_text-lg pks_font-medium pks_my-auto">
+          {currentTranscribeContent.length > 0 ? (
+            toContentText(currentTranscribeContent)
+          ) : (
+            <p className="pks_opacity-40">try saying hi....</p>
+          )}
         </div>
       </div>
+      {/* </div> */}
     </>
   );
 };

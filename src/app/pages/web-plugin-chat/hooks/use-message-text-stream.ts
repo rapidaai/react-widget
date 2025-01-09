@@ -69,10 +69,14 @@ export const useMessageTextStream = ({
     );
 
     stream.on("data", (response: AssistantMessagingResponse) => {
-      const convo = response.getData();
-      if (convo) {
-        onUpdateNotificationStageMessage(convo.getStagesList());
-        onMessaging(convo);
+      if (
+        response.getDataCase() == AssistantMessagingResponse.DataCase.MESSAGE
+      ) {
+        const convo = response.getMessage();
+        if (convo) {
+          onUpdateNotificationStageMessage(convo.getStagesList());
+          onMessaging(convo);
+        }
       }
     });
 

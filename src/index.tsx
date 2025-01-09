@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import { DarkModeProvider } from "@/contexts/dark-mode-context";
 import { EnvironmentProvider } from "@/contexts/environment-context";
 import { App } from "@/app";
-// import "@/app/index.css";
 import "@/styles/index.css";
 
 const rootElementId = "rapida-chat-app";

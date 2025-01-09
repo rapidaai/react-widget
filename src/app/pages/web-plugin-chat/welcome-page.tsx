@@ -1,11 +1,11 @@
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
 import { cn, daysAgoFromTimestamp, getTimeFromDate } from "@/styles/media";
 import { FC, memo, useCallback, useEffect, useRef, useState } from "react";
-import { AssistantConversationMessage } from "@/app/clients/protos/common_pb";
 import {
   AssistantConversation,
-  GetAllAssistantConversationResponse,
-} from "@/app/clients/protos/talk-api_pb";
+  AssistantConversationMessage,
+} from "@/app/clients/protos/common_pb";
+import { GetAllAssistantConversationResponse } from "@/app/clients/protos/talk-api_pb";
 import { GetAllAssistantConversation } from "@/app/clients/talk";
 import { useEnvironment } from "@/hooks/use-environment";
 import { HEADER_API_KEY } from "@/configs";
@@ -24,7 +24,6 @@ import useLanguageLabel from "@/hooks/use-language";
 export const WelcomePage: FC<{
   currentAssistant: Assistant | null;
 }> = memo(({ currentAssistant }) => {
-  //   const ctx = useAssistantChatContext();
   const { token, user } = useEnvironment();
   if (currentAssistant && token && user.user_id)
     return (
@@ -128,17 +127,17 @@ const AssistantPage: FC<{
             [HEADER_AUTH_ID]: user.user_id,
           }}
         />
-        <p className="pks_w-full pks_flex pks_items-center pks_justify-center pks_py-2 pks_text-xs pks_space-x-[1.5px]">
+        <div className="pks_w-full pks_flex pks_items-center pks_justify-center pks_py-2 pks_text-xs">
           <span className="pks_opacity-60">Powered by</span>
-          <RapidaIcon className="pks_w-3.5 pks_h-3.5 pks_text-blue-500 pks_opacity-90" />
+          <RapidaIcon className="pks_w-[0.9rem] pks_h-[0.9rem] pks_text-blue-500 pks_opacity-90 pks_ml-1 pks_mr-0.5" />
           <a
-            className="pks_font-medium pks_text-blue-500 hover:pks_underline"
+            className="pks_font-semibold pks_text-blue-500 hover:pks_underline"
             target="_blank"
             href="https://rapida.ai"
           >
-            Rapida
+            rapida
           </a>
-        </p>
+        </div>
       </div>
     </>
   );

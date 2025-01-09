@@ -15,6 +15,9 @@ interface EnvironmentContextProps {
     // any additional data that will be stored for the assistant
     meta?: Record<string, string>;
   };
+  theme: {
+    color: string;
+  };
 }
 
 // Function to generate a random string
@@ -38,6 +41,9 @@ export const EnvironmentContext = createContext<EnvironmentContextProps>({
     ...window.chatbotConfig?.user,
     name: window.chatbotConfig?.user?.name || "Guest",
     user_id: window.chatbotConfig?.user?.user_id || RandomString(),
+  },
+  theme: {
+    color: window.chatbotConfig?.theme?.color || "#2663eb",
   },
 });
 
@@ -118,6 +124,9 @@ export const EnvironmentProvider: React.FC<{
             window.chatbotConfig?.user?.user_id ||
             userId(window.chatbotConfig?.user?.user_id),
           meta: defaultMeta(window.chatbotConfig?.user?.meta),
+        },
+        theme: {
+          color: window.chatbotConfig?.theme?.color || "#2663eb",
         },
       }}
     >

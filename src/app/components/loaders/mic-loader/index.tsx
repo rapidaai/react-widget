@@ -3,7 +3,7 @@ import React, { FC } from "react";
 
 export const MicLoader: FC<{ isRecording: boolean }> = ({ isRecording }) => {
   return (
-    <div className="pks_h-16 pks_loader pks_relative pks_aspect-[1]">
+    <div className="pks_h-11 pks_loader pks_relative pks_aspect-[1]">
       <div className="pks_absolute pks_z-[10] pks_top-0 pks_right-0 pks_left-0 pks_bottom-0 pks_flex pks_justify-center pks_items-center">
         <div
           className={cn(
@@ -19,7 +19,7 @@ export const MicLoader: FC<{ isRecording: boolean }> = ({ isRecording }) => {
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={1.2}
+            strokeWidth={2}
             className="pks_w-5 pks_h-5 pks_mx-auto"
             stroke="currentColor"
           >

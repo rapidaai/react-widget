@@ -10,6 +10,9 @@ interface ChatbotConfig {
     meta?: Record<string, string>;
   };
   debug?: boolean;
+  theme?: {
+    color?: string;
+  };
 }
 
 interface Window {

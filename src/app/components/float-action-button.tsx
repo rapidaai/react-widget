@@ -4,6 +4,7 @@ import { RapidaIcon } from "@/icons/rapida";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/styles/media";
+import { useEnvironment } from "@/hooks/use-environment";
 
 export const FloatButtonIcon = ({
   isOpen,
@@ -15,7 +16,7 @@ export const FloatButtonIcon = ({
   appIcon: string | undefined;
 }) => {
   const [currentIcon, setCurrentIcon] = useState<JSX.Element | null>(null);
-
+  const { theme } = useEnvironment();
   useEffect(() => {
     let icon: JSX.Element;
 
@@ -57,9 +58,11 @@ export const FloatButtonIcon = ({
     >
       <span className="pks_block pks_relative pks_z-10" data-open={isOpen}>
         <div
+          style={{
+            color: theme.color,
+          }}
           className={cn(
-            "pks_rounded-full pks_flex pks_items-center pks_justify-center pks_flex-shrink-0 pks_h-12 pks_w-12 pks_p-1",
-            "pks_text-blue-600"
+            "pks_rounded-full pks_flex pks_items-center pks_justify-center pks_flex-shrink-0 pks_h-12 pks_w-12 pks_p-1"
           )}
         >
           {currentIcon}
