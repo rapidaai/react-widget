@@ -96,8 +96,10 @@ export const WebPluginChat = () => {
             animate={{ opacity: isOpen ? 1 : 0 }}
             exit={{ opacity: 0 }}
             className={cn(
+              "pks_invisible",
+              isOpen && "pks_visible",
               isExpand
-                ? "pks_bg-gray-500/5 pks_dark:bg-slate-400/5 pks_backdrop-blur-sm pks_p-8 pks_fixed pks_inset-0 pks_z-50 pks_grid pks_place-items-center pks_overflow-y-scroll dark:pks_text-gray-300 pks_text-gray-700"
+                ? "pks_bg-gray-500/5 pks_dark:bg-slate-400/5 pks_backdrop-blur-sm pks_p-8 pks_fixed pks_inset-0 pks_grid pks_place-items-center pks_overflow-y-scroll dark:pks_text-gray-300 pks_text-gray-700 pks_z-[9999]"
                 : "pks_fixed pks_bottom-0 pks_right-0 dark:pks_text-gray-300 pks_text-gray-700 pks_h-fit pks_w-fit pks_p-3 pks_bg-gradient-to-br pks_from-transparent pks_via-transparent pks_to-gray-600/10 pks_bg-opacity-8"
             )}
           >
@@ -114,7 +116,7 @@ export const WebPluginChat = () => {
                         // `linear-gradient(to bottom, ${theme.color}  white)`,
                       }}
                       className={cn(
-                        "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800 pks_z-[9999]",
+                        "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800",
                         isExpand
                           ? "pks_w-1/2 pks_min-w-[500px] pks_h-[700px] pks_max-h-full"
                           : "pks_w-[450px] pks_h-[700px] pks_max-h-full",
