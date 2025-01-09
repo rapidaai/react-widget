@@ -90,10 +90,10 @@ export const WebPluginChat = () => {
   return (
     <motion.div>
       <AnimatePresence>
-        {currentAssistant && isOpen ? (
+        {currentAssistant ? (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: isOpen ? 1 : 0 }}
             exit={{ opacity: 0 }}
             className={cn(
               isExpand
