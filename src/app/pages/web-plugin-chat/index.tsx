@@ -96,8 +96,7 @@ export const WebPluginChat = () => {
             animate={{ opacity: isOpen ? 1 : 0 }}
             exit={{ opacity: 0 }}
             className={cn(
-              "pks_invisible",
-              isOpen && "pks_visible",
+              isOpen ? "pks_visible" : "pks_invisible",
               isExpand
                 ? "pks_bg-gray-500/5 pks_dark:bg-slate-400/5 pks_backdrop-blur-sm pks_p-8 pks_fixed pks_inset-0 pks_grid pks_place-items-center pks_overflow-y-scroll dark:pks_text-gray-300 pks_text-gray-700 pks_z-[9999]"
                 : "pks_fixed pks_bottom-0 pks_right-0 dark:pks_text-gray-300 pks_text-gray-700 pks_h-fit pks_w-fit pks_p-3 pks_bg-gradient-to-br pks_from-transparent pks_via-transparent pks_to-gray-600/10 pks_bg-opacity-8"
@@ -112,7 +111,7 @@ export const WebPluginChat = () => {
                       layout
                       animate={isExpand}
                       style={{
-                        background: `linear-gradient(to bottom, ${theme.color} 0%, white 100%);`,
+                        background: `linear-gradient(to bottom, ${theme.color} 0%, white 40%)`,
                         // `linear-gradient(to bottom, ${theme.color}  white)`,
                       }}
                       className={cn(

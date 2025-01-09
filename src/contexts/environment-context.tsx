@@ -114,7 +114,6 @@ export const EnvironmentProvider: React.FC<{
           ? window.chatbotConfig?.assistant_version
           : null,
         token: window.chatbotConfig?.token,
-        // language: window.chatbotConfig?.language || "en",
         language,
         debug: window.chatbotConfig?.debug || false,
         user: {

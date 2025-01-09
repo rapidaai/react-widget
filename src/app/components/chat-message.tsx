@@ -132,11 +132,11 @@ export const SystemChatMessage: FC<{
           </AnimatePresence>
         </div>
         <div className="pks_flex pks_flex-col pks_leading-1.5 pks_p-4 pks_border-gray-200 pks_bg-gray-100 pks_rounded-e-xl pks_rounded-es-xl dark:pks_bg-gray-700">
-          <p className="pks_text-sm pks_font-normal pks_text-gray-900 dark:pks_text-white">
+          <div className="pks_text-sm pks_font-normal pks_text-gray-900 dark:pks_text-white">
             <MarkdownRenderer>
               {toContentText(messageContent.getContentsList())}
             </MarkdownRenderer>
-          </p>
+          </div>
         </div>
       </div>
     </div>
