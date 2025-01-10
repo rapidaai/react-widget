@@ -82,7 +82,7 @@ export const SystemChatMessage: FC<{
       </div>
       <div className="pks_flex pks_flex-col pks_gap-1 pks_w-full pks_max-w-[320px] pks_group pks_relative">
         <div className="pks_flex pks_items-center pks_space-x-2 rtl:pks_space-x-reverse">
-          <div className="pks_flex">
+          <div className="pks_flex pks_space-x-1">
             <span className="pks_text-sm pks_font-semibold pks_text-gray-900 dark:pks_text-white">
               {assistant
                 .getWebappearance()
@@ -106,7 +106,6 @@ export const SystemChatMessage: FC<{
             <motion.div
               layout
               className="pks_absolute pks_top-0 pks_right-0 pks_flex"
-              //   className="pks_hidden pks_transition-all pks_ease-in-out pks_delay-150 pks_duration-300 group-hover:pks_flex pks_w-full pks_py-2 pks_px-4 pks_space-x-1 pks_rounded-b-[18px] pks_justify-end pks_border-t-[0.5px]"
             >
               <LikeButton
                 onClick={() => {

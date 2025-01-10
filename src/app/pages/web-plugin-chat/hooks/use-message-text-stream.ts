@@ -72,6 +72,7 @@ export const useMessageTextStream = ({
       if (
         response.getDataCase() == AssistantMessagingResponse.DataCase.MESSAGE
       ) {
+        // console.dir(response);
         const convo = response.getMessage();
         if (convo) {
           onUpdateNotificationStageMessage(convo.getStagesList());
