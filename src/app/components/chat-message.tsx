@@ -80,7 +80,7 @@ export const SystemChatMessage: FC<{
           <RapidaIcon className="pks_h-8 pks_w-8 pks_rounded-full" />
         )}
       </div>
-      <div className="pks_flex pks_flex-col pks_gap-1 pks_w-full pks_max-w-[320px] pks_group pks_relative">
+      <div className="pks_flex pks_flex-col pks_gap-2.5 pks_w-full pks_max-w-[320px] pks_group pks_relative">
         <div className="pks_flex pks_items-center pks_space-x-2 rtl:pks_space-x-reverse">
           <div className="pks_flex pks_space-x-1">
             <span className="pks_text-sm pks_font-semibold pks_text-gray-900 dark:pks_text-white">

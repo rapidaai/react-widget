@@ -115,7 +115,8 @@ export const WebPluginChat = () => {
                         background: `linear-gradient(to bottom, ${theme.color} 0%, white 40%)`,
                       }}
                       className={cn(
-                        "pks_shadow pks_border-[0.5px] dark:pks_border-gray-800",
+                        "pks_rounded-b-[26px] pks_rounded-t-xl",
+                        "pks_shadow",
                         isExpand
                           ? "pks_w-1/2 pks_min-w-[500px] pks_h-[700px] pks_max-h-full"
                           : "pks_w-[450px] pks_h-[700px] pks_max-h-full",
@@ -123,8 +124,7 @@ export const WebPluginChat = () => {
                         "pks_backdrop-blur-xl  dark:pks_bg-gray-900",
                         "pks_bg-gradient-to-b pks_from-blue-600 pks_via-blue-500 pks_from-10% pks_via-20% pks_to-40% pks_to-white",
                         "pks_mb-28 pks_mr-4",
-                        "pks_shadow-lg",
-                        "pks_border pks_rounded-b-[26px] pks_rounded-t-xl"
+                        "pks_shadow-lg"
                       )}
                     >
                       <Header
@@ -158,7 +158,7 @@ export const WebPluginChat = () => {
           toggleOpen();
         }}
         className={cn(
-          "pks_fixed pks_bottom-8 pks_right-4",
+          "pks_fixed pks_bottom-8 pks_right-4 pks_z-50",
           "pks_h-16 pks_w-16"
         )}
       >

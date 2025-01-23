@@ -1,5 +1,5 @@
 import { Assistant } from "@/app/clients/protos/assistant-api_pb";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { ChevronUpIcon } from "@/icons/chevron-up";
 import { MotionDiv } from "@/app/components/recent-conversation";
 import { useMessageTextStream } from "@/app/pages/web-plugin-chat/hooks/use-message-text-stream";
@@ -20,9 +20,8 @@ export const SuggestedQuestion: FC<{
    */
   const { goToConversation } = useChatNavigation();
   const { token, user } = useEnvironment();
-  const { showLoader } = useRapidaStore();
   const ctx = useAssistantChatContext();
-  const { sending, onSendingTextMessage } = useMessageTextStream({
+  const { onSendingTextMessage } = useMessageTextStream({
     assistantId: assistant.getId(),
     assistantVersion: assistant.getAssistantprovidermodelid(),
     onMessaging: (message: AssistantConversationMessage) => {
@@ -59,18 +58,10 @@ export const SuggestedQuestion: FC<{
                   key={idx}
                   onClick={() => {
                     onSendingTextMessage(x.getStringValue());
-                    showLoader();
                   }}
                 >
-                  <span className="pks_absolute pks_right-0 pks_flex pks_items-center pks_justify-start pks_w-10 pks_h-10 pks_duration-300 pks_transform group-hover:pks_translate-x-full pks_translate-x-0 pks_ease pks_text-blue-600">
-                    {sending ? (
-                      <Spinner />
-                    ) : (
-                      <ChevronUpIcon
-                        className="pks_rotate-45"
-                        strokeWidth={3}
-                      />
-                    )}
+                  <span className="pks_absolute pks_right-0.5 pks_flex pks_items-center pks_justify-start pks_w-auto pks_h-10 pks_duration-300 pks_transform group-hover:pks_translate-x-full pks_translate-x-0 pks_ease pks_text-blue-600">
+                    <ChevronUpIcon className="pks_rotate-90" strokeWidth={3} />
                   </span>
                   <span className="pks_relative pks_font-medium">
                     {x.getStringValue()}
