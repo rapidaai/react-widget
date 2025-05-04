@@ -19,24 +19,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: Install dependencies
         run: yarn install
-
-      - name: Install Protobuf Compiler (protoc) Version 3.20.3
-        run: |
-          sudo apt-get update
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protoc-3.20.3-linux-x86_64.zip
-          unzip protoc-3.20.3-linux-x86_64.zip -d protoc3
-          sudo mv protoc3/bin/* /usr/local/bin/
-          sudo mv protoc3/include/* /usr/local/include/
-          rm -rf protoc-3.20.3-linux-x86_64.zip protoc3
-
-      - name: Run gRPC Client Script
-        run: |
-          chmod +x scripts/grpc-client.sh
-          bash scripts/grpc-client.sh
 
       - name: Build the project
         run: yarn run build
