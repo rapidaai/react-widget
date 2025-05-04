@@ -496,17 +496,7 @@ module.exports = {
       DEFAULT: "1",
     },
     fontFamily: {
-      sans: [
-        "Segoe UI Web",
-        "Segoe UI",
-        "Roboto",
-        "Helvetica",
-        "Arial",
-        "sans-serif",
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        "Segoe UI Symbol",
-      ],
+      sans: ["Noto Sans"],
     },
     fontSize: {
       xs: ["0.65rem", { lineHeight: "0.90rem" }],

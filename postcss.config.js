@@ -4,5 +4,11 @@ const purgecss = require("@fullhuman/postcss-purgecss")({
 });
 
 module.exports = {
-  plugins: [require("tailwindcss"), require("autoprefixer")],
+  plugins: [
+    require("tailwindcss"),
+    require("autoprefixer"),
+    // require("postcss-obfuscator")({
+    //   enable: true, // Enable plugin
+    // }),
+  ],
 };

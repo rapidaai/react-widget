@@ -17,11 +17,11 @@ if (!rootElement) {
 // Create root and render the React component
 const root = ReactDOM.createRoot(rootElement);
 root.render(
-  <React.StrictMode>
-    <DarkModeProvider>
-      <EnvironmentProvider>
-        <App />
-      </EnvironmentProvider>
-    </DarkModeProvider>
-  </React.StrictMode>
+  //   <React.StrictMode>
+  <DarkModeProvider>
+    <EnvironmentProvider>
+      <App />
+    </EnvironmentProvider>
+  </DarkModeProvider>
+  //   </React.StrictMode>
 );

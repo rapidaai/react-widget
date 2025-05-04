@@ -28,7 +28,7 @@ const arrow = (
   </svg>
 );
 
-const Tooltip: FC<TooltipProps> = ({
+export const Tooltip: FC<TooltipProps> = ({
   position = "top",
   triggerMethod = "hover",
   popupContent,
@@ -68,5 +68,3 @@ const Tooltip: FC<TooltipProps> = ({
     </PortalToFollowElem>
   );
 };
-
-export default React.memo(Tooltip);
