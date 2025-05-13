@@ -54,11 +54,25 @@ export const ConversationMessages: FC<{
         </div>
         <div className="pks_flex pks_flex-col">
           <div className="pks_flex pks_items-center pks_gap-2">
-            <span className="pks_text-gray-500 pks_mb-0.5 pks_text-[13px]">
+            <span className="pks_text-gray-500 pks_mb-0.5 pks_text-[13px] pks_font-semibold">
               {deployment.name}
             </span>
           </div>
-          <div className="pks_space-y-1 pks_text-[14px]">
+          <div className="pks_text-[14px] pks_relative">
+            <div
+              style={{
+                left: "-10px",
+                background: theme.color,
+              }}
+              className="pks_bottom-[0px] pks_rounded-[20px] pks_absolute pks_w-6 pks_h-6"
+            />
+            <div
+              style={{
+                left: "-16px",
+              }}
+              className="pks_bottom-[8px] -pks_left-[16px] pks_rounded-[40px] pks_absolute pks_bg-gray-100 pks_w-6 pks_h-6"
+            />
+
             <motion.div
               initial="initial"
               animate="animate"
@@ -66,7 +80,7 @@ export const ConversationMessages: FC<{
               style={{
                 background: theme.color,
               }}
-              className="pks_text-white pks_px-3 pks_py-2 pks_rounded-2xl pks_w-fit"
+              className="pks_text-white pks_px-3 pks_py-2 pks_rounded-2xl pks_w-fit pks_relative"
             >
               <motion.div
                 variants={{
@@ -103,7 +117,7 @@ export const ConversationMessages: FC<{
                   "[&_:is(strong,h1,h2,h3,h4,h5,h6)]:pks_font-semibold",
                   "[&_:is(h1)]:pks_text-2xl",
                   "[&_:is(h2)]:pks_text-lg",
-                  "[&_:is(li)]:pks_py-2",
+                  "[&_:is(li)]:pks_py-0",
                   "[&_:is(h3)]:pks_text-md",
                   "[&_h1:not(:first-child)]:pks_mt-8",
                   "[&_h1:not(:last-child)]:pks_mb-6",
@@ -120,28 +134,32 @@ export const ConversationMessages: FC<{
               </motion.div>
             </motion.div>
           </div>
+          <div className="pks_flex pks_flex-col pks_space-y-2 pks_mt-2">
+            {deployment.suggestionList.map((x, idx) => {
+              return (
+                <div
+                  key={`suggestion-key-${idx}`}
+                  style={{
+                    borderColor: theme.color,
+                    color: theme.color,
+                  }}
+                  onClick={() => {
+                    ctx?.onSendText(x);
+                  }}
+                  className="pks_backdrop-blur pks_bg-white pks_flex pks_items-center pks_justify-center pks_px-4 pks_py-2 pks_rounded-full pks_w-fit pks_border-[0.5px] pks_text-ms pks_text-sm hover:pks_bg-white/30 pks_font-medium pks_cursor-pointer"
+                >
+                  <span className="pks_mr-1 pks_opacity-80">{x}</span>
+                  <ArrowRight
+                    className="pks_w-4 pks_h-4 pks_shrink-0"
+                    strokeWidth={1}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </li>
-      <li className="pks_flex pks_w-full pks_flex-col pks_px-4 pks_gap-2 pks_mb-4">
-        {deployment.suggestionList.map((x, idx) => {
-          return (
-            <div
-              key={`suggestion-key-${idx}`}
-              style={{
-                borderColor: theme.color,
-                color: theme.color,
-              }}
-              onClick={() => {
-                ctx?.onSendText(x);
-              }}
-              className="pks_bg-white pks_flex pks_items-center pks_justify-center pks_px-4 pks_py-2 pks_rounded-full pks_w-fit pks_border-[0.5px] pks_text-ms pks_text-sm hover:pks_bg-white/30 pks_font-medium pks_cursor-pointer"
-            >
-              <span className="pks_mr-1">{x}</span>
-              <ArrowRight className="pks_w-4 pks_h-4" strokeWidth={1} />
-            </div>
-          );
-        })}
-      </li>
+
       {messages.map((chat, idx) => (
         <MessageContent
           key={`msg-idx-${idx}`}
@@ -168,7 +186,19 @@ export const MessageContent: FC<{
   };
   return message.role === MessageRole.User ? (
     <li className="message-cntnt pks_flex pks_items-end pks_justify-end pks_space-x-2 pks_mb-4 pks_px-4">
-      <div className="pks_flex pks_w-full pks_items-end pks_flex-col pks_space-y-1 pks_text-[14px]">
+      <div className="pks_flex pks_w-full pks_items-end pks_flex-col pks_space-y-1 pks_text-[14px] pks_relative">
+        <div
+          style={{
+            right: "-10px",
+          }}
+          className="pks_bottom-[0px] pks_rounded-[20px] pks_absolute pks_bg-gray-300 pks_w-6 pks_h-6"
+        />
+        <div
+          style={{
+            right: "-16px",
+          }}
+          className="pks_bottom-[8px] pks_rounded-[40px] pks_absolute pks_bg-gray-100 pks_w-6 pks_h-6"
+        />
         {message.messages.map((x, idx) => {
           return (
             <AnimatePresence key={`idx-msg-${idx}`}>
@@ -178,7 +208,7 @@ export const MessageContent: FC<{
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                className="pks_bg-gray-200 pks_px-3 pks_py-2 pks_rounded-2xl pks_w-fit"
+                className="pks_bg-gray-300 pks_px-3 pks_py-2 pks_rounded-2xl pks_w-fit pks_relative"
               >
                 <motion.div
                   variants={{
@@ -216,7 +246,7 @@ export const MessageContent: FC<{
                     "[&_:is(strong,h1,h2,h3,h4,h5,h6)]:pks_font-semibold",
                     "[&_:is(h1)]:pks_text-2xl",
                     "[&_:is(h2)]:pks_text-lg",
-                    "[&_:is(li)]:pks_py-2",
+                    "[&_:is(li)]:pks_py-0",
                     "[&_:is(h3)]:pks_text-md",
                     "[&_h1:not(:first-child)]:pks_mt-8",
                     "[&_h1:not(:last-child)]:pks_mb-6",
@@ -272,7 +302,20 @@ export const MessageContent: FC<{
           </span>
         </div>
 
-        <div className="pks_space-y-1 pks_text-[14px]">
+        <div className="pks_space-y-1 pks_text-[14px] pks_relative">
+          <div
+            style={{
+              left: "-10px",
+              background: theme.color,
+            }}
+            className="pks_bottom-[0px] pks_rounded-[20px] pks_absolute pks_w-6 pks_h-6"
+          />
+          <div
+            style={{
+              left: "-16px",
+            }}
+            className="pks_bottom-[8px] -pks_left-[16px] pks_rounded-[40px] pks_absolute pks_bg-gray-100 pks_w-6 pks_h-6"
+          />
           {message.messages.map((x, idx) => {
             return (
               <AnimatePresence key={`idx-msg-${idx}`}>
@@ -285,7 +328,7 @@ export const MessageContent: FC<{
                   style={{
                     background: theme.color,
                   }}
-                  className="pks_text-white pks_px-3 pks_py-2 pks_rounded-2xl pks_w-fit"
+                  className="pks_text-white pks_px-3 pks_py-2 pks_rounded-2xl pks_w-fit pks_relative"
                 >
                   <motion.div
                     variants={{
@@ -323,7 +366,7 @@ export const MessageContent: FC<{
                       "[&_:is(strong,h1,h2,h3,h4,h5,h6)]:pks_font-semibold",
                       "[&_:is(h1)]:pks_text-2xl",
                       "[&_:is(h2)]:pks_text-lg",
-                      "[&_:is(li)]:pks_py-2",
+                      "[&_:is(li)]:pks_py-0",
                       "[&_:is(h3)]:pks_text-md",
                       "[&_h1:not(:first-child)]:pks_mt-8",
                       "[&_h1:not(:last-child)]:pks_mb-6",
