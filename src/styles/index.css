@@ -44488,7 +44488,7 @@ screen and (-ms-high-contrast: active) {
     width: 100%;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn.customoption {
+#RPDContainer.RPDContainer .cds--btn.customoption {
     background-color: inherit;
     border-radius: 15px;
     border: 1px solid #0f62fe;
@@ -44503,85 +44503,85 @@ screen and (-ms-high-contrast: active) {
     outline: none;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn.customoption:hover {
+#RPDContainer.RPDContainer .cds--btn.customoption:hover {
     border: unset;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn.customoptionselected {
+#RPDContainer.RPDContainer .cds--btn.customoptionselected {
     background-color: inherit;
     color: #fff;
     cursor: default;
 }
 
-#rpdcontainer.rpdcontainer .customoption:hover:not(.cds--btn.customoptionselected):disabled {
+#RPDContainer.RPDContainer .customoption:hover:not(.cds--btn.customoptionselected):disabled {
     background-color: inherit;
     border: 1px solid #cbcaca;
     color: #cbcaca;
     cursor: disabled;
 }
 
-#rpdcontainer.rpdcontainer .customoption.cds--btn:disabled {
+#RPDContainer.RPDContainer .customoption.cds--btn:disabled {
     border-color: #9b9a9a;
     background: inherit;
     color: #d3d3d3;
 }
 
-#rpdcontainer.rpdcontainer .customoption:not(.cds--chat-btn--quick-action--selected):disabled {
+#RPDContainer.RPDContainer .customoption:not(.cds--chat-btn--quick-action--selected):disabled {
     background-color: inherit;
     color: #cbcaca;
     border: 1px solid #cbcaca;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn--primary.customoptionselected {
+#RPDContainer.RPDContainer .cds--btn--primary.customoptionselected {
     background-color: #e8e2e2 !important;
     color: gray !important;
     border: unset !important;
 }
 
-#rpdcontainer.rpdcontainer .customoption:hover:not(.cds--btn--primary.customoptionselected):not( :disabled) {
+#RPDContainer.RPDContainer .customoption:hover:not(.cds--btn--primary.customoptionselected):not( :disabled) {
     background-color: #d3d3d3;
     color: #0f62fe;
     cursor: pointer;
 }
 
-#rpdcontainer.rpdcontainer .customoption:hover(.cds--btn--primary.customoptionselected:disabled) {
+#RPDContainer.RPDContainer .customoption:hover(.cds--btn--primary.customoptionselected:disabled) {
     background-color: #d3d3d3;
     color: #0f62fe;
     cursor: pointer;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn:focus:disabled {
+#RPDContainer.RPDContainer .cds--btn:focus:disabled {
     border-color: #d3d3d3;
     background: inherit;
     color: var(--cds-text-on-color-disabled, #8d8d8d);
     cursor: not-allowed;
 }
 
-#rpdcontainer.rpdcontainer .errormessage {
+#RPDContainer.RPDContainer .errormessage {
     margin-bottom: 1em;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card {
+#RPDContainer.RPDContainer .ibm-unified-chat--card {
     --customized-card-button-text--color: var(--watsonassistantchat-carbon-text-01);
     --customized-card-button-background--color: var(--watsonassistantchat-carbon-ui-01);
     --customized-card-button--size: auto;
     --customized-card-font--size: var(--watsonassistantchat-base-font-size-med);
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card--default {
+#RPDContainer.RPDContainer .ibm-unified-chat--card--default {
     color: var(--watsonassistantchat-carbon-text-01);
     background-color: var(--watsonassistantchat-carbon-ui-01);
     font-size: var(--watsonassistantchat-base-font-size-med);
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card--customized {
+#RPDContainer.RPDContainer .ibm-unified-chat--card--customized {
     color: var(--customized-card-button-text--color);
     background-color: var(--customized-card-button-background--color);
     width: var(--customized-card-button--size);
     font-size: var(--customized-card-font--size);
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card {
+#RPDContainer.RPDContainer .ibm-unified-chat--card {
     border-radius: 0%;
     border: var(--watsonassistantchat-base-border-width-med) solid rgba(0, 0, 0, 0);
     display: block;
@@ -44596,7 +44596,7 @@ screen and (-ms-high-contrast: active) {
     background-color: #f4f4f4;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card-gen-ai-response {
+#RPDContainer.RPDContainer .ibm-unified-chat--card-gen-ai-response {
     border-radius: 0%;
     border: var(--watsonassistantchat-base-border-width-med) solid rgba(0, 0, 0, 0);
     color: var(--watsonassistantchat-carbon-text-01);
@@ -44613,18 +44613,18 @@ screen and (-ms-high-contrast: active) {
     cursor: pointer;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card--disabled {
+#RPDContainer.RPDContainer .ibm-unified-chat--card--disabled {
     color: var(--watsonassistantchat-carbon-text-03);
     background-color: var(--watsonassistantchat-carbon-ui-03);
     background-color: #e0e0e0;
     cursor: default;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card:hover {
+#RPDContainer.RPDContainer .ibm-unified-chat--card:hover {
     background-color: #e0e0e0;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card-icon {
+#RPDContainer.RPDContainer .ibm-unified-chat--card-icon {
     float: right;
     margin: 0em 0em 0em 0.25em;
     height: 20px;
@@ -44632,7 +44632,7 @@ screen and (-ms-high-contrast: active) {
     fill: #0f62fe;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card-icon svg {
+#RPDContainer.RPDContainer .ibm-unified-chat--card-icon svg {
     fill: var(--watsonassistantchat-accent-color);
     height: 1.5em;
     width: 1.5em;
@@ -44640,54 +44640,54 @@ screen and (-ms-high-contrast: active) {
     width: 20px;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card-icon-disabled svg {
+#RPDContainer.RPDContainer .ibm-unified-chat--card-icon-disabled svg {
     fill: var(--watsonassistantchat-carbon-text-03);
     height: 20px;
     width: 20px;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card-secondary-text {
+#RPDContainer.RPDContainer .ibm-unified-chat--card-secondary-text {
     font-size: small;
     font-weight: 400;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card-online-status {
+#RPDContainer.RPDContainer .ibm-unified-chat--card-online-status {
     font-size: small;
     font-weight: 400;
     color: #6f6f6f;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card .collapse-content.collapsed {
+#RPDContainer.RPDContainer .ibm-unified-chat--card .collapse-content.collapsed {
     display: none;
 }
 
-#rpdcontainer.rpdcontainer .ibm-unified-chat--card .collapsed-content.expanded {
+#RPDContainer.RPDContainer .ibm-unified-chat--card .collapsed-content.expanded {
     display: block;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__body .ibm-unified-chat--card .spinnercontainer {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__body .ibm-unified-chat--card .spinnercontainer {
     display: contents;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__body .ibm-unified-chat--card .cardlabel {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__body .ibm-unified-chat--card .cardlabel {
     margin-right: 10px;
     margin-top: 100px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer {
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__content {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__content {
     flex: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__bodywrapper {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__bodywrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -44695,76 +44695,76 @@ screen and (-ms-high-contrast: active) {
     padding-bottom: var(--watsonassistantchat-home_screen_modern-input-wrapper-height);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__bodywrapper.unifiedchatcontactcontainer__bodywrapper--padding {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__bodywrapper.unifiedchatcontactcontainer__bodywrapper--padding {
     padding-bottom: 0;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__loading {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__loading {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__body {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__body {
     padding: 1em 1.2em;
     height: 100%;
     background-color: #fff !important;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer .bx--structured-list-row {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer .bx--structured-list-row {
     display: table-row;
     border-bottom: none;
     transition: background-color 0.11s cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer .bx--btn {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer .bx--btn {
     max-width: auto;
     min-height: 48px;
     flex-shrink: 1;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer h5 {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer h5 {
     font-size: 1rem;
     margin-top: 8px;
     font-weight: 700;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer .bx--form-item {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer .bx--form-item {
     margin-top: 5px;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer__content .bx--text-input {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer__content .bx--text-input {
     background-color: #f4f4f4;
     color: #161616;
     transition: background-color 70ms cubic-bezier(0.2, 0, 0.38, 0.9) 0s,
         outline 70ms cubic-bezier(0.2, 0, 0.38, 0.9) 0s;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer__content .paragraphtext {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer__content .paragraphtext {
     font-size: 0.9rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer__content .bx--select-input {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer__content .bx--select-input {
     background-color: #f4f4f4;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer__content .bx--text-area {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer__content .bx--text-area {
     border: #8d8d8d 0.5px solid;
 }
 
-#rpdcontainer.rpdcontainer unifiedchatcontactcontainer__content .bx--form .schedulerselectpadding {
+#RPDContainer.RPDContainer unifiedchatcontactcontainer__content .bx--form .schedulerselectpadding {
     padding-bottom: 8px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__message .unifiedchatcontactcontainer__message-vertical-padding {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__message .unifiedchatcontactcontainer__message-vertical-padding {
     padding-top: 8px;
     padding-bottom: 8px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__bot-bar-color {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__bot-bar-color {
     width: var(--watsonassistantchat-message-bar-width);
     border-radius: var(--watsonassistantchat-base-border-radius-xsmall);
     background-color: var(--watsonassistantchat-carbon-interactive-01);
@@ -44772,14 +44772,14 @@ screen and (-ms-high-contrast: active) {
     height: 16px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__message {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__message {
     display: flex;
     flex-direction: row;
     max-width: 100%;
     padding-bottom: 0.7em;
 }
 
-#rpdcontainer.rpdcontainer .ibm-web-chat--default-styles {
+#RPDContainer.RPDContainer .ibm-web-chat--default-styles {
     all: revert;
     box-sizing: border-box;
     font-family: var(--watsonassistantchat-base-font-family);
@@ -44787,11 +44787,11 @@ screen and (-ms-high-contrast: active) {
     background: rgba(0, 0, 0, 0);
 }
 
-#rpdcontainer.rpdcontainer .wac__received--textcontent {
+#RPDContainer.RPDContainer .wac__received--textcontent {
     display: flex;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__message--text {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__message--text {
     color: var(--watsonassistantchat-carbon-text-01);
     position: relative;
     word-break: break-word;
@@ -44800,44 +44800,44 @@ screen and (-ms-high-contrast: active) {
     line-height: var(--watsonassistantchat-base-line-height-med);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .bx--structured-list-row.location-selector {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .bx--structured-list-row.location-selector {
     border-bottom: 1px solid var(--watsonassistantchat-carbon-ui-03);
 }
 
-#rpdcontainer.rpdcontainer .locationpromptcontainer__buttons {
+#RPDContainer.RPDContainer .locationpromptcontainer__buttons {
     display: flex;
     justify-content: space-between;
     padding: 20px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal {
     background-color: var(--watsonassistantchat-carbon-overlay-01);
     display: flex;
     align-items: center;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal .unifiedchatdialog {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal .unifiedchatdialog {
     background-color: #fff;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__message {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__message {
     padding: 1rem 1rem 3rem;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__title {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__title {
     font-size: 20px;
     padding-bottom: 1rem;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__buttoncontainer {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__buttoncontainer {
     display: content;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__buttoncontainer button {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal .unifiedchatdialog__buttoncontainer button {
     width: 50%;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactcontainer__modal .unifiedchatdialog .unifiedchatdialog__message {
+#RPDContainer.RPDContainer .unifiedchatcontactcontainer__modal .unifiedchatdialog .unifiedchatdialog__message {
     background-color: #f4f4f4;
 }
 
@@ -44854,13 +44854,13 @@ button.ucxheader_close_button:hover {
     border-top-right-radius: 8px !important;
 }
 
-#rpdcontainer.rpdcontainer .wacheader__name {
+#RPDContainer.RPDContainer .wacheader__name {
     text-align: left !important;
     margin: 10px !important;
     font-size: 105% !important;
 }
 
-#rpdcontainer.rpdcontainer #cm-siderail-header-border {
+#RPDContainer.RPDContainer #cm-siderail-header-border {
     border-bottom: 1px solid;
     border-color: #c4c4c4;
     display: block;
@@ -44868,81 +44868,81 @@ button.ucxheader_close_button:hover {
     margin-top: 20px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel h5 {
+#RPDContainer.RPDContainer .unifiedchatcustompanel h5 {
     margin-top: 16px;
     font-weight: 450;
     font-size: 20px;
     line-height: 40px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel hr.cancellationconfirmation {
+#RPDContainer.RPDContainer .unifiedchatcustompanel hr.cancellationconfirmation {
     margin-bottom: 40px;
     margin-top: 20px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .cancellationconfirmationpadding {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .cancellationconfirmationpadding {
     border-bottom-left-radius: 8px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--form .schedulerselectpadding {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--form .schedulerselectpadding {
     padding-bottom: 8px;
     cursor: pointer;
 }
 
-#rpdcontainer.rpdcontainer .cds--select-input {
+#RPDContainer.RPDContainer .cds--select-input {
     background-color: #e7e7e7 !important;
 }
 
-#rpdcontainer.rpdcontainer .cds--text-input {
+#RPDContainer.RPDContainer .cds--text-input {
     border: 1px solid gray !important;
 }
 
-#rpdcontainer.rpdcontainer .cds--text-area {
+#RPDContainer.RPDContainer .cds--text-area {
     border: 1px solid gray !important;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--form .bx--nc__pre-text,
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--form .bx--nc__post-text .nc-gdpr-info,
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--form .bx--nc__post-text .nc-gdpr-ack {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--form .bx--nc__pre-text,
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--form .bx--nc__post-text .nc-gdpr-info,
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--form .bx--nc__post-text .nc-gdpr-ack {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .modifyappointment {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .modifyappointment {
     font-size: 14px;
     margin-bottom: 20px;
     margin-top: 20px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactinfoform {
+#RPDContainer.RPDContainer .unifiedchatcontactinfoform {
     position: relative;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcontactinfoform .flatpickr-calendar.open {
+#RPDContainer.RPDContainer .unifiedchatcontactinfoform .flatpickr-calendar.open {
     position: absolute;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatprivacyform {
+#RPDContainer.RPDContainer .unifiedchatprivacyform {
     margin-top: 1rem;
 }
 
-#rpdcontainer.rpdcontainer .cds--date-picker-container .cds--label {
+#RPDContainer.RPDContainer .cds--date-picker-container .cds--label {
     padding-top: 10px;
 }
 
-#rpdcontainer.rpdcontainer .cds--label {
+#RPDContainer.RPDContainer .cds--label {
     padding-top: 10px;
 }
 
-#rpdcontainer.rpdcontainer .wacheader__centercontainer {
+#RPDContainer.RPDContainer .wacheader__centercontainer {
     display: grid !important;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .unifiedchatcustompanelleftbutton {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .unifiedchatcustompanelleftbutton {
     border-bottom-left-radius: 8px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .unifiedchatcustompanelrightbutton {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .unifiedchatcustompanelrightbutton {
     border-bottom-right-radius: 8px;
 }
 
@@ -44968,18 +44968,18 @@ button.ucxheader_close_button:hover {
     margin: none !important;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .wac {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .wac {
     border: 0 !important;
     box-shadow: none !important;
     background: #fff !important;
     padding: 0 !important;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanel__loading {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanel__loading {
     z-index: 100;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanel__content {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanel__content {
     border: none;
     height: 100vh;
     width: 100vw;
@@ -44987,51 +44987,51 @@ button.ucxheader_close_button:hover {
     overflow: scroll;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanel {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanel {
     align-items: center;
     max-height: none;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanel__body {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanel__body {
     padding: 0;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanel__bodywrapper {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanel__bodywrapper {
     overflow: unset !important;
     margin: 7vh 30vw;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer hr {
+.schedulerlandingcontainer #RPDContainer.RPDContainer hr {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--form {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--form {
     line-height: 1.5;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--select-input,
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--text-input,
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--text-area,
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--date-picker__input {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--select-input,
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--text-input,
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--text-area,
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--date-picker__input {
     background-color: #f4f4f4 !important;
     border: none !important;
     border-bottom: 1px solid var(--cds-ui-04, #8d8d8d) !important;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--btn-set {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--btn-set {
     margin-top: 3vh;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--form-item {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--form-item {
     margin-bottom: 0.25rem;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--actionable-notification--toast {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--actionable-notification--toast {
     max-inline-size: fit-content !important;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .wacwidget.wacwidget--defaultelement {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .wacwidget.wacwidget--defaultelement {
     margin: 0 !important;
     padding: 0 !important;
     inset: 0 !important;
@@ -45041,20 +45041,20 @@ button.ucxheader_close_button:hover {
     box-shadow: none !important;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .cds--text-area {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .cds--text-area {
     resize: vertical !important;
     width: 100% !important;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .formitemssidebyside {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .formitemssidebyside {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanelleftbutton,
-.schedulerlandingcontainer #rpdcontainer.rpdcontainer .unifiedchatcustompanelrightbutton {
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanelleftbutton,
+.schedulerlandingcontainer #RPDContainer.RPDContainer .unifiedchatcustompanelrightbutton {
     margin-right: 1rem;
     white-space: nowrap;
     border-radius: 0;
@@ -45062,21 +45062,21 @@ button.ucxheader_close_button:hover {
     min-width: fit-content;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn--primary.customlogin {
+#RPDContainer.RPDContainer .cds--btn--primary.customlogin {
     width: -webkit-calc(100% - 30px);
     text-align: center !important;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification__details {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification__details {
     margin: unset;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--toast-notification__icon {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--toast-notification__icon {
     visibility: hidden;
     position: absolute;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification__close-button {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification__close-button {
     width: 32px;
     min-width: 32px;
     max-width: 32px;
@@ -45087,18 +45087,18 @@ button.ucxheader_close_button:hover {
     padding-inline: 4px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification--toast .cds--actionable-notification__text-wrapper {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification--toast .cds--actionable-notification__text-wrapper {
     padding-top: 8px;
     padding-left: 12px;
     padding-bottom: 8px;
     padding-right: 32px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification__subtitle {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification__subtitle {
     font-size: 12px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification--low-contrast {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification--low-contrast {
     width: unset;
     min-width: unset;
     max-width: unset;
@@ -45108,13 +45108,13 @@ button.ucxheader_close_button:hover {
     margin-bottom: 8px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification--low-contrast.cds--actionable-notification--info {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification--low-contrast.cds--actionable-notification--info {
     border-left: unset;
     background: #fff;
     position: relative;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatlegaldisclaimer .cds--actionable-notification--low-contrast:before {
+#RPDContainer.RPDContainer .unifiedchatlegaldisclaimer .cds--actionable-notification--low-contrast:before {
     border: unset;
 }
 
@@ -45126,11 +45126,11 @@ button.ucxheader_close_button:hover {
     background-color: inherit !important;
 }
 
-#rpdcontainer.rpdcontainer .chat-input-container {
+#RPDContainer.RPDContainer .chat-input-container {
     display: flex;
 }
 
-#rpdcontainer.rpdcontainer .chat-input-container .chat-input {
+#RPDContainer.RPDContainer .chat-input-container .chat-input {
     flex: 1;
     font-size: var(--watsonassistantchat-base-font-size-med);
     line-height: var(--watsonassistantchat-base-line-height-med);
@@ -45139,7 +45139,7 @@ button.ucxheader_close_button:hover {
     position: relative;
 }
 
-#rpdcontainer.rpdcontainer .chat-input-container .chat-input .chat-input-control {
+#RPDContainer.RPDContainer .chat-input-container .chat-input .chat-input-control {
     padding: 12px 16px;
     width: 100%;
     height: 100%;
@@ -45148,13 +45148,13 @@ button.ucxheader_close_button:hover {
     border: var(--watsonassistantchat-base-border-width-med) solid rgba(0, 0, 0, 0);
 }
 
-#rpdcontainer.rpdcontainer .chat-input-container .chat-input .chat-input-control:focus {
+#RPDContainer.RPDContainer .chat-input-container .chat-input .chat-input-control:focus {
     border: var(--watsonassistantchat-base-border-width-med) solid var(--watsonassistantchat-carbon-focus);
     outline: 0;
     border-radius: 0;
 }
 
-#rpdcontainer.rpdcontainer button.chat__button--base {
+#RPDContainer.RPDContainer button.chat__button--base {
     border-radius: 0;
     box-shadow: none;
     cursor: pointer;
@@ -45167,66 +45167,66 @@ button.ucxheader_close_button:hover {
     align-items: center;
 }
 
-#rpdcontainer.rpdcontainer button.chat__button--primary {
+#RPDContainer.RPDContainer button.chat__button--primary {
     border: var(--watsonassistantchat-base-border-width-med) solid rgba(0, 0, 0, 0);
     color: var(--watsonassistantchat-accent-color-text);
 }
 
-#rpdcontainer.rpdcontainer button.chat__button--primary:enabled {
+#RPDContainer.RPDContainer button.chat__button--primary:enabled {
     background: var(--watsonassistantchat-carbon-interactive-01);
 }
 
-#rpdcontainer.rpdcontainer button.chat__button--primary:disabled {
+#RPDContainer.RPDContainer button.chat__button--primary:disabled {
     background: var(--watsonassistantchat-carbon-disabled-02);
 }
 
-#rpdcontainer.rpdcontainer button.chat__button--primary:focus {
+#RPDContainer.RPDContainer button.chat__button--primary:focus {
     box-shadow: inset 0 0 0 var(--watsonassistantchat-base-border-width-small) var(--watsonassistantchat-carbon-ui-02);
     border-color: var(--watsonassistantchat-carbon-focus);
 }
 
-#rpdcontainer.rpdcontainer button.chat__button--base:disabled,
-#rpdcontainer.rpdcontainer button.chat__button--base:disabled * {
+#RPDContainer.RPDContainer button.chat__button--base:disabled,
+#RPDContainer.RPDContainer button.chat__button--base:disabled * {
     cursor: not-allowed;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatgate h4 {
+#RPDContainer.RPDContainer .unifiedchatgate h4 {
     margin-top: 2rem;
     font-size: var(--watsonassistantchat-base-font-size-med);
     line-height: var(--watsonassistantchat-base-line-height-med);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatgate .bx--form-item {
+#RPDContainer.RPDContainer .unifiedchatgate .bx--form-item {
     margin-top: 1rem !important;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatgate {
+#RPDContainer.RPDContainer .unifiedchatgate {
     position: relative;
     overflow: auto;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatprivacyform {
+#RPDContainer.RPDContainer .unifiedchatprivacyform {
     margin-top: 1rem;
 }
 
-#rpdcontainer.rpdcontainer .mainassistant .cds--list-box__field {
+#RPDContainer.RPDContainer .mainassistant .cds--list-box__field {
     background-color: #e0e0e0;
 }
 
-#rpdcontainer.rpdcontainer .subassistant {
+#RPDContainer.RPDContainer .subassistant {
     margin-left: 10px;
 }
 
-#rpdcontainer.rpdcontainer .subassistant .cds--list-box__field {
+#RPDContainer.RPDContainer .subassistant .cds--list-box__field {
     background-color: #e0e0e0;
 }
 
-#rpdcontainer.rpdcontainer .notification-section p {
+#RPDContainer.RPDContainer .notification-section p {
     font-family: "ibm plex sans", "helvetica neue", arial, sans-serif;
     font-size: inherit;
 }
 
-#rpdcontainer.rpdcontainer .notification-section code {
+#RPDContainer.RPDContainer .notification-section code {
     font-family: "ibm plex mono", "system-ui", "-apple-system",
         "blinkmacsystemfont", ".sfnstext-regular", "monospace";
     font-size: 12px;
@@ -45240,11 +45240,11 @@ button.ucxheader_close_button:hover {
     margin-bottom: -4px;
 }
 
-#rpdcontainer.rpdcontainer .notification-section pre {
+#RPDContainer.RPDContainer .notification-section pre {
     display: inline;
 }
 
-#rpdcontainer.rpdcontainer .notification-section li {
+#RPDContainer.RPDContainer .notification-section li {
     list-style: auto;
     list-style-position: outside;
     margin-left: 14px;
@@ -45252,7 +45252,7 @@ button.ucxheader_close_button:hover {
     margin-bottom: 5px;
 }
 
-#rpdcontainer.rpdcontainer .notification-section li li {
+#RPDContainer.RPDContainer .notification-section li li {
     list-style: outside;
     margin-left: 20px;
     list-style-position: outside;
@@ -45269,30 +45269,30 @@ button.ucxheader_close_button:hover {
     bottom: 0%;
 }
 
-#rpdcontainer.rpdcontainer .bx--tag--cyan {
+#RPDContainer.RPDContainer .bx--tag--cyan {
     background-color: #add8e6;
 }
 
-#rpdcontainer.rpdcontainer .wacframe {
+#RPDContainer.RPDContainer .wacframe {
     margin-left: -35px;
     width: 57rem;
     height: 60rem;
 }
 
-#rpdcontainer.rpdcontainer .wacwidget--maxwidth.wac--widewidth .wacinputcontainer {
+#RPDContainer.RPDContainer .wacwidget--maxwidth.wac--widewidth .wacinputcontainer {
     margin-bottom: 0 !important;
 }
 
-#rpdcontainer.rpdcontainer[dir="rtl"] button {
+#RPDContainer.RPDContainer[dir="rtl"] button {
     -webkit-transform: none !important;
     transform: none;
 }
 
-#rpdcontainer.rpdcontainer[dir="rtl"] .unifiedchatlegaldisclaimer .bx--inline-notification__close-button {
+#RPDContainer.RPDContainer[dir="rtl"] .unifiedchatlegaldisclaimer .bx--inline-notification__close-button {
     position: relative;
 }
 
-#rpdcontainer.rpdcontainer[dir="rtl"] #notice-choice::part(checkbox-label)::after {
+#RPDContainer.RPDContainer[dir="rtl"] #notice-choice::part(checkbox-label)::after {
     block-size: 0.7025rem;
     border-block-end: 1.5px solid var(--cds-icon-inverse, #fff);
     border-inline-start: 1.5px solid var(--cds-icon-inverse, #fff);
@@ -45306,7 +45306,7 @@ button.ucxheader_close_button:hover {
     transform-origin: bottom right;
 }
 
-#rpdcontainer.rpdcontainer .hidewebchat {
+#RPDContainer.RPDContainer .hidewebchat {
     display: none;
 }
 
@@ -45314,7 +45314,7 @@ button.ucxheader_close_button:hover {
     left: 50%;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel {
+#RPDContainer.RPDContainer .unifiedchatcustompanel {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -45322,14 +45322,14 @@ button.ucxheader_close_button:hover {
     border-radius: 8px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content {
     flex: 1;
     overflow: hidden;
     display: flex;
     flex-direction: column;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__bodywrapper {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__bodywrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -45337,83 +45337,83 @@ button.ucxheader_close_button:hover {
     padding-bottom: var(--watsonassistantchat-home_screen_modern-input-wrapper-height);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__bodywrapper.unifiedchatcustompanel__bodywrapper--padding {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__bodywrapper.unifiedchatcustompanel__bodywrapper--padding {
     padding-bottom: 0;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__loading {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__loading {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__listbody {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__listbody {
     background-color: #fff;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__body {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__body {
     background-color: #fff;
     padding: 0 16px 32px;
     height: auto;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .bx--structured-list-row {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .bx--structured-list-row {
     display: table-row;
     border-bottom: none;
     transition: background-color 0.11s cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .bx--btn {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .bx--btn {
     max-width: auto;
     min-height: 48px;
     flex-shrink: 1;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .bx--btn-set .bx--btn {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .bx--btn-set .bx--btn {
     max-width: unset;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel .bx--form-item {
+#RPDContainer.RPDContainer .unifiedchatcustompanel .bx--form-item {
     margin-top: 5px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--text-input {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--text-input {
     background-color: #f4f4f4;
     color: #161616;
     transition: background-color 70ms cubic-bezier(0.2, 0, 0.38, 0.9) 0s,
         outline 70ms cubic-bezier(0.2, 0, 0.38, 0.9) 0s;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .paragraphtext {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .paragraphtext {
     font-size: 0.9rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--select-input {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--select-input {
     background-color: #f4f4f4;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel__content .bx--text-area {
+#RPDContainer.RPDContainer .unifiedchatcustompanel__content .bx--text-area {
     border: #8d8d8d 0.5px solid;
 }
 
-#rpdcontainer.rpdcontainer .bx--date-picker.bx--date-picker--single .bx--date-picker__input {
+#RPDContainer.RPDContainer .bx--date-picker.bx--date-picker--single .bx--date-picker__input {
     background-color: #f4f4f4;
 }
 
-#rpdcontainer.rpdcontainer .chat__body {
+#RPDContainer.RPDContainer .chat__body {
     background-color: #f4f4f4;
     height: 100%;
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-messages {
+#RPDContainer.RPDContainer .chat__body .chat-messages {
     overflow: auto;
     font: 0.8rem normal arial, sans-serif;
 }
 
-#rpdcontainer.rpdcontainer .ibm-web-chat--default-styles .surveyratingbuttons button[class*="surveyratingbutton"] {
+#RPDContainer.RPDContainer .ibm-web-chat--default-styles .surveyratingbuttons button[class*="surveyratingbutton"] {
     display: inline;
 }
 
@@ -45421,21 +45421,21 @@ button.ucxheader_close_button:hover {
     height: 25rem !important;
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-message-typing {
+#RPDContainer.RPDContainer .chat__body .chat-message-typing {
     font-size: 2rem;
     color: blue;
     margin-left: 20px;
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-message-typing:before {
+#RPDContainer.RPDContainer .chat__body .chat-message-typing:before {
     content: "…";
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-message-typing div {
+#RPDContainer.RPDContainer .chat__body .chat-message-typing div {
     display: none;
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-message-consumer {
+#RPDContainer.RPDContainer .chat__body .chat-message-consumer {
     color: #fff;
     background: #f5f5f5;
     color: var(--watsonassistantchat-secondary-color-text);
@@ -45444,12 +45444,12 @@ button.ucxheader_close_button:hover {
     margin-left: 30px;
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-message-consumer .chat-message-position {
+#RPDContainer.RPDContainer .chat__body .chat-message-consumer .chat-message-position {
     display: flex;
     justify-content: flex-end;
 }
 
-#rpdcontainer.rpdcontainer .chat__body .chat-message-consumer .wac__sent {
+#RPDContainer.RPDContainer .chat__body .chat-message-consumer .wac__sent {
     border: 1px solid var(--watsonassistantchat-secondary-color);
     background: var(--watsonassistantchat-secondary-color);
     border-radius: var(--watsonassistantchat-base-border-radius-med) var(--watsonassistantchat-base-border-radius-med) 0 var(--watsonassistantchat-base-border-radius-med);
@@ -45460,30 +45460,30 @@ button.ucxheader_close_button:hover {
     padding: 8px 12px;
 }
 
-#rpdcontainer.rpdcontainer .chat_full_width_button {
+#RPDContainer.RPDContainer .chat_full_width_button {
     min-width: 100%;
 }
 
-#rpdcontainer.rpdcontainer .transcript_button {
+#RPDContainer.RPDContainer .transcript_button {
     background: #f5f5f5;
     border: none;
     margin: auto;
     display: block;
 }
 
-#rpdcontainer.rpdcontainer .transcript_button:hover {
+#RPDContainer.RPDContainer .transcript_button:hover {
     text-decoration: underline;
     text-decoration-color: blue;
     color: blue;
 }
 
-#rpdcontainer.rpdcontainer .endchat {
+#RPDContainer.RPDContainer .endchat {
     border: none;
     margin: auto;
     display: table;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_text_button {
+#RPDContainer.RPDContainer .wacheader .header_text_button {
     width: fit-content;
     padding-left: 6px;
     padding-right: 6px;
@@ -45493,25 +45493,25 @@ button.ucxheader_close_button:hover {
     font-size: initial;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_text_button:hover {
+#RPDContainer.RPDContainer .wacheader .header_text_button:hover {
     text-decoration: underline;
     text-decoration-color: blue;
     color: blue;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_home_button {
+#RPDContainer.RPDContainer .wacheader .header_home_button {
     width: 40px;
     height: 40px;
     border: none;
     background-color: inherit;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_home_button:hover {
+#RPDContainer.RPDContainer .wacheader .header_home_button:hover {
     background-color: #f4f4f4;
     border-top-left-radius: 8px;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_breadcrumb_button {
+#RPDContainer.RPDContainer .wacheader .header_breadcrumb_button {
     width: auto;
     background-color: inherit;
     border: none;
@@ -45520,102 +45520,102 @@ button.ucxheader_close_button:hover {
     font-size: var(--watsonassistantchat-base-font-size-med);
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_breadcrumb_button:hover {
+#RPDContainer.RPDContainer .wacheader .header_breadcrumb_button:hover {
     text-decoration: underline;
     text-decoration-color: blue;
     color: blue;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .home_breadcrumb--text {
+#RPDContainer.RPDContainer .wacheader .home_breadcrumb--text {
     display: flex;
     align-items: center;
 }
 
-/* #rpdcontainer.rpdcontainer .wacheader {
+/* #RPDContainer.RPDContainer .wacheader {
     background-color: #fff;
 } */
 
-#rpdcontainer.rpdcontainer .wacheader .wide_header_buttons {
+#RPDContainer.RPDContainer .wacheader .wide_header_buttons {
     width: auto !important;
 }
 
-#rpdcontainer.rpdcontainer a.wac__button--base,
-#rpdcontainer.rpdcontainer button.wac__button--base svg {
+#RPDContainer.RPDContainer a.wac__button--base,
+#RPDContainer.RPDContainer button.wac__button--base svg {
     vertical-align: bottom;
     width: 18px;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .wacheader_leftbuttoncentersparent-container {
+#RPDContainer.RPDContainer .wacheader .wacheader_leftbuttoncentersparent-container {
     width: 100%;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .wacheader_leftbuttoncentersparent-container .wacheader__centercontainer--hide {
+#RPDContainer.RPDContainer .wacheader .wacheader_leftbuttoncentersparent-container .wacheader__centercontainer--hide {
     display: none;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_home_breadcrumb_link--text {
+#RPDContainer.RPDContainer .wacheader .header_home_breadcrumb_link--text {
     display: inline-flex;
     font-size: initial;
 }
 
-#rpdcontainer.rpdcontainer .wacheader .header_home_breadcrumb--text {
+#RPDContainer.RPDContainer .wacheader .header_home_breadcrumb--text {
     font-size: initial;
 }
 
-#rpdcontainer.rpdcontainer .wacwidget--maxwidth .wacbotcontainer .wacpanelcontent {
+#RPDContainer.RPDContainer .wacwidget--maxwidth .wacbotcontainer .wacpanelcontent {
     max-width: none;
 }
 
-#rpdcontainer.rpdcontainer .wacwidget--maxwidth .wacbotcontainer .wacheader--content {
+#RPDContainer.RPDContainer .wacwidget--maxwidth .wacbotcontainer .wacheader--content {
     max-width: 99%;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey {
     height: 100vh;
     padding: 1.5rem;
     background-color: #f5f5f5;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .loader {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .loader {
     position: absolute;
     z-index: 10;
     top: 50%;
     left: 35%;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .bold {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .bold {
     font-weight: 600;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .wacwidget__markdownp.survey_greetings,
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .wacwidget__markdownp.survey_question {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .wacwidget__markdownp.survey_greetings,
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .wacwidget__markdownp.survey_question {
     margin-bottom: 1.5rem;
     font-size: 0.9rem;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .wacwidget__markdownp.survey_question {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .wacwidget__markdownp.survey_question {
     font-weight: 600;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons {
     display: inline;
     margin: 0.75rem 0.5rem 0 0;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons :focus-visible,
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons :focus,
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons :active {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons :focus-visible,
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons :focus,
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_buttons :active {
     background-color: var(--watsonassistantchat-secondary-color);
     color: var(--watsonassistantchat-secondary-color-text);
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_answer {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_answer {
     width: 100%;
     display: flex;
     justify-content: flex-end;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_answer .survey_answer_content {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .survey_answer .survey_answer_content {
     border: 1px solid var(--watsonassistantchat-secondary-color);
     background: var(--watsonassistantchat-secondary-color);
     border-radius: var(--watsonassistantchat-base-border-radius-med) var(--watsonassistantchat-base-border-radius-med) 0 var(--watsonassistantchat-base-border-radius-med);
@@ -45625,43 +45625,43 @@ button.ucxheader_close_button:hover {
     padding: 8px 12px;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .scroll_block {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .ibm-web-chat--default-styles.survey .scroll_block {
     height: 4rem;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .survey-btn-set.bx--btn-set {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .survey-btn-set.bx--btn-set {
     justify-content: right;
 }
 
-#rpdcontainer.rpdcontainer .unifiedchatcustompanel.survey_panel .survey-btn-set.bx--btn-set .survey-close {
+#RPDContainer.RPDContainer .unifiedchatcustompanel.survey_panel .survey-btn-set.bx--btn-set .survey-close {
     max-width: 50%;
 }
 
-#rpdcontainer.rpdcontainer .cds--btn-set .cds--btn {
+#RPDContainer.RPDContainer .cds--btn-set .cds--btn {
     text-align: center !important;
     max-inline-size: 189px !important;
     max-width: -webkit-calc(50%) !important;
     display: block !important;
 }
 
-#rpdcontainer.rpdcontainer .cds--slug .cds--slug-content {
+#RPDContainer.RPDContainer .cds--slug .cds--slug-content {
     width: 30px;
 }
 
-#rpdcontainer.rpdcontainer .recursive-navigator .contact-options {
+#RPDContainer.RPDContainer .recursive-navigator .contact-options {
     margin-top: 1rem;
 }
 
-#rpdcontainer.rpdcontainer .recursive-navigator .business-location-title {
+#RPDContainer.RPDContainer .recursive-navigator .business-location-title {
     margin-bottom: 1rem;
 }
 
-#rpdcontainer.rpdcontainer svg.info_filled {
+#RPDContainer.RPDContainer svg.info_filled {
     fill: blue;
     margin-right: 4px;
 }
 
-#rpdcontainer.rpdcontainer .icon_with_text {
+#RPDContainer.RPDContainer .icon_with_text {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -45670,22 +45670,22 @@ button.ucxheader_close_button:hover {
     margin-bottom: 16px;
 }
 
-#rpdcontainer.rpdcontainer .references-container {
+#RPDContainer.RPDContainer .references-container {
     width: 100%;
     padding: 0;
     margin: 1rem 0;
     list-style: none;
 }
 
-#rpdcontainer.rpdcontainer .references-container .increase-btm-margin {
+#RPDContainer.RPDContainer .references-container .increase-btm-margin {
     margin-bottom: 1.5rem;
 }
 
-#rpdcontainer.rpdcontainer .wac__received--textcontent .wacwidget__markdownpre {
+#RPDContainer.RPDContainer .wac__received--textcontent .wacwidget__markdownpre {
     max-width: -webkit-calc(var(--cds-chat-base-width) - 82px);
 }
 
-#rpdcontainer.rpdcontainer .references-item {
+#RPDContainer.RPDContainer .references-item {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -45694,7 +45694,7 @@ button.ucxheader_close_button:hover {
     width: 100%;
 }
 
-#rpdcontainer.rpdcontainer .references-item-link {
+#RPDContainer.RPDContainer .references-item-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -45709,7 +45709,7 @@ button.ucxheader_close_button:hover {
     cursor: pointer;
 }
 
-#rpdcontainer.rpdcontainer .references-item-content {
+#RPDContainer.RPDContainer .references-item-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -45717,64 +45717,64 @@ button.ucxheader_close_button:hover {
     width: 100%;
 }
 
-#rpdcontainer.rpdcontainer .references-item-arrow {
+#RPDContainer.RPDContainer .references-item-arrow {
     fill: #0f62fe;
     width: 100%;
     height: 100%;
     flex-shrink: 0;
 }
 
-#rpdcontainer.rpdcontainer .references-toggle {
+#RPDContainer.RPDContainer .references-toggle {
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
 }
 
-#rpdcontainer.rpdcontainer .extracted-sources {
+#RPDContainer.RPDContainer .extracted-sources {
     margin-top: 10px;
     margin-bottom: 12px;
 }
 
-#rpdcontainer.rpdcontainer .extracted-sources-list-item {
+#RPDContainer.RPDContainer .extracted-sources-list-item {
     margin-top: 10px;
     margin-bottom: 10px;
 }
 
-#rpdcontainer.rpdcontainer .generative_ai_output {
+#RPDContainer.RPDContainer .generative_ai_output {
     white-space: pre-wrap;
 }
 
-#rpdcontainer.rpdcontainer .answered-by {
+#RPDContainer.RPDContainer .answered-by {
     font-style: italic;
 }
 
-#rpdcontainer.rpdcontainer .req_id {
+#RPDContainer.RPDContainer .req_id {
     font-size: 0.8em;
     font-weight: 200;
 }
 
-#rpdcontainer.rpdcontainer .assistant-name {
+#RPDContainer.RPDContainer .assistant-name {
     font-weight: bold;
 }
 
-#rpdcontainer.rpdcontainer .askisc_greeting h1 {
+#RPDContainer.RPDContainer .askisc_greeting h1 {
     font-size: var(--cds-chat-base-font-size-medium);
     font-weight: 600;
 }
 
-#rpdcontainer.rpdcontainer .askisc_greeting h2 {
+#RPDContainer.RPDContainer .askisc_greeting h2 {
     font-size: var(--cds-chat-base-font-size-xlarge);
     margin: 1rem 0 1rem;
 }
 
-#rpdcontainer.rpdcontainer .askisc_greeting .cds--tile--clickable,
-#rpdcontainer.rpdcontainer .askisc_greeting .cds--tile--clickable:hover {
+#RPDContainer.RPDContainer .askisc_greeting .cds--tile--clickable,
+#RPDContainer.RPDContainer .askisc_greeting .cds--tile--clickable:hover {
     text-decoration: none;
     color: #000;
 }
 
-#rpdcontainer.rpdcontainer .askisc_greeting .tile-container {
+#RPDContainer.RPDContainer .askisc_greeting .tile-container {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(1, minmax(7rem, 1fr));
@@ -45783,34 +45783,34 @@ button.ucxheader_close_button:hover {
 }
 
 @media (min-width: 600px) and (max-width: 1023px) {
-    #rpdcontainer.rpdcontainer .askisc_greeting .tile-container {
+    #RPDContainer.RPDContainer .askisc_greeting .tile-container {
         max-width: 80%;
         grid-template-columns: repeat(2, minmax(7rem, 1fr));
     }
 }
 
 @media (min-width: 1024px) and (max-width: 1099px) {
-    #rpdcontainer.rpdcontainer .askisc_greeting .tile-container {
+    #RPDContainer.RPDContainer .askisc_greeting .tile-container {
         max-width: 60%;
         grid-template-columns: repeat(3, minmax(7rem, 1fr));
     }
 
-    #rpdcontainer.rpdcontainer .askisc_greeting .tile-container .cds--tile--clickable {
+    #RPDContainer.RPDContainer .askisc_greeting .tile-container .cds--tile--clickable {
         height: 7rem;
     }
 }
 
 @media (min-width: 1100px) {
-    #rpdcontainer.rpdcontainer .askisc_greeting .tile-container {
+    #RPDContainer.RPDContainer .askisc_greeting .tile-container {
         max-width: 50%;
         grid-template-columns: repeat(3, minmax(7rem, 1fr));
     }
 
-    #rpdcontainer.rpdcontainer .askisc_greeting .tile-container .cds--tile--clickable {
+    #RPDContainer.RPDContainer .askisc_greeting .tile-container .cds--tile--clickable {
         height: 7rem;
     }
 }
 
-#rpdcontainer.rpdcontainer .askisc_greeting .tile-container .cds--tile--clickable {
+#RPDContainer.RPDContainer .askisc_greeting .tile-container .cds--tile--clickable {
     max-height: 8rem;
 }
