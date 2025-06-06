@@ -54,12 +54,14 @@ module.exports = {
         terserOptions: {
           mangle: true,
           compress: {
-            drop_console: true, // Remove console logs
-            pure_funcs: ["console.info", "console.debug"], // Remove specific functions
+            drop_console: true,
+            pure_funcs: ["console.info", "console.debug"],
           },
           output: {
             comments: false,
+            ascii_only: true, // ✅ Add this
           },
+          ecma: 2020, // ✅ Optional: for better Unicode support
         },
       }),
       new CssMinimizerPlugin(),
