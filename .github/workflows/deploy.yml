@@ -1,4 +1,4 @@
-name: Build and Deploy to S3
+name: Build, Deploy to S3, and Create Release
 
 on:
   push:
@@ -45,3 +45,48 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id E3SJXANXL6IYCB \
             --paths "/public/scripts/*"
+
+  create_release:
+    name: Create Release
+    needs: build_and_deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version and create tag
+        id: version
+        run: |
+          VERSION="0.1.$(date +%Y%m%d)-$(git rev-parse --short HEAD)"
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=v${VERSION}" >> $GITHUB_OUTPUT
+          if git tag -l "v${VERSION}" | grep -q "v${VERSION}"; then
+            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        if: steps.version.outputs.TAG_EXISTS == 'false'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.TAG_NAME }}" -m "Release ${{ steps.version.outputs.TAG_NAME }}"
+          git push origin "${{ steps.version.outputs.TAG_NAME }}"
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "# Release ${{ steps.version.outputs.TAG_NAME }}" > release-notes.md
+          echo "" >> release-notes.md
+          echo "## Changes" >> release-notes.md
+          echo "- Automated release from commit $(git rev-parse --short HEAD)" >> release-notes.md
+
+          gh release create "${{ steps.version.outputs.TAG_NAME }}" \
+            --title "Release ${{ steps.version.outputs.TAG_NAME }}" \
+            --notes-file release-notes.md

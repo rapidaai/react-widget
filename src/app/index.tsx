@@ -4,6 +4,7 @@ import {
   HEADER_AUTH_ID,
   HEADER_API_KEY,
   HEADER_SOURCE_KEY,
+  AssistantConnectionConfig,
 } from "rapida-react";
 import { useEnvironment } from "@/hooks/use-environment";
 import {
@@ -35,7 +36,7 @@ export const App: FC<{}> = memo(() => {
   // Create configurations outside the render function
   const connectionConfig = useMemo(() => {
     if (token)
-      return new ConnectionConfig({
+      return new AssistantConnectionConfig({
         [HEADER_API_KEY]: token,
         [HEADER_AUTH_ID]: user.user_id,
         Client: {

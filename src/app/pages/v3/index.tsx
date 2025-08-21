@@ -1,6 +1,6 @@
 import { cn } from "@/styles/media";
 import {
-  AgentWebpluginDeployment,
+  AssistantWebpluginDeployment,
   useAgentMessage,
   useConnectAgent,
   useEnsureVoiceAgent,
@@ -11,7 +11,7 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 import { Input } from "@/app/pages/v3/input";
 
 export const ChatComponent: React.FC<{
-  deployment: AgentWebpluginDeployment;
+  deployment: AssistantWebpluginDeployment;
 }> = ({ deployment }) => {
   const [open, setOpen] = useState(false);
   const ctx = useEnsureVoiceAgent();
@@ -128,7 +128,7 @@ export const ChatComponent: React.FC<{
             <FloatingButton
               open={open}
               setOpen={setOpen}
-              appIcon={deployment.url}
+              appIcon={deployment.getUrl()}
             />
           </div>
         </div>
@@ -138,7 +138,7 @@ export const ChatComponent: React.FC<{
 };
 
 const AssistantChatter: FC<{
-  deployment: AgentWebpluginDeployment;
+  deployment: AssistantWebpluginDeployment;
   onSendMessage: (txt: string) => void;
 }> = ({ deployment, onSendMessage }) => {
   return (
@@ -156,7 +156,7 @@ const AssistantChatter: FC<{
 };
 
 const Messages: FC<{
-  deployment: AgentWebpluginDeployment;
+  deployment: AssistantWebpluginDeployment;
   onSendMessage: (txt: string) => void;
 }> = ({ deployment, onSendMessage }) => {
   const { messages } = useAgentMessage();
@@ -189,7 +189,7 @@ const Messages: FC<{
             <div className="WACImageWithFallback">
               <img
                 alt="Assistant Icon"
-                src={deployment.url}
+                src={deployment.getUrl()}
                 style={{
                   width: "100%",
                   height: "100%",
@@ -198,7 +198,7 @@ const Messages: FC<{
               />
             </div>
           </div>
-          <div className="WACMessage__Label">{deployment.name}</div>
+          <div className="WACMessage__Label">{deployment.getName()}</div>
         </div>
         <div className="WAC__message--padding">
           <div className="WAC__bot-message">
@@ -208,7 +208,7 @@ const Messages: FC<{
                   <div className="WACStreamingRichText">
                     <div className="ibm-web-chat--default-styles">
                       <MarkdownPreview
-                        source={deployment.greeting}
+                        source={deployment.getGreeting()}
                         className="WACWidget__Markdown"
                         style={{ background: "transparent" }}
                       />
@@ -218,7 +218,7 @@ const Messages: FC<{
                 </div>
 
                 <div className="contact-options">
-                  {deployment.suggestionList.map((x, idx) => {
+                  {deployment.getSuggestionList().map((x, idx) => {
                     return (
                       <div
                         key={idx}
@@ -311,7 +311,7 @@ const Messages: FC<{
                 <div className="WACImageWithFallback">
                   <img
                     alt="Assistant Icon"
-                    src={deployment.url}
+                    src={deployment.getUrl()}
                     style={{
                       width: "100%",
                       height: "100%",
@@ -321,7 +321,7 @@ const Messages: FC<{
                 </div>
               </div>
               <div className="WACMessage__Label">
-                {deployment.name} {formatTimeToHHMMPM(x.time)}
+                {deployment.getName()} {formatTimeToHHMMPM(x.time)}
               </div>
             </div>
             <div className="WAC__message--padding">
