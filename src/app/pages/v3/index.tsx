@@ -166,7 +166,7 @@ const Messages: FC<{
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [JSON.stringify(messages)]);
 
   return (
     <div id="WAC__messages" className="WAC__messages" role="list">
