@@ -10,12 +10,12 @@ import { useEnvironment } from "@/hooks/use-environment";
 import {
   AgentConfig,
   Channel,
-  ConnectionConfig,
   InputOptions,
   VoiceAgent,
   VoiceAgentContext,
   WEB_PLUGIN_SOURCE,
 } from "rapida-react";
+
 export const App: FC<{}> = memo(() => {
   const { assistantId, token, assistantVersion, user } = useEnvironment();
   useEffect(() => {

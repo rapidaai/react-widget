@@ -1,5 +1,12 @@
 import { cn } from "@/styles/media";
-import { HTMLAttributes, FC, useState, useEffect } from "react";
+import {
+  HTMLAttributes,
+  FC,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { useForm } from "react-hook-form";
 
 export const Input: FC<{ onSendMessage: (txt: string) => void }> = ({
@@ -24,6 +31,22 @@ export const Input: FC<{ onSendMessage: (txt: string) => void }> = ({
       reset();
     }
   };
+
+  const [textareaHeight, setTextareaHeight] = useState("auto");
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // Reset height to auto to allow shrinking
+    e.target.style.height = "auto";
+    // Set height to scroll height, with a minimum of 32px (adjust as needed)
+    e.target.style.height = `${Math.max(e.target.scrollHeight, 32)}px`;
+
+    // Update the state if needed
+    if (textareaHeight !== e.target.style.height) {
+      setTextareaHeight(e.target.style.height);
+    }
+
+    // Propagate onChange event to parent component
+  };
+
   return (
     <form
       onSubmit={handleSubmit(onSubmitForm)}
@@ -34,33 +57,37 @@ export const Input: FC<{ onSendMessage: (txt: string) => void }> = ({
           isFocused ? "WACInputContainer--hasFocus" : ""
         }`}
       >
-        <div className="WACInputContainer__LeftContainer">
-          <div className="WACInputContainer__TextAndUpload">
-            <div className="WAC__TextArea WAC__TextArea--autoSize">
-              <textarea
-                aria-label="Message to send"
-                aria-required="false"
-                className="WAC__TextArea-textarea"
-                id="WACInputContainer-TextArea"
-                placeholder="Type something..."
-                data-enable-grammarly="false"
-                data-test-id="WACInputContainer-TextArea"
-                {...register("message", {
-                  required: "Please write your message.",
-                })}
-                required
-                onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    handleSubmit(onSubmitForm)(e);
-                  }
-                }}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-              ></textarea>
-              <div className="WAC__TextArea-sizer">Type something...</div>
-            </div>
-          </div>
-        </div>
+        <textarea
+          aria-label="Message to send"
+          aria-required="false"
+          className="WAC__TextArea-textarea"
+          id="WACInputContainer-TextArea"
+          placeholder="Type something..."
+          data-enable-grammarly="false"
+          data-test-id="WACInputContainer-TextArea"
+          {...register("message", {
+            required: "Please write your message.",
+            onChange: (e) => handleChange(e), // Combine register with onChange
+          })}
+          required
+          onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              handleSubmit(onSubmitForm)(e);
+            }
+          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          style={{
+            width: "100%",
+            height: textareaHeight,
+            border: "none",
+            outline: "none",
+            resize: "none",
+            padding: "0px",
+            boxSizing: "border-box",
+            backgroundColor: "transparent",
+          }} // Dynamically set height
+        ></textarea>
 
         <button
           id="WACInputContainer__SendButton"

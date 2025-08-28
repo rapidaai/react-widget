@@ -12,7 +12,6 @@ interface EnvironmentContextProps {
   user: {
     name: string;
     user_id: string;
-    // any additional data that will be stored for the assistant
     meta?: Record<string, string>;
   };
   theme: {

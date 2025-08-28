@@ -4905,10 +4905,10 @@ randombytes@^2.1.0:
   dependencies:
     safe-buffer "^5.1.0"
 
-rapida-react@^1.1.2-0.3:
-  version "1.1.2-0.3"
-  resolved "https://registry.yarnpkg.com/rapida-react/-/rapida-react-1.1.2-0.3.tgz#2403db9aee8331a83722ac252541035dec5e266f"
-  integrity sha512-RkLx4Y2H2gOXK3nYhrt3tfQ/Qkoz6fbvFtkmBZa5GdM9XMJet91mel8tz6UixhV8WPsVXMrB0jA1TbBkm0x2bQ==
+rapida-react@^1.1.22:
+  version "1.1.22"
+  resolved "https://registry.yarnpkg.com/rapida-react/-/rapida-react-1.1.22.tgz#65b1c74bf244ce52cf53c781555a1fc2bf1be38c"
+  integrity sha512-LEyrJahvi8oglx9METo9SYokpOgHOqIn90ppUFAHPwRxN2RcxX24HfRanMj8IP2kkCEZ7+49X72cuPgu1JFXRQ==
   dependencies:
     "@emotion/is-prop-valid" "^1.3.1"
     "@grpc/grpc-js" "^1.13.4"

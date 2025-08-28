@@ -1,9 +1,9 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import { DarkModeProvider } from "@/contexts/dark-mode-context";
 import { EnvironmentProvider } from "@/contexts/environment-context";
 import { App } from "@/app";
 import "@/styles/index.css";
+import React from "react";
 
 const rootElementId = "rapida-chat-app";
 let rootElement = document.getElementById(rootElementId);
@@ -17,11 +17,11 @@ if (!rootElement) {
 // Create root and render the React component
 const root = ReactDOM.createRoot(rootElement);
 root.render(
-  //   <React.StrictMode>
-  <DarkModeProvider>
-    <EnvironmentProvider>
-      <App />
-    </EnvironmentProvider>
-  </DarkModeProvider>
-  //   </React.StrictMode>
+  <React.StrictMode>
+    <DarkModeProvider>
+      <EnvironmentProvider>
+        <App />
+      </EnvironmentProvider>
+    </DarkModeProvider>
+  </React.StrictMode>
 );

@@ -35,7 +35,7 @@ export const ChatComponent: React.FC<{
 
   return (
     <div className="RPDContainer" id="RPDContainer">
-      <div className="RPDContainer--render cds--g10 WAC--aiTheme" dir="auto">
+      <div className="RPDContainer--render RPD_Wrapper WAC--aiTheme" dir="auto">
         <div dir="ltr" className="RPDContainer__LayoutDirection">
           <div
             className="WACWidget__regionContainer"
