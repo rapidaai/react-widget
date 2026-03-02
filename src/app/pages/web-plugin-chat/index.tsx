@@ -1,14 +1,29 @@
-import { FC, useMemo } from "react";
-
-import { useAgentDeployment } from "rapida-react";
+import { FC, useEffect, useState } from "react";
+import { AssistantWebpluginDeployment, VoiceAgent } from "@rapidaai/react";
 import { ChatComponent } from "@/app/pages/v3";
 
-export const WebPluginChat: FC<{}> = () => {
-  const { deployment, assistant } = useAgentDeployment();
+export const WebPluginChat: FC<{ voiceAgent: VoiceAgent }> = ({
+  voiceAgent,
+}) => {
+  const [deployment, setDeployment] =
+    useState<AssistantWebpluginDeployment | null>(null);
 
-  if (deployment && assistant && deployment.type === "web-plugin") {
-    // return <PluginRouter deployment={deployment.deployment!} />;
-    return <ChatComponent deployment={deployment.deployment!} />;
+  useEffect(() => {
+    voiceAgent
+      .getAssistant()
+      .then((ex) => {
+        if (ex.getSuccess()) {
+          const webDeploy = ex.getData()?.getWebplugindeployment();
+          if (webDeploy) {
+            setDeployment(webDeploy);
+          }
+        }
+      })
+      .catch(() => {});
+  }, [voiceAgent]);
+
+  if (deployment) {
+    return <ChatComponent deployment={deployment} voiceAgent={voiceAgent} />;
   }
-  return <></>; // or return an error message for incorrect deployment type
+  return <></>;
 };

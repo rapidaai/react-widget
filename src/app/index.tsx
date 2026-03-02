@@ -1,23 +1,17 @@
 import { FC, memo, useEffect, useMemo } from "react";
 import { WebPluginChat } from "@/app/pages/web-plugin-chat";
 import {
-  HEADER_AUTH_ID,
-  HEADER_API_KEY,
-  HEADER_SOURCE_KEY,
-  AssistantConnectionConfig,
-} from "rapida-react";
-import { useEnvironment } from "@/hooks/use-environment";
-import {
   AgentConfig,
   Channel,
+  ConnectionConfig,
   InputOptions,
   VoiceAgent,
-  VoiceAgentContext,
-  WEB_PLUGIN_SOURCE,
-} from "rapida-react";
+} from "@rapidaai/react";
+import { useEnvironment } from "@/hooks/use-environment";
 
 export const App: FC<{}> = memo(() => {
-  const { assistantId, token, assistantVersion, user } = useEnvironment();
+  const { assistantId, token, user, apiBase } = useEnvironment();
+
   useEffect(() => {
     if (!assistantId) {
       console.error(
@@ -33,35 +27,29 @@ export const App: FC<{}> = memo(() => {
     }
   }, [assistantId]);
 
-  // Create configurations outside the render function
   const connectionConfig = useMemo(() => {
-    if (token)
-      return new AssistantConnectionConfig({
-        [HEADER_API_KEY]: token,
-        [HEADER_AUTH_ID]: user.user_id,
-        Client: {
-          [HEADER_SOURCE_KEY]: WEB_PLUGIN_SOURCE,
-        },
-      });
-  }, [token, user.user_id]);
+    if (token && apiBase)
+      return ConnectionConfig.DefaultConnectionConfig(
+        ConnectionConfig.WithSDK({ ApiKey: token, UserId: user.user_id })
+      ).withCustomEndpoint({ assistant: apiBase });
+  }, [token, user.user_id, apiBase]);
 
   const agentConfig = useMemo(() => {
     if (assistantId)
       return new AgentConfig(
         assistantId,
-        new InputOptions([Channel.Text], Channel.Text)
+        new InputOptions([Channel.Audio, Channel.Text], Channel.Text)
       );
-  }, [assistantId, token]);
+  }, [assistantId]);
+
+  const voiceAgent = useMemo(() => {
+    if (connectionConfig && agentConfig)
+      return new VoiceAgent(connectionConfig, agentConfig);
+  }, [connectionConfig, agentConfig]);
 
   return (
     <div className="pks_font-sans">
-      {agentConfig && connectionConfig && (
-        <VoiceAgentContext.Provider
-          value={new VoiceAgent(connectionConfig, agentConfig)}
-        >
-          <WebPluginChat />
-        </VoiceAgentContext.Provider>
-      )}
+      {voiceAgent && <WebPluginChat voiceAgent={voiceAgent} />}
     </div>
   );
 });

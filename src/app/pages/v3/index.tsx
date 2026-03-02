@@ -1,10 +1,10 @@
 import { cn } from "@/styles/media";
 import {
   AssistantWebpluginDeployment,
-  useAgentMessage,
+  useAgentMessages,
   useConnectAgent,
-  useEnsureVoiceAgent,
-} from "rapida-react";
+  VoiceAgent,
+} from "@rapidaai/react";
 import React, { useState, useEffect, FC, useRef } from "react";
 import { formatTimeToHHMMPM } from "@/utils/time";
 import MarkdownPreview from "@uiw/react-markdown-preview";
@@ -12,11 +12,11 @@ import { Input } from "@/app/pages/v3/input";
 
 export const ChatComponent: React.FC<{
   deployment: AssistantWebpluginDeployment;
-}> = ({ deployment }) => {
+  voiceAgent: VoiceAgent;
+}> = ({ deployment, voiceAgent }) => {
   const [open, setOpen] = useState(false);
-  const ctx = useEnsureVoiceAgent();
   const { handleConnectAgent, handleDisconnectAgent, isConnected } =
-    useConnectAgent();
+    useConnectAgent(voiceAgent);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -24,12 +24,13 @@ export const ChatComponent: React.FC<{
       setIsLoading(false);
     }
   }, [isConnected]);
+
   const handleDisconnectClick = () => {
     if (isConnected) {
       setIsLoading(true);
-      handleDisconnectAgent(ctx);
+      handleDisconnectAgent();
     } else {
-      handleConnectAgent(ctx);
+      handleConnectAgent();
     }
   };
 
@@ -115,8 +116,9 @@ export const ChatComponent: React.FC<{
                         </div>
                         <AssistantChatter
                           deployment={deployment}
+                          voiceAgent={voiceAgent}
                           onSendMessage={(msg: string) => {
-                            ctx?.onSendText(msg);
+                            voiceAgent?.onSendText(msg);
                           }}
                         />
                       </div>
@@ -128,7 +130,7 @@ export const ChatComponent: React.FC<{
             <FloatingButton
               open={open}
               setOpen={setOpen}
-              appIcon={deployment.getUrl()}
+              name={deployment.getName()}
             />
           </div>
         </div>
@@ -139,17 +141,22 @@ export const ChatComponent: React.FC<{
 
 const AssistantChatter: FC<{
   deployment: AssistantWebpluginDeployment;
+  voiceAgent: VoiceAgent;
   onSendMessage: (txt: string) => void;
-}> = ({ deployment, onSendMessage }) => {
+}> = ({ deployment, voiceAgent, onSendMessage }) => {
   return (
     <div className="WACPanelContent WAC__ChatNonHeaderContainer">
       <div className="WAC__messagesAndInputContainer">
         <div className="WACMessagesContainer__NonInputContainer">
           <div id="WACMessages--holder" className="WACMessages--holder">
-            <Messages deployment={deployment} onSendMessage={onSendMessage} />
+            <Messages
+              deployment={deployment}
+              voiceAgent={voiceAgent}
+              onSendMessage={onSendMessage}
+            />
           </div>
         </div>
-        <Input onSendMessage={onSendMessage} />
+        <Input voiceAgent={voiceAgent} onSendMessage={onSendMessage} />
       </div>
     </div>
   );
@@ -157,9 +164,11 @@ const AssistantChatter: FC<{
 
 const Messages: FC<{
   deployment: AssistantWebpluginDeployment;
+  voiceAgent: VoiceAgent;
   onSendMessage: (txt: string) => void;
-}> = ({ deployment, onSendMessage }) => {
-  const { messages } = useAgentMessage();
+}> = ({ deployment, voiceAgent, onSendMessage }) => {
+  const agentMessages = useAgentMessages(voiceAgent);
+  const messages = agentMessages.messages;
   const scrollRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -187,18 +196,12 @@ const Messages: FC<{
         <div className="WACMessage__AvatarLine">
           <div className="WACMessage__Avatar WACMessage__Avatar--bot">
             <div className="WACImageWithFallback">
-              <img
-                alt="Assistant Icon"
-                src={deployment.getUrl()}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "100%",
-                }}
-              />
+              <BotAvatar name={deployment.getName()} />
             </div>
           </div>
-          <div className="WACMessage__Label">{deployment.getName()}</div>
+          <div className="WACMessage__Label">
+            <RoleChip role="assistant" label={deployment.getName()} />
+          </div>
         </div>
         <div className="WAC__message--padding">
           <div className="WAC__bot-message">
@@ -271,8 +274,9 @@ const Messages: FC<{
           >
             <div className="WACMessage--focusHandle" role="listitem"></div>
             <div className="WACMessage__AvatarLine">
-              <div className="WACMessage__Label">
-                You {formatTimeToHHMMPM(x.time)}
+              <div className="WACMessage__Label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <RoleChip role="user" label="You" />
+                <MessageTime time={x.time} />
               </div>
             </div>
 
@@ -309,19 +313,12 @@ const Messages: FC<{
             <div className="WACMessage__AvatarLine">
               <div className="WACMessage__Avatar WACMessage__Avatar--bot">
                 <div className="WACImageWithFallback">
-                  <img
-                    alt="Assistant Icon"
-                    src={deployment.getUrl()}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: "100%",
-                    }}
-                  />
+                  <BotAvatar name={deployment.getName()} />
                 </div>
               </div>
-              <div className="WACMessage__Label">
-                {deployment.getName()} {formatTimeToHHMMPM(x.time)}
+              <div className="WACMessage__Label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <RoleChip role="assistant" label={deployment.getName()} />
+                <MessageTime time={x.time} />
               </div>
             </div>
             <div className="WAC__message--padding">
@@ -378,11 +375,77 @@ const Messages: FC<{
   );
 };
 
+/** Colored pill badge for the sender role. */
+const ROLE_STYLES: Record<string, { bg: string; color: string }> = {
+  user:      { bg: "#4f46e5", color: "#fff" },   // indigo
+  assistant: { bg: "#0891b2", color: "#fff" },   // cyan
+  agent:     { bg: "#059669", color: "#fff" },   // emerald
+  system:    { bg: "#6b7280", color: "#fff" },   // gray
+};
+
+const RoleChip: FC<{ role: string; label: string }> = ({ role, label }) => {
+  const style = ROLE_STYLES[role] ?? ROLE_STYLES.system;
+  return (
+    <span
+      style={{
+        display: "inline-block",
+        background: style.bg,
+        color: style.color,
+        borderRadius: "4px",
+        padding: "1px 7px",
+        fontSize: "11px",
+        fontWeight: 600,
+        lineHeight: "18px",
+        letterSpacing: "0.02em",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {label}
+    </span>
+  );
+};
+
+/** Timestamp shown next to the role chip. */
+const MessageTime: FC<{ time: Date }> = ({ time }) => (
+  <span
+    style={{
+      fontSize: "11px",
+      color: "#9ca3af",
+      whiteSpace: "nowrap",
+      lineHeight: "18px",
+    }}
+  >
+    {formatTimeToHHMMPM(time)}
+  </span>
+);
+
+const BotAvatar: FC<{ name: string }> = ({ name }) => {
+  const initial = name ? name.charAt(0).toUpperCase() : "A";
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        borderRadius: "100%",
+        background: "#0f62fe",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: 600,
+        fontSize: "14px",
+      }}
+    >
+      {initial}
+    </div>
+  );
+};
+
 const FloatingButton: FC<{
   open: boolean;
   setOpen: (bl: boolean) => void;
-  appIcon: string;
-}> = ({ open, setOpen, appIcon }) => {
+  name: string;
+}> = ({ open, setOpen, name }) => {
   return (
     <div
       className={cn(
@@ -393,7 +456,7 @@ const FloatingButton: FC<{
       )}
     >
       <button
-        aria-label="Close the chat window"
+        aria-label="Open the chat window"
         id="WACLauncher__Button"
         className="WACLauncher__Button cds--btn cds--btn--primary"
         type="button"
@@ -402,15 +465,7 @@ const FloatingButton: FC<{
           setOpen(!open);
         }}
       >
-        <img
-          alt="Assistant Icon"
-          src={appIcon}
-          style={{
-            width: "100%",
-            height: "100%",
-            borderRadius: "100%",
-          }}
-        />
+        <BotAvatar name={name} />
       </button>
     </div>
   );
