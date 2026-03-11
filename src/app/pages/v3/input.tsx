@@ -1,4 +1,4 @@
-import { FC, useState, useMemo, useCallback } from "react";
+import { FC, useState, useMemo, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   useConnectAgent,
@@ -24,7 +24,8 @@ import {
 } from "lucide-react";
 
 /* ================================================================
-   Main input — switches between text and audio mode
+   Main input — mirrors UI's MessagingAction
+   Stable wrapper div so React reconciles children in-place.
    ================================================================ */
 export const Input: FC<{
   onSendMessage: (txt: string) => void;
@@ -32,23 +33,24 @@ export const Input: FC<{
   voiceEnabled?: boolean;
 }> = ({ onSendMessage, voiceAgent, voiceEnabled = false }) => {
   const { channel } = useInputModeToggleAgent(voiceAgent);
-  const isVoiceMode = voiceEnabled && channel === Channel.Audio;
-
-  if (isVoiceMode) {
-    return <AudioPanel voiceAgent={voiceAgent} />;
-  }
 
   return (
-    <TextInput
-      onSendMessage={onSendMessage}
-      voiceAgent={voiceAgent}
-      voiceEnabled={voiceEnabled}
-    />
+    <div>
+      {voiceEnabled && channel === Channel.Audio ? (
+        <AudioPanel voiceAgent={voiceAgent} />
+      ) : (
+        <TextInput
+          onSendMessage={onSendMessage}
+          voiceAgent={voiceAgent}
+          voiceEnabled={voiceEnabled}
+        />
+      )}
+    </div>
   );
 };
 
 /* ================================================================
-   Text input
+   Text input — mirrors UI's SimpleMessagingAction
    ================================================================ */
 const TextInput: FC<{
   onSendMessage: (txt: string) => void;
@@ -56,10 +58,11 @@ const TextInput: FC<{
   voiceEnabled: boolean;
 }> = ({ onSendMessage, voiceAgent, voiceEnabled }) => {
   const { handleVoiceToggle } = useInputModeToggleAgent(voiceAgent);
-  const { handleConnectAgent, isConnected, isConnecting } =
+  const { handleConnectAgent, handleDisconnectAgent, isConnected, isConnecting } =
     useConnectAgent(voiceAgent);
 
   const [isFocused, setIsFocused] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const {
     register,
@@ -88,6 +91,10 @@ const TextInput: FC<{
     <form
       onSubmit={handleSubmit(onSubmitForm)}
       className={`rpd-input ${isFocused ? "rpd-input--focused" : ""}`}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest("button")) return;
+        textareaRef.current?.focus();
+      }}
     >
       <textarea
         aria-label="Type a message"
@@ -98,6 +105,10 @@ const TextInput: FC<{
           required: true,
           onChange: handleResize,
         })}
+        ref={(el) => {
+          register("message").ref(el);
+          textareaRef.current = el;
+        }}
         onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -118,7 +129,6 @@ const TextInput: FC<{
             aria-label="Send"
           >
             <Send width="14" height="14" />
-            <span>Send</span>
           </button>
         ) : voiceEnabled ? (
           <button
@@ -128,7 +138,7 @@ const TextInput: FC<{
             aria-label={isConnecting ? "Connecting..." : "Voice"}
             onClick={async () => {
               await handleVoiceToggle();
-              if (!isConnected) await handleConnectAgent();
+              !isConnected && (await handleConnectAgent());
             }}
           >
             {isConnecting ? (
@@ -136,21 +146,20 @@ const TextInput: FC<{
             ) : (
               <AudioLines width="14" height="14" />
             )}
-            <span>{isConnecting ? "Connecting..." : "Voice"}</span>
           </button>
         ) : null}
 
-        {/* Stop button — shown when connected */}
         {voiceEnabled && (isConnected || isConnecting) && (
           <button
             className="rpd-action-btn rpd-action-btn--danger"
             type="button"
             disabled={!isConnected && !isConnecting}
             aria-label="Stop"
-            onClick={() => voiceAgent && useConnectAgent(voiceAgent)}
+            onClick={async () => {
+              await handleDisconnectAgent();
+            }}
           >
             <StopCircle width="14" height="14" />
-            <span>Stop</span>
           </button>
         )}
       </div>
@@ -159,7 +168,7 @@ const TextInput: FC<{
 };
 
 /* ================================================================
-   Audio panel — toolbar style: [Mute | Visualizer+Device | Text | Stop]
+   Audio panel — mirrors UI's AudioMessagingAction
    ================================================================ */
 const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   const localMultibandVolume = useMultibandMicrophoneTrackVolume(
@@ -173,10 +182,11 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   const { handleTextToggle } = useInputModeToggleAgent(voiceAgent);
   const { isMuted, handleToggleMute } = useMuteAgent(voiceAgent);
 
-  // Only request device permissions after connected (mic already granted by WebRTC)
-  // This avoids a double permission prompt
   const { devices, activeDeviceId, setActiveMediaDevice } =
-    useSelectInputDeviceAgent({ voiceAgent, requestPermissions: isConnected });
+    useSelectInputDeviceAgent({
+      voiceAgent: voiceAgent,
+      requestPermissions: true,
+    });
 
   const activeDeviceLabel = useMemo(() => {
     const d = devices.find((d) => d.deviceId === activeDeviceId);
@@ -208,7 +218,9 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
         <button
           type="button"
           disabled={!isConnected}
-          onClick={() => handleToggleMute()}
+          onClick={async () => {
+            await handleToggleMute();
+          }}
           className={`rpd-audio__btn ${isMuted ? "rpd-audio__btn--muted" : ""}`}
           aria-label={isMuted ? "Unmute" : "Mute"}
         >
@@ -242,7 +254,9 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
         <button
           type="button"
           disabled={!isConnected}
-          onClick={() => handleTextToggle()}
+          onClick={async () => {
+            await handleTextToggle();
+          }}
           className="rpd-audio__btn"
           aria-label="Switch to text"
         >
@@ -253,7 +267,9 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
         <button
           type="button"
           disabled={!isConnected && !isConnecting}
-          onClick={() => handleDisconnectAgent()}
+          onClick={async () => {
+            await handleDisconnectAgent();
+          }}
           className="rpd-audio__btn rpd-audio__btn--stop"
           aria-label="Stop"
         >
@@ -262,7 +278,6 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
           ) : (
             <StopCircle width="16" height="16" />
           )}
-          <span>{isConnecting ? "Connecting" : "Stop"}</span>
         </button>
       </div>
     </div>

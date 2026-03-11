@@ -1,6 +1,6 @@
 {
     "name": "@rapidaai/web-widget",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Rapida AI chat widget — embeddable voice + text AI agent",
     "main": "dist/app.min.js",
     "files": [

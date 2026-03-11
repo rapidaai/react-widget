@@ -703,11 +703,13 @@ body.rpd-body--docked-left {
    ---------------------------------------------------------------- */
 .rpd-input {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: flex-end;
     background: var(--rpd-ui-01);
     border: 1px solid var(--rpd-border-subtle);
     flex-shrink: 0;
     margin: -1px;
+    cursor: text;
 }
 
 .rpd-input--focused {
@@ -716,6 +718,7 @@ body.rpd-body--docked-left {
 
 .rpd-textarea {
     flex: 1;
+    min-width: 0;
     border: none;
     outline: none;
     resize: none;
@@ -733,22 +736,24 @@ body.rpd-body--docked-left {
     color: var(--rpd-text-04);
 }
 
-/* Action row below textarea */
+/* Action buttons fixed to the right of textarea */
 .rpd-input__actions {
     display: flex;
-    align-items: stretch;
-    justify-content: flex-end;
-    padding: var(--rpd-spacing-02) var(--rpd-spacing-04) var(--rpd-spacing-03);
+    align-items: center;
+    flex-shrink: 0;
+    padding: var(--rpd-spacing-02) var(--rpd-spacing-03);
+    gap: var(--rpd-spacing-02);
 }
 
 /* Action button — grouped toolbar style */
 .rpd-action-btn {
     display: flex;
     align-items: center;
-    gap: var(--rpd-spacing-02);
+    gap: 6px;
     height: 32px;
     padding: 0 var(--rpd-spacing-04);
     border: 1px solid var(--rpd-border-subtle);
+    border-radius: var(--rpd-radius);
     font-family: var(--rpd-font-sans);
     font-size: var(--rpd-font-size-xs);
     font-weight: 500;
