@@ -68,12 +68,8 @@ const TextInput: FC<{
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { isValid },
   } = useForm({ mode: "onChange" });
-
-  const messageValue = watch("message", "");
-  const hasContent = Boolean(messageValue && messageValue.trim().length > 0);
 
   const onSubmitForm = (data: any) => {
     if (isValid) {
@@ -121,10 +117,9 @@ const TextInput: FC<{
 
       {/* Action buttons */}
       <div className="rpd-input__actions">
-        {hasContent ? (
+        {isValid ? (
           <button
             className="rpd-action-btn rpd-action-btn--primary"
-            disabled={!isValid}
             type="submit"
             aria-label="Send"
           >
@@ -147,9 +142,18 @@ const TextInput: FC<{
               <AudioLines width="14" height="14" />
             )}
           </button>
-        ) : null}
+        ) : (
+          <button
+            className="rpd-action-btn rpd-action-btn--primary"
+            type="submit"
+            disabled
+            aria-label="Send"
+          >
+            <Send width="14" height="14" />
+          </button>
+        )}
 
-        {voiceEnabled && (isConnected || isConnecting) && (
+        {(isConnected || isConnecting) && (
           <button
             className="rpd-action-btn rpd-action-btn--danger"
             type="button"

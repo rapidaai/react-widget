@@ -704,7 +704,7 @@ body.rpd-body--docked-left {
 .rpd-input {
     display: flex;
     flex-direction: row;
-    align-items: flex-end;
+    align-items: center;
     background: var(--rpd-ui-01);
     border: 1px solid var(--rpd-border-subtle);
     flex-shrink: 0;
