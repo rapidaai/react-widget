@@ -13,7 +13,7 @@ jest.mock('@rapidaai/react', () => {
       DefaultConnectionConfig: jest.fn(() => ({
         withCustomEndpoint: jest.fn().mockReturnThis(),
       })),
-      WithSDK: jest.fn(() => ({})),
+      WithWebpluginClient: jest.fn(() => ({})),
     },
     AgentConfig: jest.fn(),
     InputOptions: jest.fn(),

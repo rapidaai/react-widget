@@ -12,10 +12,10 @@
             "./src/types" // Ensure this directory contains globals.d.ts
         ],
         "target": "es6",
-        "module": "commonjs",
+        "module": "es2020",
         "resolveJsonModule": true,
         "jsx": "react-jsx",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "strict": true,
         "esModuleInterop": true
     },
