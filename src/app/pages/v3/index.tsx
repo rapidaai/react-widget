@@ -1,472 +1,381 @@
-import { cn } from "@/styles/media";
 import {
   AssistantWebpluginDeployment,
   useAgentMessages,
   useConnectAgent,
   VoiceAgent,
 } from "@rapidaai/react";
-import React, { useState, useEffect, FC, useRef } from "react";
+import React, { useState, useEffect, FC, useRef, useCallback } from "react";
 import { formatTimeToHHMMPM } from "@/utils/time";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { Input } from "@/app/pages/v3/input";
+import { useEnvironment } from "@/hooks/use-environment";
 
-export const ChatComponent: React.FC<{
+/* ================================================================
+   Icons — Carbon 16px
+   ================================================================ */
+const IconMinimize: FC = () => (
+  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
+    <path d="M5 15h22v2H5z" />
+  </svg>
+);
+
+const IconChat: FC = () => (
+  <svg width="22" height="22" viewBox="0 0 32 32" fill="currentColor">
+    <path d="M17.74,30,16,29l4-7h6a2,2,0,0,0,2-2V8a2,2,0,0,0-2-2H6A2,2,0,0,0,4,8V20a2,2,0,0,0,2,2h9v2H6a4,4,0,0,1-4-4V8A4,4,0,0,1,6,4H26a4,4,0,0,1,4,4V20a4,4,0,0,1-4,4H21.16Z" />
+    <path d="M8 10H24V12H8zM8 16H18V18H8z" />
+  </svg>
+);
+
+const IconArrowRight: FC = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 32 32"
+    fill="currentColor"
+    strokeWidth={1.5}
+  >
+    <path d="M18 6l-1.43 1.393L24.15 15H4v2h20.15l-7.58 7.573L18 26l10-10z" />
+  </svg>
+);
+
+const IconChevronLeft: FC = () => (
+  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
+    <path d="M10 16L20 6l1.4 1.4-8.6 8.6 8.6 8.6L20 26z" />
+  </svg>
+);
+
+const IconChevronRight: FC = () => (
+  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
+    <path d="M22 16L12 26l-1.4-1.4 8.6-8.6-8.6-8.6L12 6z" />
+  </svg>
+);
+
+/** Watson-style bot avatar */
+const BotAvatarIcon: FC = () => (
+  <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor">
+    <circle cx="16" cy="16" r="2" />
+    <circle cx="16" cy="8" r="2" />
+    <circle cx="16" cy="24" r="2" />
+    <circle cx="8" cy="12" r="2" />
+    <circle cx="24" cy="12" r="2" />
+    <circle cx="8" cy="20" r="2" />
+    <circle cx="24" cy="20" r="2" />
+    <line
+      x1="16"
+      y1="10"
+      x2="16"
+      y2="14"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <line
+      x1="16"
+      y1="18"
+      x2="16"
+      y2="22"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <line
+      x1="9.5"
+      y1="13"
+      x2="14.5"
+      y2="15"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <line
+      x1="17.5"
+      y1="15"
+      x2="22.5"
+      y2="13"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <line
+      x1="9.5"
+      y1="19"
+      x2="14.5"
+      y2="17"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+    <line
+      x1="17.5"
+      y1="17"
+      x2="22.5"
+      y2="19"
+      stroke="currentColor"
+      strokeWidth="1"
+    />
+  </svg>
+);
+
+/* ================================================================
+   Main export
+   ================================================================ */
+export const ChatComponent: FC<{
   deployment: AssistantWebpluginDeployment;
   voiceAgent: VoiceAgent;
 }> = ({ deployment, voiceAgent }) => {
-  const [open, setOpen] = useState(false);
-  const { handleConnectAgent, handleDisconnectAgent, isConnected } =
-    useConnectAgent(voiceAgent);
-  const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useEnvironment();
+  const config = window.chatbotConfig;
+  const layout = config?.layout || "floating";
+  const position = config?.position || "bottom-right";
+  const showLauncher = config?.showLauncher !== false;
+  const themeMode = theme?.mode || "light";
+  const displayName = config?.name || deployment.getName() || "Assistant";
 
+  const isDocked = layout === "docked-right" || layout === "docked-left";
+  const dockSide = layout === "docked-left" ? "left" : "right";
+
+  // Docked starts open, floating starts closed
+  const [open, setOpen] = useState(isDocked);
+
+  // Manage body margin for docked layout
   useEffect(() => {
-    if (!isConnected) {
-      setIsLoading(false);
-    }
-  }, [isConnected]);
-
-  const handleDisconnectClick = () => {
-    if (isConnected) {
-      setIsLoading(true);
-      handleDisconnectAgent();
+    if (!isDocked) return;
+    const cls = `rpd-body--docked-${dockSide}`;
+    if (open) {
+      document.body.classList.add(cls);
     } else {
-      handleConnectAgent();
+      document.body.classList.remove(cls);
     }
-  };
+    return () => document.body.classList.remove(cls);
+  }, [isDocked, dockSide, open]);
+
+  // Shell class
+  const shellClass = isDocked
+    ? `rpd-shell rpd-shell--docked rpd-shell--docked-${dockSide}`
+    : `rpd-shell rpd-shell--${position} ${layout === "inline" ? "rpd-shell--inline" : ""}`;
 
   return (
-    <div className="RPDContainer" id="RPDContainer">
-      <div className="RPDContainer--render RPD_Wrapper WAC--aiTheme" dir="auto">
-        <div dir="ltr" className="RPDContainer__LayoutDirection">
-          <div
-            className="WACWidget__regionContainer"
-            role="region"
-            aria-label="Chat"
+    <div className="rpd" data-rpd-theme={themeMode}>
+      <div className={shellClass}>
+        {/* Panel */}
+        <div
+          className={`rpd-panel ${open ? "" : "rpd-panel--closed"}`}
+          role="dialog"
+          aria-label="Chat"
+        >
+          {/* Header */}
+          <div className="rpd-header">
+            <div className="rpd-header__spacer" />
+            <button
+              className="rpd-btn-icon"
+              type="button"
+              aria-label={isDocked ? "Collapse" : "Minimize"}
+              onClick={() => setOpen(false)}
+            >
+              {isDocked ? (
+                dockSide === "right" ? (
+                  <IconChevronRight />
+                ) : (
+                  <IconChevronLeft />
+                )
+              ) : (
+                <IconMinimize />
+              )}
+            </button>
+          </div>
+
+          {/* Messages */}
+          <MessagesArea
+            deployment={deployment}
+            voiceAgent={voiceAgent}
+            botName={displayName}
+            logoUrl={config?.logo_url}
+            onSendMessage={(msg) => voiceAgent?.onSendText(msg)}
+          />
+
+          {/* Input */}
+          <Input
+            voiceAgent={voiceAgent}
+            onSendMessage={(msg) => voiceAgent?.onSendText(msg)}
+            voiceEnabled={
+              !!deployment.getInputaudio() && !!deployment.getOutputaudio()
+            }
+          />
+        </div>
+
+        {/* Floating launcher */}
+        {!isDocked && showLauncher && (
+          <button
+            className={`rpd-launcher ${open ? "rpd-launcher--hidden" : ""}`}
+            type="button"
+            aria-label="Open chat"
+            onClick={() => setOpen(true)}
           >
-            <div className="WACMainWindow WACWidget__FocusTrapContainer">
-              <div
-                id="WACWidget"
-                className={cn(
-                  "WACWidget WACLocale-en WACWidget--rounded WACWidget--defaultElement WACWidget--launched",
-                  open
-                    ? "WAC--standardWidth"
-                    : "WACWidget--closed WAC--narrowWidth"
-                )}
-              >
-                <div className="WACWidget__animationContainer">
-                  <div className="WACWidget--content">
-                    {/*  */}
-                    <div className="WACBotContainer">
-                      <div className="WAC">
-                        <div className="WACHeader__Container">
-                          <div className="WACHeader WAC--primaryColor">
-                            <div
-                              className="WACHeader--content WAC--primaryColor"
-                              data-floating-menu-container="true"
-                            >
-                              <div className="WACHeader__Buttons WACHeader__LeftButtons"></div>
-                              <div className="WACHeader__CenterContainer">
-                                <div className="WACHeader__Name WACWidget__textEllipsis"></div>
-                              </div>
-                              <div className="WACHeader__Buttons WACHeader__RightButtons">
-                                <button
-                                  aria-labelledby="tooltip-:r7m:"
-                                  className="cds--btn--icon-only WACHeader__RestartButton WACDirectionHasReversibleSVG cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost"
-                                  type="button"
-                                  onClick={() => {
-                                    isConnected && handleDisconnectClick();
-                                  }}
-                                >
-                                  <svg
-                                    focusable="false"
-                                    preserveAspectRatio="xMidYMid meet"
-                                    fill="currentColor"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 16 16"
-                                    aria-hidden="true"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path d="M13,9c0,2.8-2.2,5-5,5s-5-2.2-5-5s2.2-5,5-5h3.1L9.3,5.8L10,6.5l3-3l-3-3L9.3,1.2L11.1,3H8C4.7,3,2,5.7,2,9s2.7,6,6,6 s6-2.7,6-6H13z"></path>
-                                  </svg>
-                                </button>
-                                <button
-                                  aria-labelledby="tooltip-:r7p:"
-                                  className="cds--btn--icon-only WACHeader__CloseButton WACDirectionHasReversibleSVG cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost"
-                                  type="button"
-                                  onClick={() => setOpen(false)}
-                                >
-                                  <svg
-                                    focusable="false"
-                                    preserveAspectRatio="xMidYMid meet"
-                                    fill="currentColor"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 32 32"
-                                    aria-hidden="true"
-                                    className="WACIcon__Subtract"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path d="M5 15L5 17 27 17 27 15 5 15z"></path>
-                                  </svg>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <AssistantChatter
-                          deployment={deployment}
-                          voiceAgent={voiceAgent}
-                          onSendMessage={(msg: string) => {
-                            voiceAgent?.onSendText(msg);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <FloatingButton
-              open={open}
-              setOpen={setOpen}
-              name={deployment.getName()}
-            />
-          </div>
-        </div>
+            <IconChat />
+          </button>
+        )}
       </div>
+
+      {/* Docked expand tab — shown when docked + collapsed */}
+      {isDocked && !open && (
+        <button
+          className={`rpd-docked-tab rpd-docked-tab--${dockSide}`}
+          type="button"
+          aria-label="Open chat"
+          onClick={() => setOpen(true)}
+        >
+          Chat
+        </button>
+      )}
     </div>
   );
 };
 
-const AssistantChatter: FC<{
-  deployment: AssistantWebpluginDeployment;
-  voiceAgent: VoiceAgent;
-  onSendMessage: (txt: string) => void;
-}> = ({ deployment, voiceAgent, onSendMessage }) => {
-  return (
-    <div className="WACPanelContent WAC__ChatNonHeaderContainer">
-      <div className="WAC__messagesAndInputContainer">
-        <div className="WACMessagesContainer__NonInputContainer">
-          <div id="WACMessages--holder" className="WACMessages--holder">
-            <Messages
-              deployment={deployment}
-              voiceAgent={voiceAgent}
-              onSendMessage={onSendMessage}
-            />
-          </div>
-        </div>
-        <Input voiceAgent={voiceAgent} onSendMessage={onSendMessage} />
-      </div>
-    </div>
-  );
-};
+/* ================================================================
+   Group consecutive messages by role
+   ================================================================ */
+type MessageItem = { id: string; role: string; time: Date; messages: string[] };
+type MessageGroup = { role: string; items: MessageItem[] };
 
-const Messages: FC<{
+function groupMessages(messages: MessageItem[]): MessageGroup[] {
+  return messages.reduce<MessageGroup[]>((acc, msg) => {
+    const last = acc[acc.length - 1];
+    if (last && last.role === msg.role) {
+      last.items.push(msg);
+    } else {
+      acc.push({ role: msg.role, items: [msg] });
+    }
+    return acc;
+  }, []);
+}
+
+/* ================================================================
+   Messages area
+   ================================================================ */
+const MessagesArea: FC<{
   deployment: AssistantWebpluginDeployment;
   voiceAgent: VoiceAgent;
+  botName: string;
+  logoUrl?: string;
   onSendMessage: (txt: string) => void;
-}> = ({ deployment, voiceAgent, onSendMessage }) => {
-  const agentMessages = useAgentMessages(voiceAgent);
-  const messages = agentMessages.messages;
-  const scrollRef = useRef<HTMLButtonElement>(null);
+}> = ({ deployment, voiceAgent, botName, logoUrl, onSendMessage }) => {
+  const { messages } = useAgentMessages(voiceAgent);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [JSON.stringify(messages)]);
+  const suggestions = deployment.getSuggestionList();
+  const greeting = deployment.getGreeting();
 
   return (
-    <div id="WAC__messages" className="WAC__messages" role="list">
-      <button
-        type="button"
-        className="WACMessages--scrollHandle"
-        tabIndex={0}
-        aria-label="Chat history begin. Activate to focus the first message then use the arrow, home, and end keys to move between messages. Press escape to exit."
-      />
-      <div className="ibm-web-chat--reset-styles" id="welcomeNodeBeforeElement">
-        <div></div>
-      </div>
-      <div
-        id="WAC__message-0"
-        className="WAC__message WAC__message-0 WAC__message--firstMessage WAC__message--withAvatarLine WAC__message--response WAC__message--no-animation"
-      >
-        <div className="WACMessage--focusHandle" role="listitem"></div>
-        <div className="WACMessage__AvatarLine">
-          <div className="WACMessage__Avatar WACMessage__Avatar--bot">
-            <div className="WACImageWithFallback">
-              <BotAvatar name={deployment.getName()} />
-            </div>
-          </div>
-          <div className="WACMessage__Label">
-            <RoleChip role="assistant" label={deployment.getName()} />
-          </div>
+    <div className="rpd-messages" role="log" aria-live="polite">
+      {/* Greeting */}
+      <div className="rpd-msg-bot">
+        <BotMessageHeader name={botName} logoUrl={logoUrl} />
+        <div className="rpd-msg-bot__body">
+          <MarkdownPreview
+            source={greeting}
+            className="rpd-md"
+            style={{ background: "transparent" }}
+          />
         </div>
-        <div className="WAC__message--padding">
-          <div className="WAC__bot-message">
-            <div className="WAC__received WAC__message-vertical-padding WAC__received--text">
-              <div className="WAC__received--inner">
-                <div className="WAC__received--textContent">
-                  <div className="WACStreamingRichText">
-                    <div className="ibm-web-chat--default-styles">
-                      <MarkdownPreview
-                        source={deployment.getGreeting()}
-                        className="WACWidget__Markdown"
-                        style={{ background: "transparent" }}
-                      />
-                    </div>
-                  </div>
-                  {/*  */}
-                </div>
 
-                <div className="contact-options">
-                  {deployment.getSuggestionList().map((x, idx) => {
-                    return (
-                      <div
-                        key={idx}
-                        className="ibm-unified-chat--card ibm-unified-chat--card--customized ibm-unified-chat--card"
-                        onClick={() => {
-                          onSendMessage(x);
-                        }}
-                      >
-                        <span className="ibm-unified-chat--card-icon ibm-unified-chat--card-icon">
-                          <svg
-                            id="ucx-f8d06fc6-40e6-4af6-86e6-922649248272"
-                            focusable="false"
-                            preserveAspectRatio="xMidYMid meet"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="#0f62fe"
-                            width="25"
-                            height="25"
-                            viewBox="0 0 36 36"
-                            aria-hidden="true"
-                            data-di-rand="1749144538514"
-                          >
-                            <polygon points="18 6 16.57 7.393 24.15 15 4 15 4 17 24.15 17 16.57 24.573 18 26 28 16 18 6" />
-                            <title>{x}</title>
-                          </svg>
-                        </span>
-                        <div className="spinnerContainer">
-                          <span className="cardLabel">{x}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  <div className="scroll_block"></div>
-                </div>
-
-                {/*  */}
-              </div>
+        {suggestions.length > 0 && (
+          <>
+            <div className="rpd-cards">
+              {suggestions.map((text, idx) => (
+                <button
+                  key={idx}
+                  className="rpd-card"
+                  type="button"
+                  onClick={() => onSendMessage(text)}
+                >
+                  <span className="rpd-card__text">{text}</span>
+                  <span className="rpd-card__icon">
+                    <IconArrowRight />
+                  </span>
+                </button>
+              ))}
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
-      {/*  */}
 
-      {messages.map((x) => {
-        return x.role == "user" ? (
-          <div
-            key={x.id}
-            id={`WAC__message-${x.id}`}
-            className="WAC__message WAC__message-13 WAC__message--withAvatarLine WAC__message--request"
-          >
-            <div className="WACMessage--focusHandle" role="listitem"></div>
-            <div className="WACMessage__AvatarLine">
-              <div className="WACMessage__Label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <RoleChip role="user" label="You" />
-                <MessageTime time={x.time} />
-              </div>
+      {/* Conversation — group consecutive messages by same role */}
+      {groupMessages(messages).map((group, gi) =>
+        group.role === "user" ? (
+          <div key={gi} className="rpd-msg-user">
+            <div className="rpd-msg-user__meta">
+              <span className="rpd-msg-user__name">You</span>
+              <span className="rpd-msg-user__time">
+                {formatTimeToHHMMPM(group.items[0].time)}
+              </span>
             </div>
-
-            <div className="WAC__message--padding">
-              <div className="WAC__sent-container">
-                <div className="WAC__sentAndMessageState-container WAC__message-vertical-padding">
-                  <div className="WAC__sent">
-                    <div className="WACVisuallyHidden">You said</div>
-                    <div className="WAC__sent--bubble">
-                      <div>
-                        <div className="WAC__sent--text">
-                          {x.messages.map((x, ix) => (
-                            <MarkdownPreview
-                              key={ix}
-                              source={x}
-                              className="WACWidget__Markdown"
-                              style={{ background: "transparent" }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="rpd-msg-user__bubble">
+              {group.items.map((msg) =>
+                msg.messages.map((m, ix) => (
+                  <MarkdownPreview
+                    key={`${msg.id}-${ix}`}
+                    source={m}
+                    className="rpd-md"
+                    style={{ background: "transparent" }}
+                  />
+                )),
+              )}
             </div>
           </div>
         ) : (
-          <div
-            id="WAC__message-12"
-            className="WAC__message WAC__message-12 WAC__message--withAvatarLine WAC__message--response"
-          >
-            <div className="WACMessage--focusHandle" role="listitem"></div>
-            <div className="WACMessage__AvatarLine">
-              <div className="WACMessage__Avatar WACMessage__Avatar--bot">
-                <div className="WACImageWithFallback">
-                  <BotAvatar name={deployment.getName()} />
-                </div>
-              </div>
-              <div className="WACMessage__Label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                <RoleChip role="assistant" label={deployment.getName()} />
-                <MessageTime time={x.time} />
-              </div>
-            </div>
-            <div className="WAC__message--padding">
-              <div className="WAC__bot-message">
-                <div className="WAC__received WAC__message-vertical-padding WAC__received--options">
-                  <div className="WAC__received--inner">
-                    <div className="WAC__received--metablock">
-                      <div className="WAC__description WAC__received--metablock-content WACMetablock__Title">
-                        <div className="ibm-web-chat--default-styles">
-                          {x.messages.map((x, ix) => (
-                            <MarkdownPreview
-                              key={ix}
-                              source={x}
-                              className="WACWidget__Markdown"
-                              style={{ background: "transparent" }}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div key={gi} className="rpd-msg-bot">
+            <BotMessageHeader
+              name={botName}
+              logoUrl={logoUrl}
+              time={group.items[0].time}
+            />
+            <div className="rpd-msg-bot__body">
+              {group.items.map((msg) =>
+                msg.messages.map((m, ix) => (
+                  <MarkdownPreview
+                    key={`${msg.id}-${ix}`}
+                    source={m}
+                    className="rpd-md"
+                    style={{ background: "transparent" }}
+                  />
+                )),
+              )}
             </div>
           </div>
-        );
-      })}
+        ),
+      )}
 
+      {/* Typing */}
       {messages.length > 0 && messages[messages.length - 1].role === "user" && (
-        <div className="WAC__message WAC__message--lastMessage">
-          <div className="WAC__message--padding">
-            <div></div>
-            <div className="WAC__bot-message">
-              <div className="WAC__received WAC__received--loading WAC__message-vertical-padding">
-                <div className="WAC__received--inner">
-                  <div className="WAC__LoadingIcon" aria-hidden="true">
-                    <span className="WAC__loading-ball"></span>
-                    <span className="WAC__loading-ball"></span>
-                    <span className="WAC__loading-ball"></span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="rpd-typing">
+          <span className="rpd-typing__dot" />
+          <span className="rpd-typing__dot" />
+          <span className="rpd-typing__dot" />
         </div>
       )}
-      <button
-        type="button"
-        ref={scrollRef}
-        className="WACMessages--scrollHandle"
-        aria-label="Chat history end. Activate to focus the last message then use the arrow, home, and end keys to move between messages. Press escape to exit."
-      ></button>
+
+      <div ref={scrollRef} />
     </div>
   );
 };
 
-/** Colored pill badge for the sender role. */
-const ROLE_STYLES: Record<string, { bg: string; color: string }> = {
-  user:      { bg: "#4f46e5", color: "#fff" },   // indigo
-  assistant: { bg: "#0891b2", color: "#fff" },   // cyan
-  agent:     { bg: "#059669", color: "#fff" },   // emerald
-  system:    { bg: "#6b7280", color: "#fff" },   // gray
-};
-
-const RoleChip: FC<{ role: string; label: string }> = ({ role, label }) => {
-  const style = ROLE_STYLES[role] ?? ROLE_STYLES.system;
-  return (
-    <span
-      style={{
-        display: "inline-block",
-        background: style.bg,
-        color: style.color,
-        borderRadius: "4px",
-        padding: "1px 7px",
-        fontSize: "11px",
-        fontWeight: 600,
-        lineHeight: "18px",
-        letterSpacing: "0.02em",
-        whiteSpace: "nowrap",
-      }}
-    >
-      {label}
-    </span>
-  );
-};
-
-/** Timestamp shown next to the role chip. */
-const MessageTime: FC<{ time: Date }> = ({ time }) => (
-  <span
-    style={{
-      fontSize: "11px",
-      color: "#9ca3af",
-      whiteSpace: "nowrap",
-      lineHeight: "18px",
-    }}
-  >
-    {formatTimeToHHMMPM(time)}
-  </span>
+/* ================================================================
+   Shared sub-components
+   ================================================================ */
+const BotMessageHeader: FC<{ name: string; logoUrl?: string; time?: Date }> = ({
+  name,
+  logoUrl,
+  time,
+}) => (
+  <div className="rpd-msg-bot__header">
+    {logoUrl ? (
+      <img className="rpd-msg-bot__avatar-img" src={logoUrl} alt={name} />
+    ) : (
+      <div className="rpd-msg-bot__avatar">
+        <BotAvatarIcon />
+      </div>
+    )}
+    <span className="rpd-msg-bot__name">{name}</span>
+    {time && (
+      <span className="rpd-msg-bot__time">{formatTimeToHHMMPM(time)}</span>
+    )}
+  </div>
 );
-
-const BotAvatar: FC<{ name: string }> = ({ name }) => {
-  const initial = name ? name.charAt(0).toUpperCase() : "A";
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: "100%",
-        background: "#0f62fe",
-        color: "#fff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: 600,
-        fontSize: "14px",
-      }}
-    >
-      {initial}
-    </div>
-  );
-};
-
-const FloatingButton: FC<{
-  open: boolean;
-  setOpen: (bl: boolean) => void;
-  name: string;
-}> = ({ open, setOpen, name }) => {
-  return (
-    <div
-      className={cn(
-        "WACLauncher__ButtonContainer WACLauncher__ButtonContainer--round WACLauncher__ButtonContainer--noAnimation",
-        open
-          ? "WACLauncher__ButtonContainer--hidden"
-          : "WACLauncher__ButtonContainer"
-      )}
-    >
-      <button
-        aria-label="Open the chat window"
-        id="WACLauncher__Button"
-        className="WACLauncher__Button cds--btn cds--btn--primary"
-        type="button"
-        data-di-id="#WACLauncher__Button"
-        onClick={() => {
-          setOpen(!open);
-        }}
-      >
-        <BotAvatar name={name} />
-      </button>
-    </div>
-  );
-};

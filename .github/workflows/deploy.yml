@@ -1,4 +1,4 @@
-name: Build, Deploy to S3, and Create Release
+name: Build, Deploy to S3, and Publish to npm
 
 on:
   push:
@@ -14,21 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main repository and submodules
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
 
       - name: Build the project
-        run: yarn run build
+        run: npm run build
 
       - name: Upload to S3
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -37,8 +38,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
+          # Latest — short cache
           aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/app.min.js \
-            --region $AWS_REGION --acl public-read
+            --region $AWS_REGION --acl public-read \
+            --cache-control "public,max-age=3600"
+
+          # Versioned — immutable cache for pinning
+          VERSION=$(node -p "require('./package.json').version")
+          aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/v${VERSION}/app.min.js \
+            --region $AWS_REGION --acl public-read \
+            --cache-control "public,max-age=31536000,immutable"
 
       - name: Invalidate CloudFront cache
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -50,6 +59,20 @@ jobs:
           aws cloudfront create-invalidation \
             --distribution-id E3SJXANXL6IYCB \
             --paths "/public/scripts/*"
+
+      - name: Publish to npm
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          PKG=$(node -p "require('./package.json').name")
+          VER=$(node -p "require('./package.json').version")
+          if npm view "${PKG}@${VER}" version 2>/dev/null; then
+            echo "npm: ${PKG}@${VER} already published — skipping"
+          else
+            npm publish --access public
+            echo "npm: published ${PKG}@${VER}"
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   create_release:
     name: Create Release
@@ -67,7 +90,7 @@ jobs:
       - name: Get version and create tag
         id: version
         run: |
-          VERSION="0.1.$(date +%Y%m%d)-$(git rev-parse --short HEAD)"
+          VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "TAG_NAME=v${VERSION}" >> $GITHUB_OUTPUT
           if git tag -l "v${VERSION}" | grep -q "v${VERSION}"; then
@@ -85,13 +108,23 @@ jobs:
           git push origin "${{ steps.version.outputs.TAG_NAME }}"
 
       - name: Create GitHub Release
+        if: steps.version.outputs.TAG_EXISTS == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "# Release ${{ steps.version.outputs.TAG_NAME }}" > release-notes.md
-          echo "" >> release-notes.md
-          echo "## Changes" >> release-notes.md
-          echo "- Automated release from commit $(git rev-parse --short HEAD)" >> release-notes.md
+          {
+            echo "# Release ${{ steps.version.outputs.TAG_NAME }}"
+            echo ""
+            echo "## Deployment"
+            echo "| Target | URL |"
+            echo "|--------|-----|"
+            echo "| CDN (latest) | \`https://cdn-01.rapida.ai/public/scripts/app.min.js\` |"
+            echo "| CDN (pinned) | \`https://cdn-01.rapida.ai/public/scripts/v${{ steps.version.outputs.VERSION }}/app.min.js\` |"
+            echo "| npm | \`npm i @rapidaai/web-widget@${{ steps.version.outputs.VERSION }}\` |"
+            echo ""
+            echo "## Changes"
+            echo "- Commit: $(git rev-parse --short HEAD)"
+          } > release-notes.md
 
           gh release create "${{ steps.version.outputs.TAG_NAME }}" \
             --title "Release ${{ steps.version.outputs.TAG_NAME }}" \

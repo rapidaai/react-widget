@@ -23,5 +23,5 @@ root.render(
         <App />
       </EnvironmentProvider>
     </DarkModeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

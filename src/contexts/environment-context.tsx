@@ -16,6 +16,7 @@ interface EnvironmentContextProps {
   };
   theme: {
     color: string;
+    mode?: "light" | "dark" | "system";
   };
 }
 
@@ -29,7 +30,7 @@ export const EnvironmentContext = createContext<EnvironmentContextProps>({
   assistantId: window.chatbotConfig?.assistant_id,
   apiBase: window.chatbotConfig?.api_base
     ? window.chatbotConfig?.api_base
-    : "https://assistant-01.rapida.ai",
+    : "https://assistant-01.in.rapida.ai",
   assistantVersion: window.chatbotConfig?.assistant_version
     ? window.chatbotConfig?.assistant_version
     : null,
@@ -43,6 +44,7 @@ export const EnvironmentContext = createContext<EnvironmentContextProps>({
   },
   theme: {
     color: window.chatbotConfig?.theme?.color || "#2663eb",
+    mode: window.chatbotConfig?.theme?.mode || "light",
   },
 });
 
@@ -50,7 +52,7 @@ export const EnvironmentProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [language, setLanguage] = useState(
-    window.chatbotConfig?.language || "en"
+    window.chatbotConfig?.language || "en",
   );
 
   const userId = useCallback((userId?: string): string => {
@@ -125,6 +127,7 @@ export const EnvironmentProvider: React.FC<{
         },
         theme: {
           color: window.chatbotConfig?.theme?.color || "#2663eb",
+          mode: window.chatbotConfig?.theme?.mode || "light",
         },
       }}
     >

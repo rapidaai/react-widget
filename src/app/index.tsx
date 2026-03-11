@@ -11,17 +11,16 @@ import { useEnvironment } from "@/hooks/use-environment";
 
 export const App: FC<{}> = memo(() => {
   const { assistantId, token, user, apiBase } = useEnvironment();
-
   useEffect(() => {
     if (!assistantId) {
       console.error(
-        "Please provide an assistant_id for initialize the assistant."
+        "Please provide an assistant_id for initialize the assistant.",
       );
       return;
     }
     if (!token) {
       console.error(
-        "Please provide an authentication token for initialize the assistant."
+        "Please provide an authentication token for initialize the assistant.",
       );
       return;
     }
@@ -30,15 +29,18 @@ export const App: FC<{}> = memo(() => {
   const connectionConfig = useMemo(() => {
     if (token && apiBase)
       return ConnectionConfig.DefaultConnectionConfig(
-        ConnectionConfig.WithSDK({ ApiKey: token, UserId: user.user_id })
-      ).withCustomEndpoint({ assistant: apiBase });
+        ConnectionConfig.WithWebpluginClient({
+          ApiKey: token,
+          UserId: user.user_id,
+        }),
+      ).withCustomEndpoint({ assistant: apiBase, web: apiBase });
   }, [token, user.user_id, apiBase]);
 
   const agentConfig = useMemo(() => {
     if (assistantId)
       return new AgentConfig(
         assistantId,
-        new InputOptions([Channel.Audio, Channel.Text], Channel.Text)
+        new InputOptions([Channel.Audio, Channel.Text], Channel.Text),
       );
   }, [assistantId]);
 

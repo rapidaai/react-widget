@@ -1,4 +1,3 @@
-import { cn } from "@/styles/media";
 import { FC, useState, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -20,22 +19,47 @@ import {
   MessageSquareText,
   Mic,
   MicOff,
-  StopCircleIcon,
+  Send,
+  StopCircle,
 } from "lucide-react";
 
+/* ================================================================
+   Main input — switches between text and audio mode
+   ================================================================ */
 export const Input: FC<{
   onSendMessage: (txt: string) => void;
   voiceAgent: VoiceAgent;
-}> = ({ onSendMessage, voiceAgent }) => {
-  const { channel, handleVoiceToggle } = useInputModeToggleAgent(voiceAgent);
+  voiceEnabled?: boolean;
+}> = ({ onSendMessage, voiceAgent, voiceEnabled = false }) => {
+  const { channel } = useInputModeToggleAgent(voiceAgent);
+  const isVoiceMode = voiceEnabled && channel === Channel.Audio;
+
+  if (isVoiceMode) {
+    return <AudioPanel voiceAgent={voiceAgent} />;
+  }
+
+  return (
+    <TextInput
+      onSendMessage={onSendMessage}
+      voiceAgent={voiceAgent}
+      voiceEnabled={voiceEnabled}
+    />
+  );
+};
+
+/* ================================================================
+   Text input
+   ================================================================ */
+const TextInput: FC<{
+  onSendMessage: (txt: string) => void;
+  voiceAgent: VoiceAgent;
+  voiceEnabled: boolean;
+}> = ({ onSendMessage, voiceAgent, voiceEnabled }) => {
+  const { handleVoiceToggle } = useInputModeToggleAgent(voiceAgent);
   const { handleConnectAgent, isConnected, isConnecting } =
     useConnectAgent(voiceAgent);
 
-  const isVoiceMode = channel === Channel.Audio;
-
   const [isFocused, setIsFocused] = useState(false);
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
 
   const {
     register,
@@ -43,9 +67,7 @@ export const Input: FC<{
     reset,
     watch,
     formState: { isValid },
-  } = useForm({
-    mode: "onChange",
-  });
+  } = useForm({ mode: "onChange" });
 
   const messageValue = watch("message", "");
   const hasContent = Boolean(messageValue && messageValue.trim().length > 0);
@@ -57,107 +79,78 @@ export const Input: FC<{
     }
   };
 
-  const [textareaHeight, setTextareaHeight] = useState("auto");
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = "auto";
-    e.target.style.height = `${Math.max(e.target.scrollHeight, 32)}px`;
-    if (textareaHeight !== e.target.style.height) {
-      setTextareaHeight(e.target.style.height);
-    }
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
   };
-
-  if (isVoiceMode) {
-    return <AudioPanel voiceAgent={voiceAgent} />;
-  }
 
   return (
     <form
       onSubmit={handleSubmit(onSubmitForm)}
-      className="WACInputAndCompletions"
+      className={`rpd-input ${isFocused ? "rpd-input--focused" : ""}`}
     >
-      <div
-        className={`WACInputContainer ${
-          isFocused ? "WACInputContainer--hasFocus" : ""
-        }`}
-      >
-        <textarea
-          aria-label="Message to send"
-          aria-required="false"
-          className="WAC__TextArea-textarea"
-          id="WACInputContainer-TextArea"
-          placeholder="Type something..."
-          data-enable-grammarly="false"
-          data-test-id="WACInputContainer-TextArea"
-          {...register("message", {
-            required: "Please write your message.",
-            onChange: (e) => handleChange(e),
-          })}
-          required
-          onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              handleSubmit(onSubmitForm)(e);
-            }
-          }}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          style={{
-            width: "100%",
-            height: textareaHeight,
-            border: "none",
-            outline: "none",
-            resize: "none",
-            padding: "0px",
-            boxSizing: "border-box",
-            backgroundColor: "transparent",
-          }}
-        />
+      <textarea
+        aria-label="Type a message"
+        className="rpd-textarea"
+        placeholder="Type something..."
+        rows={1}
+        {...register("message", {
+          required: true,
+          onChange: handleResize,
+        })}
+        onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(onSubmitForm)(e);
+          }
+        }}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+      />
 
+      {/* Action buttons */}
+      <div className="rpd-input__actions">
         {hasContent ? (
           <button
-            id="WACInputContainer__SendButton"
-            className={cn(
-              "cds--btn--icon-only WACInputContainer__SendButton cds--btn cds--btn-md cds--layout--size-md cds--btn--ghost",
-              isValid ? "cds--btn" : "cds--btn--disabled"
-            )}
+            className="rpd-action-btn rpd-action-btn--primary"
             disabled={!isValid}
             type="submit"
+            aria-label="Send"
           >
-            <svg
-              focusable="false"
-              preserveAspectRatio="xMidYMid meet"
-              fill="currentColor"
-              width="24"
-              height="24"
-              viewBox="0 0 32 32"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M27.45,15.11l-22-11a1,1,0,0,0-1.08.12,1,1,0,0,0-.33,1L7,16,4,26.74A1,1,0,0,0,5,28a1,1,0,0,0,.45-.11l22-11a1,1,0,0,0,0-1.78Zm-20.9,10L8.76,17H18V15H8.76L6.55,6.89,24.76,16Z"></path>
-            </svg>
+            <Send width="14" height="14" />
+            <span>Send</span>
           </button>
-        ) : (
+        ) : voiceEnabled ? (
           <button
-            id="WACInputContainer__VoiceButton"
-            className="cds--btn--icon-only WACInputContainer__SendButton cds--btn cds--btn-md cds--layout--size-md cds--btn--ghost"
+            className="rpd-action-btn rpd-action-btn--primary"
             type="button"
             disabled={isConnecting}
-            aria-label={isConnecting ? "Connecting..." : "Start voice input"}
+            aria-label={isConnecting ? "Connecting..." : "Voice"}
             onClick={async () => {
               await handleVoiceToggle();
-              if (!isConnected) {
-                await handleConnectAgent();
-              }
+              if (!isConnected) await handleConnectAgent();
             }}
           >
             {isConnecting ? (
-              <Loader2
-                width="24"
-                height="24"
-                style={{ animation: "spin 1s linear infinite" }}
-              />
+              <Loader2 width="14" height="14" className="rpd-spin" />
             ) : (
-              <AudioLines width="24" height="24" />
+              <AudioLines width="14" height="14" />
             )}
+            <span>{isConnecting ? "Connecting..." : "Voice"}</span>
+          </button>
+        ) : null}
+
+        {/* Stop button — shown when connected */}
+        {voiceEnabled && (isConnected || isConnecting) && (
+          <button
+            className="rpd-action-btn rpd-action-btn--danger"
+            type="button"
+            disabled={!isConnected && !isConnecting}
+            aria-label="Stop"
+            onClick={() => voiceAgent && useConnectAgent(voiceAgent)}
+          >
+            <StopCircle width="14" height="14" />
+            <span>Stop</span>
           </button>
         )}
       </div>
@@ -165,91 +158,78 @@ export const Input: FC<{
   );
 };
 
+/* ================================================================
+   Audio panel — toolbar style: [Mute | Visualizer+Device | Text | Stop]
+   ================================================================ */
 const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   const localMultibandVolume = useMultibandMicrophoneTrackVolume(
     voiceAgent,
     5,
     0.05,
-    0.85
+    0.85,
   );
   const { isConnected, isConnecting, handleDisconnectAgent } =
     useConnectAgent(voiceAgent);
   const { handleTextToggle } = useInputModeToggleAgent(voiceAgent);
   const { isMuted, handleToggleMute } = useMuteAgent(voiceAgent);
 
+  // Only request device permissions after connected (mic already granted by WebRTC)
+  // This avoids a double permission prompt
   const { devices, activeDeviceId, setActiveMediaDevice } =
-    useSelectInputDeviceAgent({
-      voiceAgent,
-      requestPermissions: true,
-    });
+    useSelectInputDeviceAgent({ voiceAgent, requestPermissions: isConnected });
 
   const activeDeviceLabel = useMemo(() => {
-    const device = devices.find((d) => d.deviceId === activeDeviceId);
-    if (device) {
-      const label = device.label || "Unknown Device";
-      return label.length > 25 ? label.substring(0, 22) + "..." : label;
+    const d = devices.find((d) => d.deviceId === activeDeviceId);
+    if (d) {
+      const l = d.label || "Unknown Device";
+      return l.length > 25 ? l.substring(0, 22) + "..." : l;
     }
     return "Select Microphone";
   }, [devices, activeDeviceId]);
 
   const handleDeviceChange = useCallback(
-    async (deviceId: string) => {
-      if (deviceId !== activeDeviceId) {
-        await setActiveMediaDevice(deviceId);
-      }
+    async (id: string) => {
+      if (id !== activeDeviceId) await setActiveMediaDevice(id);
     },
-    [activeDeviceId, setActiveMediaDevice]
+    [activeDeviceId, setActiveMediaDevice],
   );
 
-  const visualizerFrequencies = useMemo(() => {
-    if (isMuted) {
-      return Array.from({ length: 5 }, () => [0.02]);
-    }
+  const frequencies = useMemo(() => {
+    if (isMuted) return Array.from({ length: 5 }, () => [0.02]);
     return localMultibandVolume.length > 0
       ? localMultibandVolume
       : Array.from({ length: 5 }, () => [0.02]);
   }, [isMuted, localMultibandVolume]);
 
   return (
-    <div className="WACInputAndCompletions">
-      <div
-        className="WACInputContainer"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "4px",
-          padding: "8px",
-        }}
-      >
-        {/* Mic mute/unmute button */}
+    <div className="rpd-audio">
+      <div className="rpd-audio__toolbar">
+        {/* Mute */}
         <button
           type="button"
           disabled={!isConnected}
-          onClick={async () => await handleToggleMute()}
-          className="cds--btn--icon-only cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost"
-          aria-label={isMuted ? "Unmute microphone" : "Mute microphone"}
-          style={{ color: isMuted ? "#da1e28" : undefined }}
+          onClick={() => handleToggleMute()}
+          className={`rpd-audio__btn ${isMuted ? "rpd-audio__btn--muted" : ""}`}
+          aria-label={isMuted ? "Unmute" : "Mute"}
         >
           {isMuted ? (
-            <MicOff width="20" height="20" />
+            <MicOff width="16" height="16" />
           ) : (
-            <Mic width="20" height="20" />
+            <Mic width="16" height="16" />
           )}
         </button>
 
-        {/* Visualizer + device selector */}
-        <div
-          style={{ display: "flex", alignItems: "center", gap: "4px", flex: 1 }}
-        >
+        {/* Visualizer + Device */}
+        <div className="rpd-audio__viz">
           <MultibandAudioVisualizerComponent
             state={isMuted ? "disconnected" : "listening"}
             barWidth={4}
             minBarHeight={3}
             maxBarHeight={18}
-            frequencies={visualizerFrequencies}
+            barColor={isMuted ? "rpd-bar rpd-bar--muted" : "rpd-bar"}
+            frequencies={frequencies}
+            classNames="rpd-visualizer"
           />
-
           <DeviceSelectorFlyout
             devices={devices}
             activeDeviceId={activeDeviceId}
@@ -258,75 +238,61 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
           />
         </div>
 
-        {/* Switch to text button */}
+        {/* Switch to text */}
         <button
           type="button"
           disabled={!isConnected}
-          onClick={async () => await handleTextToggle()}
-          className="cds--btn--icon-only cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost"
+          onClick={() => handleTextToggle()}
+          className="rpd-audio__btn"
           aria-label="Switch to text"
         >
-          <MessageSquareText width="20" height="20" />
+          <MessageSquareText width="16" height="16" />
         </button>
 
-        {/* Stop / disconnect button */}
+        {/* Stop */}
         <button
           type="button"
           disabled={!isConnected && !isConnecting}
-          onClick={async () => await handleDisconnectAgent()}
-          className="cds--btn--icon-only cds--btn cds--btn--md cds--layout--size-md cds--btn--ghost"
-          aria-label="Stop voice"
-          style={{ color: "#da1e28" }}
+          onClick={() => handleDisconnectAgent()}
+          className="rpd-audio__btn rpd-audio__btn--stop"
+          aria-label="Stop"
         >
-          <StopCircleIcon width="20" height="20" />
+          {isConnecting ? (
+            <Loader2 width="16" height="16" className="rpd-spin" />
+          ) : (
+            <StopCircle width="16" height="16" />
+          )}
+          <span>{isConnecting ? "Connecting" : "Stop"}</span>
         </button>
       </div>
     </div>
   );
 };
 
+/* ================================================================
+   Device selector flyout
+   ================================================================ */
 const DeviceSelectorFlyout: FC<{
   devices: MediaDeviceInfo[];
   activeDeviceId: string;
   activeDeviceLabel: string;
-  onDeviceChange: (deviceId: string) => void;
+  onDeviceChange: (id: string) => void;
 }> = ({ devices, activeDeviceId, activeDeviceLabel, onDeviceChange }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      style={{ position: "relative" }}
-    >
+    <div className="rpd-device">
       <button
         type="button"
-        className="cds--btn cds--btn--md cds--btn--ghost"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-          fontSize: "12px",
-          padding: "4px 8px",
-          height: "auto",
-          minHeight: "unset",
-        }}
+        className="rpd-device__trigger"
+        onClick={() => setOpen(!open)}
       >
-        <span
-          style={{
-            maxWidth: "120px",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {activeDeviceLabel}
-        </span>
+        <span className="rpd-device__label">{activeDeviceLabel}</span>
         <ChevronDown
           width="14"
           height="14"
           style={{
-            transition: "transform 0.2s",
+            transition: "transform 0.15s",
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
           }}
         />
@@ -334,73 +300,51 @@ const DeviceSelectorFlyout: FC<{
 
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.2 }}
-            style={{
-              position: "absolute",
-              bottom: "calc(100% + 8px)",
-              left: 0,
-              zIndex: 50,
-              background: "#fff",
-              border: "1px solid #e0e0e0",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-              minWidth: "260px",
-              maxWidth: "300px",
-            }}
-          >
+          <>
             <div
-              style={{
-                padding: "6px 12px",
-                borderBottom: "1px solid #e0e0e0",
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#6f6f6f",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
+              className="rpd-device__backdrop"
+              onClick={() => setOpen(false)}
+            />
+            <motion.div
+              className="rpd-device__flyout"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.15 }}
             >
-              Select Microphone
-            </div>
-            <div style={{ padding: "4px", maxHeight: "180px", overflowY: "auto" }}>
-              {devices.map((device, idx) => {
-                const isActive = activeDeviceId === device.deviceId;
-                return (
-                  <button
-                    key={device.deviceId || idx}
-                    type="button"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      textAlign: "left",
-                      padding: "8px 12px",
-                      fontSize: "13px",
-                      background: isActive ? "#0f62fe" : "transparent",
-                      color: isActive ? "#fff" : "#161616",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => onDeviceChange(device.deviceId)}
-                  >
-                    <span
-                      style={{
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
+              <div className="rpd-device__heading">Select Microphone</div>
+              <div className="rpd-device__list">
+                {devices.length === 0 && (
+                  <div className="rpd-device__empty">No microphones found</div>
+                )}
+                {devices.map((device, idx) => {
+                  const active = activeDeviceId === device.deviceId;
+                  return (
+                    <button
+                      key={device.deviceId || idx}
+                      type="button"
+                      className={`rpd-device__item ${active ? "rpd-device__item--active" : ""}`}
+                      onClick={() => {
+                        onDeviceChange(device.deviceId);
+                        setOpen(false);
                       }}
                     >
-                      {device.label || `Microphone ${idx + 1}`}
-                    </span>
-                    {isActive && <Check width="14" height="14" />}
-                  </button>
-                );
-              })}
-            </div>
-          </motion.div>
+                      <span
+                        style={{
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {device.label || `Microphone ${idx + 1}`}
+                      </span>
+                      {active && <Check width="14" height="14" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

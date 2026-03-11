@@ -54,8 +54,8 @@ module.exports = {
         terserOptions: {
           mangle: true,
           compress: {
-            drop_console: true,
-            pure_funcs: ["console.info", "console.debug"],
+            drop_console: false,
+            pure_funcs: ["console.info", "console.debug", "console.log"],
           },
           output: {
             comments: false,
