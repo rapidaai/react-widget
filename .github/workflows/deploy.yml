@@ -17,6 +17,10 @@ jobs:
       id-token: write
     env:
       AZURE_STORAGE_CONTAINER: "$web"
+      AZURE_STORAGE_ACCOUNT: rapidastore
+      AZURE_CDN_RESOURCE_GROUP: rg-rapida-in-01
+      AZURE_CDN_PROFILE_NAME: cdn-rapida-ai
+      AZURE_CDN_ENDPOINT_NAME: cdn-01
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,11 +47,10 @@ jobs:
             -p "${{ secrets.AZURE_CLIENT_SECRET }}" \
             --tenant "${{ secrets.AZURE_TENANT_ID }}" \
             -o none
+          az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
       - name: Upload to Azure Storage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
 
@@ -73,17 +76,13 @@ jobs:
             --overwrite true \
             --auth-mode login
 
-      - name: Purge Azure CDN cache
+      - name: Purge Azure Front Door cache
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          AZURE_CDN_RESOURCE_GROUP: ${{ secrets.AZURE_CDN_RESOURCE_GROUP }}
-          AZURE_CDN_PROFILE_NAME: ${{ secrets.AZURE_CDN_PROFILE_NAME }}
-          AZURE_CDN_ENDPOINT_NAME: ${{ secrets.AZURE_CDN_ENDPOINT_NAME }}
         run: |
-          az cdn endpoint purge \
+          az afd endpoint purge \
             --resource-group "$AZURE_CDN_RESOURCE_GROUP" \
             --profile-name "$AZURE_CDN_PROFILE_NAME" \
-            --name "$AZURE_CDN_ENDPOINT_NAME" \
+            --endpoint-name "$AZURE_CDN_ENDPOINT_NAME" \
             --content-paths "/public/scripts/app.min.js"
 
       - name: Publish to npm
