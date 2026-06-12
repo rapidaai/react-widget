@@ -16,11 +16,13 @@ jobs:
       contents: read
       id-token: write
     env:
-      AZURE_STORAGE_CONTAINER: "$web"
+      AZURE_STORAGE_CONTAINER: rapida-assets-01
       AZURE_STORAGE_ACCOUNT: rapidastore
       AZURE_CDN_RESOURCE_GROUP: rg-rapida-in-01
       AZURE_CDN_PROFILE_NAME: cdn-rapida-ai
       AZURE_CDN_ENDPOINT_NAME: cdn-01
+      AZURE_SUBSCRIPTION_ID: c33d62c6-7f88-47bf-9ae0-5630dca7dea5
+      AZURE_TENANT_ID: 81511a15-ddb7-4236-9b7b-0a099bc32099
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,7 +45,8 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: >-
+            {"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ env.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ env.AZURE_TENANT_ID }}"}
 
       - name: Upload to Azure Storage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
