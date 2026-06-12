@@ -94,6 +94,8 @@ jobs:
       - name: Purge Azure Front Door cache
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
+          az extension add --name cdn --upgrade
+
           az afd endpoint purge \
             --resource-group "$AZURE_CDN_RESOURCE_GROUP" \
             --profile-name "$AZURE_CDN_PROFILE_NAME" \
