@@ -1,4 +1,35 @@
-interface ChatbotConfig {
+import type {
+  ChatContainerProps,
+  ChatCustomElementProps,
+} from "@carbon/ai-chat";
+
+type WidgetLayoutMode = "floating" | "docked-right" | "docked-left" | "inline";
+type WidgetPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left";
+
+type AiChatConfig = Partial<
+  Omit<ChatCustomElementProps, "className" | "layout"> &
+    Omit<ChatContainerProps, "layout">
+>;
+
+type LayoutConfig = NonNullable<ChatContainerProps["layout"]> & {
+  /** Rapida widget placement mode. */
+  mode?: WidgetLayoutMode;
+  /** Rapida widget position when mode is "floating". */
+  position?: WidgetPosition;
+  /** Legacy launcher shortcut. Prefer launcher.isOn for new configs. */
+  showLauncher?: boolean;
+};
+
+type ThemeConfig = {
+  /** Legacy color theme mode. Also used to choose AI Chat theme defaults. */
+  mode?: "light" | "dark" | "system";
+  /** Legacy primary brand color. Prefer layout.customProperties for UI overrides. */
+  color?: string;
+  /** Theme token passed to the AI Chat renderer, for example "g10" or "g100". */
+  injectTheme?: ChatContainerProps["injectCarbonTheme"];
+};
+
+interface ChatbotConfig extends AiChatConfig {
   assistant_id?: string;
   assistant_version?: string;
   api_base?: string;
@@ -11,35 +42,43 @@ interface ChatbotConfig {
   };
   debug?: boolean;
 
-  /** Bot display name shown in header. Falls back to deployment name. */
+  /** Bot display name. Maps to assistantName/header.title by default. */
   name?: string;
 
-  /** URL to a logo/avatar image shown in the header. Falls back to text initial. */
+  /** Bot avatar URL. Maps to assistantAvatarUrl by default. */
   logo_url?: string;
 
-  /**
-   * Widget layout mode:
-   * - "floating"      — fixed-position panel with launcher FAB (default)
-   * - "docked-right"  — panel fixed to right side, pushes page content left
-   * - "docked-left"   — panel fixed to left side, pushes page content right
-   * - "inline"        — flows with page, no fixed positioning
-   */
-  layout?: "floating" | "docked-right" | "docked-left" | "inline";
+  /** Widget layout section. String values remain supported for old embeds. */
+  layout?: WidgetLayoutMode | LayoutConfig;
 
-  /** Widget position when layout is "floating" */
-  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  /** Legacy widget position when layout is "floating". Prefer layout.position. */
+  position?: WidgetPosition;
 
-  /** Show or hide the default launcher button. Only applies to "floating" layout. */
+  /** Legacy launcher shortcut. Prefer launcher.isOn for new configs. */
   showLauncher?: boolean;
 
-  theme?: {
-    /** Color theme mode */
-    mode?: "light" | "dark" | "system";
-    /** Primary brand color (hex) */
-    color?: string;
-  };
+  /**
+   * Theme section for UI theme tokens and legacy widget theme settings.
+   *
+   * AI Chat config sections such as header, launcher, layout, history,
+   * messaging, input, keyboardShortcuts, upload, and homescreen are exposed
+   * directly on window.chatbotConfig.
+   *
+   * `mode` and `color` remain supported for old widget theme settings.
+   *
+   * Rapida owns:
+   * - messaging.customSendMessage
+   * - renderWriteableElements.afterInputElement audio controls merge
+   *
+   * Everything else is passed through to IBM AI Chat.
+   */
+  theme?: ThemeConfig;
 }
 
-interface Window {
-  chatbotConfig?: ChatbotConfig;
+declare global {
+  interface Window {
+    chatbotConfig?: ChatbotConfig;
+  }
 }
+
+export {};

@@ -1,4 +1,4 @@
-name: Build, Deploy to S3, and Publish to npm
+name: Build, Deploy to Azure CDN, and Publish to npm
 
 on:
   push:
@@ -12,18 +12,22 @@ jobs:
   build_and_deploy:
     name: Build and Deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AZURE_STORAGE_CONTAINER: "$web"
     steps:
-      - name: Checkout main repository and submodules
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.GH_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          registry-url: "https://registry.npmjs.org"
+          node-version: "22.14.0"
+
+      - name: Use npm with trusted publishing support
+        run: npm install -g npm@11.5.1
 
       - name: Install dependencies
         run: npm ci
@@ -31,34 +35,56 @@ jobs:
       - name: Build the project
         run: npm run build
 
-      - name: Upload to S3
+      - name: Login to Azure
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          az login --service-principal \
+            -u "${{ secrets.AZURE_CLIENT_ID }}" \
+            -p "${{ secrets.AZURE_CLIENT_SECRET }}" \
+            --tenant "${{ secrets.AZURE_TENANT_ID }}" \
+            -o none
+
+      - name: Upload to Azure Storage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}
         run: |
-          # Latest — short cache
-          aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/app.min.js \
-            --region $AWS_REGION --acl public-read \
-            --cache-control "public,max-age=3600"
-
-          # Versioned — immutable cache for pinning
           VERSION=$(node -p "require('./package.json').version")
-          aws s3 cp ./dist/app.min.js s3://${{ secrets.S3_BUCKET_NAME }}/public/scripts/v${VERSION}/app.min.js \
-            --region $AWS_REGION --acl public-read \
-            --cache-control "public,max-age=31536000,immutable"
 
-      - name: Invalidate CloudFront cache
+          # Latest - short cache
+          az storage blob upload \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "public/scripts/app.min.js" \
+            --file "./dist/app.min.js" \
+            --content-type "application/javascript" \
+            --content-cache-control "public,max-age=3600" \
+            --overwrite true \
+            --auth-mode login
+
+          # Versioned - immutable cache for pinning
+          az storage blob upload \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "public/scripts/v${VERSION}/app.min.js" \
+            --file "./dist/app.min.js" \
+            --content-type "application/javascript" \
+            --content-cache-control "public,max-age=31536000,immutable" \
+            --overwrite true \
+            --auth-mode login
+
+      - name: Purge Azure CDN cache
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AZURE_CDN_RESOURCE_GROUP: ${{ secrets.AZURE_CDN_RESOURCE_GROUP }}
+          AZURE_CDN_PROFILE_NAME: ${{ secrets.AZURE_CDN_PROFILE_NAME }}
+          AZURE_CDN_ENDPOINT_NAME: ${{ secrets.AZURE_CDN_ENDPOINT_NAME }}
         run: |
-          aws cloudfront create-invalidation \
-            --distribution-id E3SJXANXL6IYCB \
-            --paths "/public/scripts/*"
+          az cdn endpoint purge \
+            --resource-group "$AZURE_CDN_RESOURCE_GROUP" \
+            --profile-name "$AZURE_CDN_PROFILE_NAME" \
+            --name "$AZURE_CDN_ENDPOINT_NAME" \
+            --content-paths "/public/scripts/app.min.js"
 
       - name: Publish to npm
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -68,11 +94,9 @@ jobs:
           if npm view "${PKG}@${VER}" version 2>/dev/null; then
             echo "npm: ${PKG}@${VER} already published — skipping"
           else
-            npm publish --access public
+            npm publish --access public --provenance
             echo "npm: published ${PKG}@${VER}"
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   create_release:
     name: Create Release

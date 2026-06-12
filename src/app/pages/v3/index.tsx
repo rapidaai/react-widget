@@ -1,381 +1,511 @@
 import {
   AssistantWebpluginDeployment,
+  Channel,
   useAgentMessages,
-  useConnectAgent,
+  useInputModeToggleAgent,
   VoiceAgent,
 } from "@rapidaai/react";
-import React, { useState, useEffect, FC, useRef, useCallback } from "react";
-import { formatTimeToHHMMPM } from "@/utils/time";
-import MarkdownPreview from "@uiw/react-markdown-preview";
-import { Input } from "@/app/pages/v3/input";
+import {
+  BusEventViewChange,
+  CarbonTheme as AiChatTheme,
+  ChatContainer,
+  ChatContainerProps,
+  ChatCustomElement,
+  ChatInstance,
+  CornersType,
+  LayoutCustomProperties,
+  MessageResponse,
+  MessageResponseTypes,
+  MinimizeButtonIconType,
+  OptionItemPreference,
+  PublicConfigMessaging,
+  RenderWriteableElementResponse,
+} from "@carbon/ai-chat";
+import {
+  CSSProperties,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { AudioControls } from "@/app/pages/v3/input";
 import { useEnvironment } from "@/hooks/use-environment";
 
-/* ================================================================
-   Icons — Carbon 16px
-   ================================================================ */
-const IconMinimize: FC = () => (
-  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
-    <path d="M5 15h22v2H5z" />
-  </svg>
-);
+const PANEL_WIDTH = "min(100vw, 450px)";
+const FLOATING_PANEL_WIDTH = "min(calc(100vw - 32px), 450px)";
+const FLOATING_PANEL_HEIGHT = "min(85dvh, calc(100dvh - 96px))";
+const SHELL_OFFSET = "1rem";
+const SHELL_Z_INDEX = 9999;
+const AI_CHAT_INPUT_STYLE_ID = "rapida-chat-input-style";
+const AI_CHAT_INPUT_STYLE = `
+  .cds-aichat--input-container {
+    border-radius: 0 !important;
+    font-size: 12px !important;
+  }
 
-const IconChat: FC = () => (
-  <svg width="22" height="22" viewBox="0 0 32 32" fill="currentColor">
-    <path d="M17.74,30,16,29l4-7h6a2,2,0,0,0,2-2V8a2,2,0,0,0-2-2H6A2,2,0,0,0,4,8V20a2,2,0,0,0,2,2h9v2H6a4,4,0,0,1-4-4V8A4,4,0,0,1,6,4H26a4,4,0,0,1,4,4V20a4,4,0,0,1-4,4H21.16Z" />
-    <path d="M8 10H24V12H8zM8 16H18V18H8z" />
-  </svg>
-);
+  .cds-aichat--input-container [contenteditable="true"],
+  .cds-aichat--input-container textarea {
+    font-size: inherit !important;
+  }
+`;
 
-const IconArrowRight: FC = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 32 32"
-    fill="currentColor"
-    strokeWidth={1.5}
-  >
-    <path d="M18 6l-1.43 1.393L24.15 15H4v2h20.15l-7.58 7.573L18 26l10-10z" />
-  </svg>
-);
+type PendingResponse = {
+  resolve: () => void;
+  abortHandler: () => void;
+  signal: AbortSignal;
+};
 
-const IconChevronLeft: FC = () => (
-  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
-    <path d="M10 16L20 6l1.4 1.4-8.6 8.6 8.6 8.6L20 26z" />
-  </svg>
-);
+type WidgetLayoutMode = "floating" | "docked-right" | "docked-left" | "inline";
+type WidgetPosition = "bottom-right" | "bottom-left" | "top-right" | "top-left";
+type ThemeSettings = NonNullable<Window["chatbotConfig"]>["theme"];
+type LayoutSettings = NonNullable<Window["chatbotConfig"]>["layout"];
 
-const IconChevronRight: FC = () => (
-  <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
-    <path d="M22 16L12 26l-1.4-1.4 8.6-8.6-8.6-8.6L12 6z" />
-  </svg>
-);
+type ResolvedLayoutSettings = {
+  mode: WidgetLayoutMode;
+  position: WidgetPosition;
+  showLauncher?: boolean;
+  aiChatLayout?: ChatContainerProps["layout"];
+};
 
-/** Watson-style bot avatar */
-const BotAvatarIcon: FC = () => (
-  <svg width="18" height="18" viewBox="0 0 32 32" fill="currentColor">
-    <circle cx="16" cy="16" r="2" />
-    <circle cx="16" cy="8" r="2" />
-    <circle cx="16" cy="24" r="2" />
-    <circle cx="8" cy="12" r="2" />
-    <circle cx="24" cy="12" r="2" />
-    <circle cx="8" cy="20" r="2" />
-    <circle cx="24" cy="20" r="2" />
-    <line
-      x1="16"
-      y1="10"
-      x2="16"
-      y2="14"
-      stroke="currentColor"
-      strokeWidth="1"
-    />
-    <line
-      x1="16"
-      y1="18"
-      x2="16"
-      y2="22"
-      stroke="currentColor"
-      strokeWidth="1"
-    />
-    <line
-      x1="9.5"
-      y1="13"
-      x2="14.5"
-      y2="15"
-      stroke="currentColor"
-      strokeWidth="1"
-    />
-    <line
-      x1="17.5"
-      y1="15"
-      x2="22.5"
-      y2="13"
-      stroke="currentColor"
-      strokeWidth="1"
-    />
-    <line
-      x1="9.5"
-      y1="19"
-      x2="14.5"
-      y2="17"
-      stroke="currentColor"
-      strokeWidth="1"
-    />
-    <line
-      x1="17.5"
-      y1="17"
-      x2="22.5"
-      y2="19"
-      stroke="currentColor"
-      strokeWidth="1"
-    />
-  </svg>
-);
-
-/* ================================================================
-   Main export
-   ================================================================ */
 export const ChatComponent: FC<{
   deployment: AssistantWebpluginDeployment;
   voiceAgent: VoiceAgent;
 }> = ({ deployment, voiceAgent }) => {
   const { theme } = useEnvironment();
   const config = window.chatbotConfig;
-  const layout = config?.layout || "floating";
-  const position = config?.position || "bottom-right";
-  const showLauncher = config?.showLauncher !== false;
-  const themeMode = theme?.mode || "light";
-  const displayName = config?.name || deployment.getName() || "Assistant";
+  const {
+    assistant_id: _assistantId,
+    assistant_version: _assistantVersion,
+    api_base: _apiBase,
+    token: _token,
+    language,
+    user: _user,
+    name,
+    logo_url: logoUrl,
+    layout: layoutSettings,
+    position: legacyPosition,
+    showLauncher: legacyShowLauncher,
+    theme: themeSettings,
+    ...aiChatConfig
+  } = config ?? {};
+  const {
+    mode: configThemeMode,
+    color: _configThemeColor,
+    injectTheme,
+  } = themeSettings ?? {};
+  const {
+    mode: layout,
+    position,
+    showLauncher,
+    aiChatLayout,
+  } = resolveLayoutSettings(layoutSettings, legacyPosition, legacyShowLauncher);
+  const themeMode = theme?.mode || configThemeMode || "light";
+  const displayName = name || deployment.getName() || "Assistant";
+  const voiceEnabled =
+    !!deployment.getInputaudio() && !!deployment.getOutputaudio();
 
   const isDocked = layout === "docked-right" || layout === "docked-left";
+  const isCustomElement = isDocked || layout === "inline";
   const dockSide = layout === "docked-left" ? "left" : "right";
+  const { channel } = useInputModeToggleAgent(voiceAgent);
+  const { messages } = useAgentMessages(voiceAgent);
 
-  // Docked starts open, floating starts closed
-  const [open, setOpen] = useState(isDocked);
+  const [customElementOpen, setCustomElementOpen] = useState(
+    aiChatConfig.openChatByDefault ?? isCustomElement,
+  );
+  const [instanceReadyVersion, setInstanceReadyVersion] = useState(0);
+  const chatInstanceRef = useRef<ChatInstance | null>(null);
+  const seenRapidaMessageIds = useRef<Set<string>>(new Set());
+  const pendingResponses = useRef<PendingResponse[]>([]);
 
-  // Manage body margin for docked layout
   useEffect(() => {
     if (!isDocked) return;
-    const cls = `rpd-body--docked-${dockSide}`;
-    if (open) {
-      document.body.classList.add(cls);
-    } else {
-      document.body.classList.remove(cls);
-    }
-    return () => document.body.classList.remove(cls);
-  }, [isDocked, dockSide, open]);
 
-  // Shell class
-  const shellClass = isDocked
-    ? `rpd-shell rpd-shell--docked rpd-shell--docked-${dockSide}`
-    : `rpd-shell rpd-shell--${position} ${layout === "inline" ? "rpd-shell--inline" : ""}`;
+    const marginKey = dockSide === "right" ? "marginRight" : "marginLeft";
+    const previousMargin = document.body.style[marginKey];
 
-  return (
-    <div className="rpd" data-rpd-theme={themeMode}>
-      <div className={shellClass}>
-        {/* Panel */}
-        <div
-          className={`rpd-panel ${open ? "" : "rpd-panel--closed"}`}
-          role="dialog"
-          aria-label="Chat"
-        >
-          {/* Header */}
-          <div className="rpd-header">
-            <div className="rpd-header__spacer" />
-            <button
-              className="rpd-btn-icon"
-              type="button"
-              aria-label={isDocked ? "Collapse" : "Minimize"}
-              onClick={() => setOpen(false)}
-            >
-              {isDocked ? (
-                dockSide === "right" ? (
-                  <IconChevronRight />
-                ) : (
-                  <IconChevronLeft />
-                )
-              ) : (
-                <IconMinimize />
-              )}
-            </button>
-          </div>
+    document.body.style[marginKey] = customElementOpen ? PANEL_WIDTH : "";
 
-          {/* Messages */}
-          <MessagesArea
-            deployment={deployment}
-            voiceAgent={voiceAgent}
-            botName={displayName}
-            logoUrl={config?.logo_url}
-            onSendMessage={(msg) => voiceAgent?.onSendText(msg)}
-          />
+    return () => {
+      document.body.style[marginKey] = previousMargin;
+    };
+  }, [isDocked, dockSide, customElementOpen]);
 
-          {/* Input */}
-          <Input
-            voiceAgent={voiceAgent}
-            onSendMessage={(msg) => voiceAgent?.onSendText(msg)}
-            voiceEnabled={
-              !!deployment.getInputaudio() && !!deployment.getOutputaudio()
-            }
-          />
-        </div>
-
-        {/* Floating launcher */}
-        {!isDocked && showLauncher && (
-          <button
-            className={`rpd-launcher ${open ? "rpd-launcher--hidden" : ""}`}
-            type="button"
-            aria-label="Open chat"
-            onClick={() => setOpen(true)}
-          >
-            <IconChat />
-          </button>
-        )}
-      </div>
-
-      {/* Docked expand tab — shown when docked + collapsed */}
-      {isDocked && !open && (
-        <button
-          className={`rpd-docked-tab rpd-docked-tab--${dockSide}`}
-          type="button"
-          aria-label="Open chat"
-          onClick={() => setOpen(true)}
-        >
-          Chat
-        </button>
-      )}
-    </div>
+  const addMessageToChat = useCallback(
+    async (message: MessageResponse) => {
+      await chatInstanceRef.current?.messaging.addMessage(message);
+      const pending = pendingResponses.current.shift();
+      if (pending) {
+        pending.signal.removeEventListener("abort", pending.abortHandler);
+        pending.resolve();
+      }
+    },
+    [],
   );
-};
-
-/* ================================================================
-   Group consecutive messages by role
-   ================================================================ */
-type MessageItem = { id: string; role: string; time: Date; messages: string[] };
-type MessageGroup = { role: string; items: MessageItem[] };
-
-function groupMessages(messages: MessageItem[]): MessageGroup[] {
-  return messages.reduce<MessageGroup[]>((acc, msg) => {
-    const last = acc[acc.length - 1];
-    if (last && last.role === msg.role) {
-      last.items.push(msg);
-    } else {
-      acc.push({ role: msg.role, items: [msg] });
-    }
-    return acc;
-  }, []);
-}
-
-/* ================================================================
-   Messages area
-   ================================================================ */
-const MessagesArea: FC<{
-  deployment: AssistantWebpluginDeployment;
-  voiceAgent: VoiceAgent;
-  botName: string;
-  logoUrl?: string;
-  onSendMessage: (txt: string) => void;
-}> = ({ deployment, voiceAgent, botName, logoUrl, onSendMessage }) => {
-  const { messages } = useAgentMessages(voiceAgent);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [JSON.stringify(messages)]);
-  const suggestions = deployment.getSuggestionList();
-  const greeting = deployment.getGreeting();
+    const instance = chatInstanceRef.current;
+    if (!instance) return;
+
+    messages.forEach((message) => {
+      if (
+        message.role === "user" ||
+        seenRapidaMessageIds.current.has(message.id)
+      ) {
+        return;
+      }
+
+      seenRapidaMessageIds.current.add(message.id);
+      void addMessageToChat({
+        id: message.id,
+        output: {
+          generic: message.messages.map((text) => ({
+            response_type: MessageResponseTypes.TEXT,
+            text,
+          })),
+        },
+      });
+    });
+  }, [messages, addMessageToChat, instanceReadyVersion]);
+
+  const customSendMessage = useCallback<
+    NonNullable<PublicConfigMessaging["customSendMessage"]>
+  >(
+    async (request, requestOptions, instance) => {
+      chatInstanceRef.current = instance;
+      const text = request.input.text?.trim() ?? "";
+
+      if (!text) {
+        await addWelcomeMessage(instance, deployment);
+        return;
+      }
+
+      await voiceAgent.onSendText(text);
+
+      return new Promise<void>((resolve) => {
+        if (requestOptions.signal.aborted) {
+          resolve();
+          return;
+        }
+
+        const abortHandler = () => {
+          pendingResponses.current = pendingResponses.current.filter(
+            (pending) => pending.resolve !== resolve,
+          );
+          resolve();
+        };
+
+        pendingResponses.current.push({
+          resolve,
+          abortHandler,
+          signal: requestOptions.signal,
+        });
+        requestOptions.signal.addEventListener("abort", abortHandler, {
+          once: true,
+        });
+      });
+    },
+    [deployment, voiceAgent],
+  );
+
+  const onBeforeRender = useCallback(
+    async (instance: ChatInstance) => {
+      chatInstanceRef.current = instance;
+      applyAiChatInputStyle();
+      setInstanceReadyVersion((version) => version + 1);
+      await aiChatConfig.onBeforeRender?.(instance);
+    },
+    [aiChatConfig],
+  );
+
+  const onViewChange = useCallback(
+    (event: BusEventViewChange, instance: ChatInstance) => {
+      setCustomElementOpen(Boolean(event.newViewState.mainWindow));
+      aiChatConfig.onViewChange?.(event, instance);
+    },
+    [aiChatConfig],
+  );
+
+  const renderWriteableElements = useMemo<RenderWriteableElementResponse>(
+    () => ({
+      ...aiChatConfig.renderWriteableElements,
+      afterInputElement: (
+        <>
+          {aiChatConfig.renderWriteableElements?.afterInputElement}
+          <AudioControls voiceAgent={voiceAgent} voiceEnabled={voiceEnabled} />
+        </>
+      ),
+    }),
+    [aiChatConfig.renderWriteableElements, voiceAgent, voiceEnabled],
+  );
+
+  const chatProps = useMemo<ChatContainerProps>(() => {
+    const defaultProps: ChatContainerProps = {
+      aiEnabled: false,
+      assistantName: displayName,
+      assistantAvatarUrl: logoUrl,
+      debug: aiChatConfig.debug,
+      injectCarbonTheme:
+        injectTheme ??
+        (themeMode === "dark"
+          ? AiChatTheme.G100
+          : themeMode === "light"
+            ? AiChatTheme.G10
+            : undefined),
+      locale: language,
+      namespace: "rapida-chat",
+      openChatByDefault: isCustomElement,
+      shouldSanitizeHTML: true,
+      shouldTakeFocusIfOpensAutomatically: false,
+      header: {
+        title: displayName,
+        showAiLabel: false,
+        hideDefaultAiLabelContent: true,
+        minimizeButtonIconType:
+          dockSide === "left"
+            ? MinimizeButtonIconType.SIDE_PANEL_LEFT
+            : MinimizeButtonIconType.SIDE_PANEL_RIGHT,
+      },
+      history: {
+        isOn: false,
+      },
+      launcher: {
+        isOn: layout === "floating" ? showLauncher !== false : false,
+      },
+      layout: {
+        corners: CornersType.SQUARE,
+        showFrame: true,
+        customProperties: getThemeLayoutProperties(layout, position),
+      },
+      messaging: {
+        messageTimeoutSecs: 150,
+        messageLoadingIndicatorTimeoutSecs: 1,
+      },
+    };
+    const resolvedInjectTheme =
+      injectTheme ??
+      aiChatConfig.injectCarbonTheme ??
+      defaultProps.injectCarbonTheme;
+
+    return {
+      ...defaultProps,
+      ...aiChatConfig,
+      injectCarbonTheme: resolvedInjectTheme,
+      header: {
+        ...defaultProps.header,
+        ...aiChatConfig.header,
+      },
+      history: {
+        ...defaultProps.history,
+        ...aiChatConfig.history,
+      },
+      launcher: {
+        ...defaultProps.launcher,
+        ...aiChatConfig.launcher,
+      },
+      layout: {
+        ...defaultProps.layout,
+        ...aiChatLayout,
+        customProperties: {
+          ...defaultProps.layout?.customProperties,
+          ...aiChatLayout?.customProperties,
+        },
+      },
+      input: {
+        ...aiChatConfig.input,
+        isDisabled:
+          channel === Channel.Audio || aiChatConfig.input?.isDisabled,
+      },
+      messaging: {
+        ...defaultProps.messaging,
+        ...aiChatConfig.messaging,
+        customSendMessage,
+      },
+      onBeforeRender,
+      onViewChange,
+      renderWriteableElements,
+    };
+  }, [
+    aiChatConfig,
+    channel,
+    customSendMessage,
+    displayName,
+    dockSide,
+    aiChatLayout,
+    injectTheme,
+    isCustomElement,
+    language,
+    layout,
+    logoUrl,
+    onBeforeRender,
+    onViewChange,
+    position,
+    renderWriteableElements,
+    showLauncher,
+    themeMode,
+  ]);
+
+  if (!isCustomElement) {
+    return <ChatContainer {...chatProps} />;
+  }
 
   return (
-    <div className="rpd-messages" role="log" aria-live="polite">
-      {/* Greeting */}
-      <div className="rpd-msg-bot">
-        <BotMessageHeader name={botName} logoUrl={logoUrl} />
-        <div className="rpd-msg-bot__body">
-          <MarkdownPreview
-            source={greeting}
-            className="rpd-md"
-            style={{ background: "transparent" }}
-          />
-        </div>
-
-        {suggestions.length > 0 && (
-          <>
-            <div className="rpd-cards">
-              {suggestions.map((text, idx) => (
-                <button
-                  key={idx}
-                  className="rpd-card"
-                  type="button"
-                  onClick={() => onSendMessage(text)}
-                >
-                  <span className="rpd-card__text">{text}</span>
-                  <span className="rpd-card__icon">
-                    <IconArrowRight />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      {/* Conversation — group consecutive messages by same role */}
-      {groupMessages(messages).map((group, gi) =>
-        group.role === "user" ? (
-          <div key={gi} className="rpd-msg-user">
-            <div className="rpd-msg-user__meta">
-              <span className="rpd-msg-user__name">You</span>
-              <span className="rpd-msg-user__time">
-                {formatTimeToHHMMPM(group.items[0].time)}
-              </span>
-            </div>
-            <div className="rpd-msg-user__bubble">
-              {group.items.map((msg) =>
-                msg.messages.map((m, ix) => (
-                  <MarkdownPreview
-                    key={`${msg.id}-${ix}`}
-                    source={m}
-                    className="rpd-md"
-                    style={{ background: "transparent" }}
-                  />
-                )),
-              )}
-            </div>
-          </div>
-        ) : (
-          <div key={gi} className="rpd-msg-bot">
-            <BotMessageHeader
-              name={botName}
-              logoUrl={logoUrl}
-              time={group.items[0].time}
-            />
-            <div className="rpd-msg-bot__body">
-              {group.items.map((msg) =>
-                msg.messages.map((m, ix) => (
-                  <MarkdownPreview
-                    key={`${msg.id}-${ix}`}
-                    source={m}
-                    className="rpd-md"
-                    style={{ background: "transparent" }}
-                  />
-                )),
-              )}
-            </div>
-          </div>
-        ),
-      )}
-
-      {/* Typing */}
-      {messages.length > 0 && messages[messages.length - 1].role === "user" && (
-        <div className="rpd-typing">
-          <span className="rpd-typing__dot" />
-          <span className="rpd-typing__dot" />
-          <span className="rpd-typing__dot" />
-        </div>
-      )}
-
-      <div ref={scrollRef} />
+    <div style={getCustomElementShellStyle(layout, dockSide, customElementOpen)}>
+      <ChatCustomElement
+        {...chatProps}
+        className="rapida-theme-chat"
+        style={customElementStyle}
+      />
     </div>
   );
 };
 
-/* ================================================================
-   Shared sub-components
-   ================================================================ */
-const BotMessageHeader: FC<{ name: string; logoUrl?: string; time?: Date }> = ({
-  name,
-  logoUrl,
-  time,
-}) => (
-  <div className="rpd-msg-bot__header">
-    {logoUrl ? (
-      <img className="rpd-msg-bot__avatar-img" src={logoUrl} alt={name} />
-    ) : (
-      <div className="rpd-msg-bot__avatar">
-        <BotAvatarIcon />
-      </div>
-    )}
-    <span className="rpd-msg-bot__name">{name}</span>
-    {time && (
-      <span className="rpd-msg-bot__time">{formatTimeToHHMMPM(time)}</span>
-    )}
-  </div>
-);
+async function addWelcomeMessage(
+  instance: ChatInstance,
+  deployment: AssistantWebpluginDeployment,
+) {
+  const generic: MessageResponse["output"]["generic"] = [];
+  const greeting = deployment.getGreeting();
+  const suggestions = deployment.getSuggestionList();
+
+  if (greeting) {
+    generic.push({
+      response_type: MessageResponseTypes.TEXT,
+      text: greeting,
+    });
+  }
+
+  if (suggestions.length > 0) {
+    generic.push({
+      response_type: MessageResponseTypes.OPTION,
+      preference: OptionItemPreference.BUTTON,
+      options: suggestions.map((label) => ({
+        label,
+        value: {
+          input: {
+            text: label,
+          },
+        },
+      })),
+    });
+  }
+
+  if (generic.length > 0) {
+    await instance.messaging.addMessage({
+      id: "rapida-welcome",
+      output: { generic },
+    });
+  }
+}
+
+function applyAiChatInputStyle() {
+  document.querySelectorAll("cds-aichat-react").forEach((element) => {
+    const root = element.shadowRoot;
+    if (!root || root.getElementById(AI_CHAT_INPUT_STYLE_ID)) return;
+
+    const style = document.createElement("style");
+    style.id = AI_CHAT_INPUT_STYLE_ID;
+    style.textContent = AI_CHAT_INPUT_STYLE;
+    root.appendChild(style);
+  });
+}
+
+function resolveLayoutSettings(
+  settings: LayoutSettings,
+  legacyPosition?: WidgetPosition,
+  legacyShowLauncher?: boolean,
+): ResolvedLayoutSettings {
+  const position = legacyPosition ?? "bottom-right";
+
+  if (!settings) {
+    return {
+      mode: "floating",
+      position,
+      showLauncher: legacyShowLauncher,
+    };
+  }
+
+  if (typeof settings === "string") {
+    return {
+      mode: settings,
+      position,
+      showLauncher: legacyShowLauncher,
+    };
+  }
+
+  const {
+    mode = "floating",
+    position: layoutPosition,
+    showLauncher,
+    ...aiChatLayout
+  } = settings;
+
+  return {
+    mode,
+    position: layoutPosition ?? position,
+    showLauncher: showLauncher ?? legacyShowLauncher,
+    aiChatLayout,
+  };
+}
+
+function getThemeLayoutProperties(
+  layout: string,
+  position: string,
+): Partial<Record<LayoutCustomProperties, string>> | undefined {
+  if (layout !== "floating") return undefined;
+
+  return {
+    [LayoutCustomProperties.width]: FLOATING_PANEL_WIDTH,
+    [LayoutCustomProperties.height]: FLOATING_PANEL_HEIGHT,
+    [LayoutCustomProperties.max_height]: FLOATING_PANEL_HEIGHT,
+    [LayoutCustomProperties.bottom_position]: position.startsWith("bottom")
+      ? SHELL_OFFSET
+      : "auto",
+    [LayoutCustomProperties.top_position]: position.startsWith("top")
+      ? SHELL_OFFSET
+      : "auto",
+    [LayoutCustomProperties.right_position]: position.endsWith("right")
+      ? SHELL_OFFSET
+      : "auto",
+    [LayoutCustomProperties.left_position]: position.endsWith("left")
+      ? SHELL_OFFSET
+      : "auto",
+    [LayoutCustomProperties.launcher_position_bottom]:
+      position.startsWith("bottom") ? SHELL_OFFSET : "auto",
+    [LayoutCustomProperties.launcher_position_right]: position.endsWith("right")
+      ? SHELL_OFFSET
+      : "auto",
+  };
+}
+
+function getCustomElementShellStyle(
+  layout: string,
+  dockSide: "left" | "right",
+  open: boolean,
+): CSSProperties {
+  if (layout === "inline") {
+    return {
+      width: "100%",
+      height: "100%",
+      minHeight: "560px",
+    };
+  }
+
+  return {
+    position: "fixed",
+    top: 0,
+    bottom: 0,
+    [dockSide]: 0,
+    width: open ? PANEL_WIDTH : 0,
+    height: "100dvh",
+    zIndex: SHELL_Z_INDEX,
+  } as CSSProperties;
+}
+
+const customElementStyle: CSSProperties = {
+  display: "block",
+  width: "100%",
+  height: "100%",
+};
