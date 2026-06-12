@@ -23,6 +23,7 @@ jobs:
       AZURE_CDN_ENDPOINT_NAME: cdn-01
       AZURE_SUBSCRIPTION_ID: c33d62c6-7f88-47bf-9ae0-5630dca7dea5
       AZURE_TENANT_ID: 81511a15-ddb7-4236-9b7b-0a099bc32099
+      AZURE_CLIENT_ID: 9479d9cc-723d-4dd0-877f-5615dccd17f7
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,26 +44,11 @@ jobs:
 
       - name: Login to Azure
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: |
-          if [ -z "$AZURE_CLIENT_ID" ]; then
-            echo "Missing GitHub secret: AZURE_CLIENT_ID"
-            exit 1
-          fi
-          if [ -z "$AZURE_CLIENT_SECRET" ]; then
-            echo "Missing GitHub secret: AZURE_CLIENT_SECRET"
-            exit 1
-          fi
-
-          az login --service-principal \
-            --username "$AZURE_CLIENT_ID" \
-            --password "$AZURE_CLIENT_SECRET" \
-            --tenant "$AZURE_TENANT_ID" \
-            --output none
-
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
       - name: Upload to Azure Storage
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
