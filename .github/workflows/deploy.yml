@@ -54,12 +54,26 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          LATEST_BLOB="public/scripts/app.min.js"
+          VERSIONED_BLOB="public/scripts/v${VERSION}/app.min.js"
+
+          az storage blob lease break \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --blob-name "$LATEST_BLOB" \
+            --auth-mode login || true
+
+          az storage blob lease break \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --blob-name "$VERSIONED_BLOB" \
+            --auth-mode login || true
 
           # Latest - short cache
           az storage blob upload \
             --account-name "$AZURE_STORAGE_ACCOUNT" \
             --container-name "$AZURE_STORAGE_CONTAINER" \
-            --name "public/scripts/app.min.js" \
+            --name "$LATEST_BLOB" \
             --file "./dist/app.min.js" \
             --content-type "application/javascript" \
             --content-cache-control "public,max-age=3600" \
@@ -70,7 +84,7 @@ jobs:
           az storage blob upload \
             --account-name "$AZURE_STORAGE_ACCOUNT" \
             --container-name "$AZURE_STORAGE_CONTAINER" \
-            --name "public/scripts/v${VERSION}/app.min.js" \
+            --name "$VERSIONED_BLOB" \
             --file "./dist/app.min.js" \
             --content-type "application/javascript" \
             --content-cache-control "public,max-age=31536000,immutable" \
