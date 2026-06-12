@@ -12,6 +12,7 @@ module.exports = {
   output: {
     filename: "app.min.js",
     path: path.resolve(__dirname, "dist"),
+    clean: true,
   },
   resolve: {
     alias: {
@@ -24,6 +25,9 @@ module.exports = {
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/, // Regex to ignore locales
       contextRegExp: /moment$/,
+    }),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
     }),
     new MiniCssExtractPlugin(),
   ],
@@ -43,6 +47,14 @@ module.exports = {
           "style-loader",
           "css-loader",
           "postcss-loader",
+        ],
+      },
+      {
+        test: /\.s[ac]ss$/,
+        use: [
+          "style-loader",
+          "css-loader",
+          "sass-loader",
         ],
       },
     ],

@@ -1,179 +1,73 @@
-import { FC, useState, useMemo, useCallback, useRef } from "react";
-import { useForm } from "react-hook-form";
+import {
+  CSSProperties,
+  FC,
+  useCallback,
+  useMemo,
+} from "react";
+import { Button, Dropdown } from "@carbon/react";
 import {
   useConnectAgent,
   useInputModeToggleAgent,
   useMuteAgent,
   useMultibandMicrophoneTrackVolume,
   useSelectInputDeviceAgent,
-  MultibandAudioVisualizerComponent,
   Channel,
   VoiceAgent,
 } from "@rapidaai/react";
-import { AnimatePresence, motion } from "framer-motion";
 import {
-  AudioLines,
-  Check,
-  ChevronDown,
-  Loader2,
-  MessageSquareText,
-  Mic,
-  MicOff,
-  Send,
-  StopCircle,
-} from "lucide-react";
+  AudioConsole,
+  Chat,
+  InProgress,
+  Microphone,
+  MicrophoneOff,
+  StopFilled,
+} from "@carbon/icons-react";
 
-/* ================================================================
-   Main input — mirrors UI's MessagingAction
-   Stable wrapper div so React reconciles children in-place.
-   ================================================================ */
-export const Input: FC<{
-  onSendMessage: (txt: string) => void;
+export const AudioControls: FC<{
   voiceAgent: VoiceAgent;
   voiceEnabled?: boolean;
-}> = ({ onSendMessage, voiceAgent, voiceEnabled = false }) => {
+}> = ({ voiceAgent, voiceEnabled = false }) => {
   const { channel } = useInputModeToggleAgent(voiceAgent);
 
+  if (!voiceEnabled) return null;
+
   return (
-    <div>
-      {voiceEnabled && channel === Channel.Audio ? (
+    <div
+      data-rounded="bottom"
+      data-stacked={channel === Channel.Audio ? true : undefined}
+      style={audioSlotStyle}
+    >
+      {channel === Channel.Audio ? (
         <AudioPanel voiceAgent={voiceAgent} />
       ) : (
-        <TextInput
-          onSendMessage={onSendMessage}
-          voiceAgent={voiceAgent}
-          voiceEnabled={voiceEnabled}
-        />
+        <StartVoiceButton voiceAgent={voiceAgent} />
       )}
     </div>
   );
 };
 
-/* ================================================================
-   Text input — mirrors UI's SimpleMessagingAction
-   ================================================================ */
-const TextInput: FC<{
-  onSendMessage: (txt: string) => void;
-  voiceAgent: VoiceAgent;
-  voiceEnabled: boolean;
-}> = ({ onSendMessage, voiceAgent, voiceEnabled }) => {
+const StartVoiceButton: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   const { handleVoiceToggle } = useInputModeToggleAgent(voiceAgent);
-  const { handleConnectAgent, handleDisconnectAgent, isConnected, isConnecting } =
+  const { handleConnectAgent, isConnected, isConnecting } =
     useConnectAgent(voiceAgent);
 
-  const [isFocused, setIsFocused] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { isValid },
-  } = useForm({ mode: "onChange" });
-
-  const onSubmitForm = (data: any) => {
-    if (isValid) {
-      onSendMessage(data.message);
-      reset();
-    }
-  };
-
-  const handleResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.target.style.height = "auto";
-    e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
-  };
-
   return (
-    <form
-      onSubmit={handleSubmit(onSubmitForm)}
-      className={`rpd-input ${isFocused ? "rpd-input--focused" : ""}`}
-      onClick={(e) => {
-        if ((e.target as HTMLElement).closest("button")) return;
-        textareaRef.current?.focus();
+    <Button
+      type="button"
+      kind="ghost"
+      size="md"
+      renderIcon={isConnecting ? InProgress : AudioConsole}
+      disabled={isConnecting}
+      onClick={async () => {
+        await handleVoiceToggle();
+        if (!isConnected) await handleConnectAgent();
       }}
     >
-      <textarea
-        aria-label="Type a message"
-        className="rpd-textarea"
-        placeholder="Type something..."
-        rows={1}
-        {...register("message", {
-          required: true,
-          onChange: handleResize,
-        })}
-        ref={(el) => {
-          register("message").ref(el);
-          textareaRef.current = el;
-        }}
-        onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            handleSubmit(onSubmitForm)(e);
-          }
-        }}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-      />
-
-      {/* Action buttons */}
-      <div className="rpd-input__actions">
-        {isValid ? (
-          <button
-            className="rpd-action-btn rpd-action-btn--primary"
-            type="submit"
-            aria-label="Send"
-          >
-            <Send width="14" height="14" />
-          </button>
-        ) : voiceEnabled ? (
-          <button
-            className="rpd-action-btn rpd-action-btn--primary"
-            type="button"
-            disabled={isConnecting}
-            aria-label={isConnecting ? "Connecting..." : "Voice"}
-            onClick={async () => {
-              await handleVoiceToggle();
-              !isConnected && (await handleConnectAgent());
-            }}
-          >
-            {isConnecting ? (
-              <Loader2 width="14" height="14" className="rpd-spin" />
-            ) : (
-              <AudioLines width="14" height="14" />
-            )}
-          </button>
-        ) : (
-          <button
-            className="rpd-action-btn rpd-action-btn--primary"
-            type="submit"
-            disabled
-            aria-label="Send"
-          >
-            <Send width="14" height="14" />
-          </button>
-        )}
-
-        {(isConnected || isConnecting) && (
-          <button
-            className="rpd-action-btn rpd-action-btn--danger"
-            type="button"
-            disabled={!isConnected && !isConnecting}
-            aria-label="Stop"
-            onClick={async () => {
-              await handleDisconnectAgent();
-            }}
-          >
-            <StopCircle width="14" height="14" />
-          </button>
-        )}
-      </div>
-    </form>
+      {isConnecting ? "Connecting" : "Voice"}
+    </Button>
   );
 };
 
-/* ================================================================
-   Audio panel — mirrors UI's AudioMessagingAction
-   ================================================================ */
 const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   const localMultibandVolume = useMultibandMicrophoneTrackVolume(
     voiceAgent,
@@ -188,15 +82,15 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
 
   const { devices, activeDeviceId, setActiveMediaDevice } =
     useSelectInputDeviceAgent({
-      voiceAgent: voiceAgent,
+      voiceAgent,
       requestPermissions: true,
     });
 
   const activeDeviceLabel = useMemo(() => {
-    const d = devices.find((d) => d.deviceId === activeDeviceId);
-    if (d) {
-      const l = d.label || "Unknown Device";
-      return l.length > 25 ? l.substring(0, 22) + "..." : l;
+    const device = devices.find((item) => item.deviceId === activeDeviceId);
+    if (device) {
+      const label = device.label || "Unknown Device";
+      return label.length > 25 ? `${label.substring(0, 22)}...` : label;
     }
     return "Select Microphone";
   }, [devices, activeDeviceId]);
@@ -216,156 +110,180 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   }, [isMuted, localMultibandVolume]);
 
   return (
-    <div className="rpd-audio">
-      <div className="rpd-audio__toolbar">
-        {/* Mute */}
-        <button
-          type="button"
-          disabled={!isConnected}
-          onClick={async () => {
-            await handleToggleMute();
-          }}
-          className={`rpd-audio__btn ${isMuted ? "rpd-audio__btn--muted" : ""}`}
-          aria-label={isMuted ? "Unmute" : "Mute"}
-        >
-          {isMuted ? (
-            <MicOff width="16" height="16" />
-          ) : (
-            <Mic width="16" height="16" />
-          )}
-        </button>
+    <div style={audioToolbarStyle}>
+      <Button
+        type="button"
+        kind={isMuted ? "danger--ghost" : "ghost"}
+        size="md"
+        hasIconOnly
+        disabled={!isConnected}
+        onClick={async () => {
+          await handleToggleMute();
+        }}
+        iconDescription={isMuted ? "Unmute" : "Mute"}
+        renderIcon={isMuted ? MicrophoneOff : Microphone}
+      />
 
-        {/* Visualizer + Device */}
-        <div className="rpd-audio__viz">
-          <MultibandAudioVisualizerComponent
-            state={isMuted ? "disconnected" : "listening"}
-            barWidth={4}
-            minBarHeight={3}
-            maxBarHeight={18}
-            barColor={isMuted ? "rpd-bar rpd-bar--muted" : "rpd-bar"}
-            frequencies={frequencies}
-            classNames="rpd-visualizer"
-          />
-          <DeviceSelectorFlyout
-            devices={devices}
-            activeDeviceId={activeDeviceId}
-            activeDeviceLabel={activeDeviceLabel}
-            onDeviceChange={handleDeviceChange}
-          />
-        </div>
-
-        {/* Switch to text */}
-        <button
-          type="button"
-          disabled={!isConnected}
-          onClick={async () => {
-            await handleTextToggle();
-          }}
-          className="rpd-audio__btn"
-          aria-label="Switch to text"
-        >
-          <MessageSquareText width="16" height="16" />
-        </button>
-
-        {/* Stop */}
-        <button
-          type="button"
-          disabled={!isConnected && !isConnecting}
-          onClick={async () => {
-            await handleDisconnectAgent();
-          }}
-          className="rpd-audio__btn rpd-audio__btn--stop"
-          aria-label="Stop"
-        >
-          {isConnecting ? (
-            <Loader2 width="16" height="16" className="rpd-spin" />
-          ) : (
-            <StopCircle width="16" height="16" />
-          )}
-        </button>
+      <div style={audioStatusStyle}>
+        <FrequencyBars frequencies={frequencies} isMuted={isMuted} />
+        <DeviceSelector
+          devices={devices}
+          activeDeviceId={activeDeviceId}
+          activeDeviceLabel={activeDeviceLabel}
+          onDeviceChange={handleDeviceChange}
+        />
       </div>
+
+      <Button
+        type="button"
+        kind="ghost"
+        size="md"
+        hasIconOnly
+        disabled={!isConnected}
+        onClick={async () => {
+          await handleTextToggle();
+        }}
+        iconDescription="Switch to text"
+        renderIcon={Chat}
+      />
+
+      <Button
+        type="button"
+        kind="danger"
+        size="md"
+        hasIconOnly
+        disabled={!isConnected && !isConnecting}
+        onClick={async () => {
+          await handleDisconnectAgent();
+        }}
+        iconDescription="Stop"
+        renderIcon={isConnecting ? InProgress : StopFilled}
+      />
     </div>
   );
 };
 
-/* ================================================================
-   Device selector flyout
-   ================================================================ */
-const DeviceSelectorFlyout: FC<{
+const DeviceSelector: FC<{
   devices: MediaDeviceInfo[];
   activeDeviceId: string;
   activeDeviceLabel: string;
   onDeviceChange: (id: string) => void;
 }> = ({ devices, activeDeviceId, activeDeviceLabel, onDeviceChange }) => {
-  const [open, setOpen] = useState(false);
+  const deviceOptions = useMemo(
+    () =>
+      devices.map((device, idx) => ({
+        id: device.deviceId,
+        label: device.label || `Microphone ${idx + 1}`,
+      })),
+    [devices],
+  );
+  const selectedDevice = useMemo(
+    () => deviceOptions.find((device) => device.id === activeDeviceId) ?? null,
+    [activeDeviceId, deviceOptions],
+  );
 
   return (
-    <div className="rpd-device">
-      <button
-        type="button"
-        className="rpd-device__trigger"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="rpd-device__label">{activeDeviceLabel}</span>
-        <ChevronDown
-          width="14"
-          height="14"
-          style={{
-            transition: "transform 0.15s",
-            transform: open ? "rotate(180deg)" : "rotate(0deg)",
-          }}
-        />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <>
-            <div
-              className="rpd-device__backdrop"
-              onClick={() => setOpen(false)}
-            />
-            <motion.div
-              className="rpd-device__flyout"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.15 }}
-            >
-              <div className="rpd-device__heading">Select Microphone</div>
-              <div className="rpd-device__list">
-                {devices.length === 0 && (
-                  <div className="rpd-device__empty">No microphones found</div>
-                )}
-                {devices.map((device, idx) => {
-                  const active = activeDeviceId === device.deviceId;
-                  return (
-                    <button
-                      key={device.deviceId || idx}
-                      type="button"
-                      className={`rpd-device__item ${active ? "rpd-device__item--active" : ""}`}
-                      onClick={() => {
-                        onDeviceChange(device.deviceId);
-                        setOpen(false);
-                      }}
-                    >
-                      <span
-                        style={{
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {device.label || `Microphone ${idx + 1}`}
-                      </span>
-                      {active && <Check width="14" height="14" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+    <div style={deviceSelectorStyle}>
+      <Dropdown
+        id="rapida-device-selector"
+        aria-label="Select Microphone"
+        titleText="Select Microphone"
+        hideLabel
+        label={activeDeviceLabel}
+        direction="top"
+        size="md"
+        items={deviceOptions}
+        selectedItem={selectedDevice}
+        itemToString={(item) => item?.label ?? ""}
+        onChange={({ selectedItem }) => {
+          if (selectedItem) void onDeviceChange(selectedItem.id);
+        }}
+      />
     </div>
   );
+};
+
+const FrequencyBars: FC<{
+  frequencies: Float32Array[] | number[][];
+  isMuted: boolean;
+}> = ({ frequencies, isMuted }) => {
+  const summedFrequencies = useMemo(
+    () =>
+      frequencies.map((bandFrequencies) => {
+        if (!bandFrequencies || bandFrequencies.length === 0) return 0;
+        const values = Array.from(bandFrequencies as ArrayLike<number>);
+        const sumSquares = values.reduce((acc, val) => acc + val * val, 0);
+        const rms = Math.sqrt(sumSquares / values.length);
+        return Math.min(1, Math.pow(rms, 0.7) * 1.2);
+      }),
+    [frequencies],
+  );
+
+  return (
+    <div style={frequencyBarsStyle} aria-hidden="true">
+      {summedFrequencies.map((frequency, index) => {
+        const height = 3 + Math.max(frequency, 0.05) * 15;
+        const scale = !isMuted && frequency > 0.3 ? 1 + frequency * 0.1 : 1;
+
+        return (
+          <span
+            key={`frequency-${index}`}
+            style={{
+              ...frequencyBarStyle,
+              height,
+              transform: `scaleY(${scale})`,
+              backgroundColor: isMuted
+                ? "var(--cds-support-error)"
+                : "var(--cds-icon-interactive)",
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+const audioSlotStyle: CSSProperties = {
+  borderTop: "1px solid var(--cds-border-subtle-01)",
+  background: "var(--cds-layer)",
+  padding: "0.5rem 1rem",
+};
+
+const audioToolbarStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.5rem",
+  minWidth: 0,
+};
+
+const audioStatusStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  display: "flex",
+  alignItems: "center",
+  gap: "0.75rem",
+};
+
+const deviceSelectorStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+};
+
+const frequencyBarsStyle: CSSProperties = {
+  width: "2.25rem",
+  height: "1.5rem",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "0.1875rem",
+  flexShrink: 0,
+};
+
+const frequencyBarStyle: CSSProperties = {
+  width: "0.25rem",
+  minHeight: "0.1875rem",
+  borderRadius: "999px",
+  transition:
+    "height 80ms ease-out, transform 80ms ease-out, background-color 200ms ease-out",
+  willChange: "height, transform",
 };
