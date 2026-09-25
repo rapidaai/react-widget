@@ -111,6 +111,8 @@ export const ChatComponent: FC<{
   const dockSide = layout === "docked-left" ? "left" : "right";
   const { channel } = useInputModeToggleAgent(voiceAgent);
   const { messages } = useAgentMessages(voiceAgent);
+  const isInputDisabled =
+    channel === Channel.Audio || Boolean(aiChatConfig.input?.isDisabled);
 
   const [customElementOpen, setCustomElementOpen] = useState(
     aiChatConfig.openChatByDefault ?? isCustomElement,
@@ -228,6 +230,10 @@ export const ChatComponent: FC<{
     [aiChatConfig],
   );
 
+  useEffect(() => {
+    chatInstanceRef.current?.updateInputIsDisabled(isInputDisabled);
+  }, [isInputDisabled, instanceReadyVersion]);
+
   const renderWriteableElements = useMemo<RenderWriteableElementResponse>(
     () => ({
       ...aiChatConfig.renderWriteableElements,
@@ -315,8 +321,7 @@ export const ChatComponent: FC<{
       },
       input: {
         ...aiChatConfig.input,
-        isDisabled:
-          channel === Channel.Audio || aiChatConfig.input?.isDisabled,
+        isDisabled: isInputDisabled,
       },
       messaging: {
         ...defaultProps.messaging,
@@ -329,7 +334,6 @@ export const ChatComponent: FC<{
     };
   }, [
     aiChatConfig,
-    channel,
     customSendMessage,
     displayName,
     dockSide,
@@ -345,6 +349,7 @@ export const ChatComponent: FC<{
     renderWriteableElements,
     showLauncher,
     themeMode,
+    isInputDisabled,
   ]);
 
   if (!isCustomElement) {
