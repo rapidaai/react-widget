@@ -154,7 +154,13 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
         hasIconOnly
         disabled={!isConnected && !isConnecting}
         onClick={async () => {
-          await handleDisconnectAgent();
+          try {
+            if (isConnected) {
+              await handleTextToggle();
+            }
+          } finally {
+            await handleDisconnectAgent();
+          }
         }}
         iconDescription="Stop"
         renderIcon={isConnecting ? InProgress : StopFilled}
