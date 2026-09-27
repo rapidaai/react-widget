@@ -9,8 +9,8 @@ import {
 } from "@rapidaai/react";
 import { useEnvironment } from "@/hooks/use-environment";
 
-export const App: FC<{}> = memo(() => {
-  const { assistantId, token, user, apiBase } = useEnvironment();
+export const App: FC = memo(() => {
+  const { assistantId, token, user, apiBase, theme } = useEnvironment();
   useEffect(() => {
     if (!assistantId) {
       console.error(
@@ -24,7 +24,7 @@ export const App: FC<{}> = memo(() => {
       );
       return;
     }
-  }, [assistantId]);
+  }, [assistantId, token]);
 
   const connectionConfig = useMemo(() => {
     if (token && apiBase)
@@ -49,9 +49,13 @@ export const App: FC<{}> = memo(() => {
       return new VoiceAgent(connectionConfig, agentConfig);
   }, [connectionConfig, agentConfig]);
 
+  if (!voiceAgent) return null;
+
   return (
-    <div className="pks_font-sans">
-      {voiceAgent && <WebPluginChat voiceAgent={voiceAgent} />}
-    </div>
+    <WebPluginChat
+      voiceAgent={voiceAgent}
+      config={window.chatbotConfig}
+      themeMode={theme.mode}
+    />
   );
 });

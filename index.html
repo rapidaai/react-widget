@@ -30,53 +30,30 @@
   <body>
     <script>
       window.chatbotConfig = {
-        
-        api_base: "http://localhost:8080",
-        assistant_id: "2318335886699266048",
-        token: "e4da0463dfddcca57c8f4432a64fb6540f3669513f26379d8f1ac9a791e1d11e",
-        // ---- Full-screen local demo ----
-        // The widget fills the page through #rapida-chat-app.
+        api_base: "https://voiceapi.helo.ai",
+        assistant_id: "2359355242199384064",
+        token:
+          "3f1f063304788c77a4932d93e968a350efa79582289d3a39123e143deaedb6e7",
+        user: {
+          user_id: "demo-user",
+          name: "Guest",
+        },
         layout: {
-          mode: "floating", // floating | docked-right | docked-left | inline
-          corners: "square",
-          showFrame: true,
+          mode: "floating",
+          position: "bottom-right",
         },
         launcher: {
           isOn: true,
         },
-
-        // ---- Usage 2: Docked to side ----
-        // Panel sticks to the side of the viewport and pushes page content.
-        // layout: { mode: "docked-right" },   // docked-right | docked-left
-
-        // ---- Usage 3: Inline ----
-        // Panel flows with page content, no fixed positioning.
-        // layout: { mode: "inline" },
-
-        name: "Assistant",
-        // logo_url:
-        //   "https://www.rapida.ai/images/logos/icon-07.svg",
+        name: "HeloAI Assistant",
+        logo_url:
+          "https://rapida-assets-01.s3.ap-south-1.amazonaws.com/cdn/rapidaLogo.png",
         theme: {
-          mode: "light", // light | dark
-          injectTheme: "g10",
-        },
-        aiEnabled: false,
-        header: {
-          title: "",
-          name: "",
-          showAiLabel: false,
-          hideDefaultAiLabelContent: true,
-          minimizeButtonIconType: "minimize",
-        },
-        history: {
-          isOn: false,
-        },
-        messaging: {
-          messageTimeoutSecs: 150,
-          messageLoadingIndicatorTimeoutSecs: 1,
+          mode: "dark", // light | dark
         },
       };
     </script>
-    <script defer src="https://cdn-01.rapida.ai/public/scripts/app.min.js?v=12"></script>
+    <script defer src="dist/app.min.js"></script>
+    <!-- <script defer src="https://cdn-01.rapida.ai/public/scripts/app.min.js?v=12"></script> -->
   </body>
 </html>
