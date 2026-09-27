@@ -1,9 +1,4 @@
-import {
-  CSSProperties,
-  FC,
-  useCallback,
-  useMemo,
-} from "react";
+import { CSSProperties, FC, useCallback, useMemo } from "react";
 import { Button, Dropdown } from "@carbon/react";
 import {
   useConnectAgent,
@@ -26,7 +21,8 @@ import {
 export const AudioControls: FC<{
   voiceAgent: VoiceAgent;
   voiceEnabled?: boolean;
-}> = ({ voiceAgent, voiceEnabled = false }) => {
+  transcript?: string;
+}> = ({ voiceAgent, voiceEnabled = false, transcript = "" }) => {
   const { channel } = useInputModeToggleAgent(voiceAgent);
 
   if (!voiceEnabled) return null;
@@ -38,7 +34,7 @@ export const AudioControls: FC<{
       style={audioSlotStyle}
     >
       {channel === Channel.Audio ? (
-        <AudioPanel voiceAgent={voiceAgent} />
+        <AudioPanel voiceAgent={voiceAgent} transcript={transcript} />
       ) : (
         <StartVoiceButton voiceAgent={voiceAgent} />
       )}
@@ -48,8 +44,7 @@ export const AudioControls: FC<{
 
 const StartVoiceButton: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   const { handleVoiceToggle } = useInputModeToggleAgent(voiceAgent);
-  const { handleConnectAgent, isConnected, isConnecting } =
-    useConnectAgent(voiceAgent);
+  const { handleConnectAgent, isConnected, isConnecting } = useConnectAgent(voiceAgent);
 
   return (
     <Button
@@ -68,23 +63,19 @@ const StartVoiceButton: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   );
 };
 
-const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
-  const localMultibandVolume = useMultibandMicrophoneTrackVolume(
-    voiceAgent,
-    5,
-    0.05,
-    0.85,
-  );
-  const { isConnected, isConnecting, handleDisconnectAgent } =
-    useConnectAgent(voiceAgent);
+const AudioPanel: FC<{ voiceAgent: VoiceAgent; transcript?: string }> = ({
+  voiceAgent,
+  transcript = "",
+}) => {
+  const localMultibandVolume = useMultibandMicrophoneTrackVolume(voiceAgent, 5, 0.05, 0.85);
+  const { isConnected, isConnecting, handleDisconnectAgent } = useConnectAgent(voiceAgent);
   const { handleTextToggle } = useInputModeToggleAgent(voiceAgent);
   const { isMuted, handleToggleMute } = useMuteAgent(voiceAgent);
 
-  const { devices, activeDeviceId, setActiveMediaDevice } =
-    useSelectInputDeviceAgent({
-      voiceAgent,
-      requestPermissions: true,
-    });
+  const { devices, activeDeviceId, setActiveMediaDevice } = useSelectInputDeviceAgent({
+    voiceAgent,
+    requestPermissions: true,
+  });
 
   const activeDeviceLabel = useMemo(() => {
     const device = devices.find((item) => item.deviceId === activeDeviceId);
@@ -110,61 +101,70 @@ const AudioPanel: FC<{ voiceAgent: VoiceAgent }> = ({ voiceAgent }) => {
   }, [isMuted, localMultibandVolume]);
 
   return (
-    <div style={audioToolbarStyle}>
-      <Button
-        type="button"
-        kind={isMuted ? "danger--ghost" : "ghost"}
-        size="md"
-        hasIconOnly
-        disabled={!isConnected}
-        onClick={async () => {
-          await handleToggleMute();
-        }}
-        iconDescription={isMuted ? "Unmute" : "Mute"}
-        renderIcon={isMuted ? MicrophoneOff : Microphone}
-      />
+    <div style={audioPanelStyle}>
+      {transcript && (
+        <div style={voiceTranscriptStyle}>
+          <span style={voiceTranscriptLabelStyle}>You said</span>
+          <span style={voiceTranscriptTextStyle}>{transcript}</span>
+        </div>
+      )}
 
-      <div style={audioStatusStyle}>
-        <FrequencyBars frequencies={frequencies} isMuted={isMuted} />
-        <DeviceSelector
-          devices={devices}
-          activeDeviceId={activeDeviceId}
-          activeDeviceLabel={activeDeviceLabel}
-          onDeviceChange={handleDeviceChange}
+      <div style={audioToolbarStyle}>
+        <Button
+          type="button"
+          kind={isMuted ? "danger--ghost" : "ghost"}
+          size="md"
+          hasIconOnly
+          disabled={!isConnected}
+          onClick={async () => {
+            await handleToggleMute();
+          }}
+          iconDescription={isMuted ? "Unmute" : "Mute"}
+          renderIcon={isMuted ? MicrophoneOff : Microphone}
+        />
+
+        <div style={audioStatusStyle}>
+          <FrequencyBars frequencies={frequencies} isMuted={isMuted} />
+          <DeviceSelector
+            devices={devices}
+            activeDeviceId={activeDeviceId}
+            activeDeviceLabel={activeDeviceLabel}
+            onDeviceChange={handleDeviceChange}
+          />
+        </div>
+
+        <Button
+          type="button"
+          kind="ghost"
+          size="md"
+          hasIconOnly
+          disabled={!isConnected}
+          onClick={async () => {
+            await handleTextToggle();
+          }}
+          iconDescription="Switch to text"
+          renderIcon={Chat}
+        />
+
+        <Button
+          type="button"
+          kind="danger"
+          size="md"
+          hasIconOnly
+          disabled={!isConnected && !isConnecting}
+          onClick={async () => {
+            try {
+              if (isConnected) {
+                await handleTextToggle();
+              }
+            } finally {
+              await handleDisconnectAgent();
+            }
+          }}
+          iconDescription="Stop"
+          renderIcon={isConnecting ? InProgress : StopFilled}
         />
       </div>
-
-      <Button
-        type="button"
-        kind="ghost"
-        size="md"
-        hasIconOnly
-        disabled={!isConnected}
-        onClick={async () => {
-          await handleTextToggle();
-        }}
-        iconDescription="Switch to text"
-        renderIcon={Chat}
-      />
-
-      <Button
-        type="button"
-        kind="danger"
-        size="md"
-        hasIconOnly
-        disabled={!isConnected && !isConnecting}
-        onClick={async () => {
-          try {
-            if (isConnected) {
-              await handleTextToggle();
-            }
-          } finally {
-            await handleDisconnectAgent();
-          }
-        }}
-        iconDescription="Stop"
-        renderIcon={isConnecting ? InProgress : StopFilled}
-      />
     </div>
   );
 };
@@ -238,9 +238,7 @@ const FrequencyBars: FC<{
               ...frequencyBarStyle,
               height,
               transform: `scaleY(${scale})`,
-              backgroundColor: isMuted
-                ? "var(--cds-support-error)"
-                : "var(--cds-icon-interactive)",
+              backgroundColor: isMuted ? "var(--cds-support-error)" : "var(--cds-icon-interactive)",
             }}
           />
         );
@@ -253,6 +251,35 @@ const audioSlotStyle: CSSProperties = {
   borderTop: "1px solid var(--cds-border-subtle-01)",
   background: "var(--cds-layer)",
   padding: "0.5rem 1rem",
+};
+
+const audioPanelStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.5rem",
+};
+
+const voiceTranscriptStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "baseline",
+  gap: "0.5rem",
+  minWidth: 0,
+  color: "var(--cds-text-primary)",
+  fontSize: "0.8125rem",
+  lineHeight: 1.35,
+};
+
+const voiceTranscriptLabelStyle: CSSProperties = {
+  flexShrink: 0,
+  color: "var(--cds-text-secondary)",
+  fontWeight: 600,
+};
+
+const voiceTranscriptTextStyle: CSSProperties = {
+  minWidth: 0,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 };
 
 const audioToolbarStyle: CSSProperties = {
@@ -289,7 +316,6 @@ const frequencyBarStyle: CSSProperties = {
   width: "0.25rem",
   minHeight: "0.1875rem",
   borderRadius: "999px",
-  transition:
-    "height 80ms ease-out, transform 80ms ease-out, background-color 200ms ease-out",
+  transition: "height 80ms ease-out, transform 80ms ease-out, background-color 200ms ease-out",
   willChange: "height, transform",
 };

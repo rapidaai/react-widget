@@ -2,16 +2,25 @@
     "name": "@rapidaai/web-widget",
     "version": "1.2.0",
     "description": "Rapida AI chat widget — embeddable voice + text AI agent",
-    "main": "dist/app.min.js",
-    "files": [
-        "dist/app.min.js"
-    ],
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "https://github.com/rapidaai/voice-ai.git",
         "directory": "sdks/react-widget"
     },
-    "license": "MIT",
+    "files": [
+        "dist/app.min.js"
+    ],
+    "main": "dist/app.min.js",
+    "scripts": {
+        "build": "webpack",
+        "build-dev": "webpack --mode development",
+        "start": "webpack --mode development --watch",
+        "prestart": "tsc",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage"
+    },
     "dependencies": {
         "@carbon/ai-chat": "^1.14.0",
         "@carbon/icons-react": "^11.82.0",
@@ -76,13 +85,5 @@
         "webpack": "^5.93.0",
         "webpack-bundle-analyzer": "^4.10.2",
         "webpack-cli": "^5.1.4"
-    },
-    "scripts": {
-        "build": "webpack",
-        "start": "webpack --mode development --watch",
-        "prestart": "tsc",
-        "test": "jest",
-        "test:watch": "jest --watch",
-        "test:coverage": "jest --coverage"
     }
 }

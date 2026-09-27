@@ -1,0 +1,18 @@
+{
+    "semi": true,
+    "trailingComma": "all",
+    "singleQuote": false,
+    "jsxSingleQuote": false,
+    "useTabs": false,
+    "tabWidth": 2,
+    "sortPackageJson": false,
+    "ignorePatterns": [],
+    "overrides": [
+        {
+            "files": ["*.json", ".prettierrc"],
+            "options": {
+                "tabWidth": 4
+            }
+        }
+    ]
+}

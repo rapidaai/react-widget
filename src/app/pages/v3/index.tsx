@@ -1,6 +1,8 @@
 import {
   AssistantWebpluginDeployment,
   Channel,
+  MessageRole,
+  MessageStatus,
   useAgentMessages,
   useInputModeToggleAgent,
   VoiceAgent,
@@ -14,6 +16,8 @@ import {
   ChatInstance,
   CornersType,
   LayoutCustomProperties,
+  MessageInputType,
+  MessageRequest,
   MessageResponse,
   MessageResponseTypes,
   MinimizeButtonIconType,
@@ -21,15 +25,7 @@ import {
   PublicConfigMessaging,
   RenderWriteableElementResponse,
 } from "@carbon/ai-chat";
-import {
-  CSSProperties,
-  FC,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { CSSProperties, FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AudioControls } from "@/app/pages/v3/input";
 import { useEnvironment } from "@/hooks/use-environment";
 
@@ -39,6 +35,7 @@ const FLOATING_PANEL_HEIGHT = "min(85dvh, calc(100dvh - 96px))";
 const SHELL_OFFSET = "1rem";
 const SHELL_Z_INDEX = 9999;
 const AI_CHAT_INPUT_STYLE_ID = "rapida-chat-input-style";
+const VOICE_TRANSCRIPT_CONTEXT_KEY = "__rapidaVoiceTranscript";
 const AI_CHAT_INPUT_STYLE = `
   .cds-aichat--input-container {
     border-radius: 0 !important;
@@ -55,6 +52,11 @@ type PendingResponse = {
   resolve: () => void;
   abortHandler: () => void;
   signal: AbortSignal;
+};
+
+type RenderedAssistantMessage = {
+  carbonId: string;
+  signature: string;
 };
 
 type WidgetLayoutMode = "floating" | "docked-right" | "docked-left" | "inline";
@@ -90,11 +92,7 @@ export const ChatComponent: FC<{
     theme: themeSettings,
     ...aiChatConfig
   } = config ?? {};
-  const {
-    mode: configThemeMode,
-    color: _configThemeColor,
-    injectTheme,
-  } = themeSettings ?? {};
+  const { mode: configThemeMode, color: _configThemeColor, injectTheme } = themeSettings ?? {};
   const {
     mode: layout,
     position,
@@ -103,23 +101,37 @@ export const ChatComponent: FC<{
   } = resolveLayoutSettings(layoutSettings, legacyPosition, legacyShowLauncher);
   const themeMode = theme?.mode || configThemeMode || "light";
   const displayName = name || deployment.getName() || "Assistant";
-  const voiceEnabled =
-    !!deployment.getInputaudio() && !!deployment.getOutputaudio();
+  const voiceEnabled = !!deployment.getInputaudio() && !!deployment.getOutputaudio();
 
   const isDocked = layout === "docked-right" || layout === "docked-left";
   const isCustomElement = isDocked || layout === "inline";
   const dockSide = layout === "docked-left" ? "left" : "right";
   const { channel } = useInputModeToggleAgent(voiceAgent);
   const { messages } = useAgentMessages(voiceAgent);
-  const isInputDisabled =
-    channel === Channel.Audio || Boolean(aiChatConfig.input?.isDisabled);
+  const isInputDisabled = channel === Channel.Audio || Boolean(aiChatConfig.input?.isDisabled);
+  const voiceTranscript = useMemo(() => {
+    if (channel !== Channel.Audio) return "";
+
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      if (message.role !== MessageRole.User) continue;
+      if (message.status === MessageStatus.Complete) continue;
+
+      const text = message.messages.join(" ").trim();
+      if (text) return text;
+    }
+
+    return "";
+  }, [channel, messages]);
 
   const [customElementOpen, setCustomElementOpen] = useState(
     aiChatConfig.openChatByDefault ?? isCustomElement,
   );
   const [instanceReadyVersion, setInstanceReadyVersion] = useState(0);
   const chatInstanceRef = useRef<ChatInstance | null>(null);
-  const seenRapidaMessageIds = useRef<Set<string>>(new Set());
+  const renderedAssistantMessages = useRef<Map<string, RenderedAssistantMessage>>(new Map());
+  const voiceUserTranscriptIds = useRef<Set<string>>(new Set());
+  const insertedVoiceTranscriptIds = useRef<Set<string>>(new Set());
   const pendingResponses = useRef<PendingResponse[]>([]);
 
   useEffect(() => {
@@ -135,48 +147,135 @@ export const ChatComponent: FC<{
     };
   }, [isDocked, dockSide, customElementOpen]);
 
-  const addMessageToChat = useCallback(
-    async (message: MessageResponse) => {
-      await chatInstanceRef.current?.messaging.addMessage(message);
-      const pending = pendingResponses.current.shift();
-      if (pending) {
-        pending.signal.removeEventListener("abort", pending.abortHandler);
-        pending.resolve();
+  const addMessageToChat = useCallback(async (message: MessageResponse) => {
+    await chatInstanceRef.current?.messaging.addMessage(message);
+    const pending = pendingResponses.current.shift();
+    if (pending) {
+      pending.signal.removeEventListener("abort", pending.abortHandler);
+      pending.resolve();
+    }
+  }, []);
+
+  const addUserTranscriptToChat = useCallback(
+    async (message: MessageRequest) => {
+      const instance = chatInstanceRef.current;
+      if (!instance) return;
+
+      instance.updateInputIsDisabled(false);
+      try {
+        await instance.send(message);
+      } finally {
+        instance.updateIsMessageLoadingCounter("reset");
+        instance.updateInputIsDisabled(isInputDisabled);
       }
     },
-    [],
+    [isInputDisabled],
   );
 
   useEffect(() => {
     const instance = chatInstanceRef.current;
     if (!instance) return;
 
-    messages.forEach((message) => {
-      if (
-        message.role === "user" ||
-        seenRapidaMessageIds.current.has(message.id)
-      ) {
+    void syncMessages();
+
+    async function syncMessages() {
+      for (const message of messages) {
+        const messageKey = getMessageKey(message);
+
+        if (message.role === MessageRole.User) {
+          if (channel === Channel.Audio) {
+            voiceUserTranscriptIds.current.add(getTranscriptKey(message));
+          }
+          await addCompletedUserTranscript(message);
+          continue;
+        }
+
+        const matchingUserMessage = messages.find(
+          (item) => item.role === MessageRole.User && item.id === message.id,
+        );
+        if (matchingUserMessage && channel === Channel.Audio) {
+          voiceUserTranscriptIds.current.add(getTranscriptKey(matchingUserMessage));
+        }
+        if (
+          matchingUserMessage &&
+          !insertedVoiceTranscriptIds.current.has(getTranscriptKey(matchingUserMessage))
+        ) {
+          if (matchingUserMessage.status !== MessageStatus.Complete) {
+            continue;
+          }
+
+          await addCompletedUserTranscript(matchingUserMessage);
+        }
+
+        const assistantTurnKey = `${message.role}:${message.id}`;
+        const renderedAssistantMessage = renderedAssistantMessages.current.get(assistantTurnKey);
+        const messageSignature = getMessageSignature(message);
+        if (renderedAssistantMessage?.signature === messageSignature) {
+          continue;
+        }
+
+        const carbonId = renderedAssistantMessage?.carbonId ?? `rapida:${assistantTurnKey}`;
+        renderedAssistantMessages.current.set(assistantTurnKey, {
+          carbonId,
+          signature: messageSignature,
+        });
+        await addMessageToChat({
+          id: carbonId,
+          output: {
+            generic: message.messages.map((text) => ({
+              response_type: MessageResponseTypes.TEXT,
+              text,
+            })),
+          },
+        });
+      }
+    }
+
+    async function addCompletedUserTranscript(message: (typeof messages)[number]) {
+      const text = message.messages.join(" ").trim();
+      if (!text || message.status !== MessageStatus.Complete) {
         return;
       }
 
-      seenRapidaMessageIds.current.add(message.id);
-      void addMessageToChat({
-        id: message.id,
-        output: {
-          generic: message.messages.map((text) => ({
-            response_type: MessageResponseTypes.TEXT,
-            text,
-          })),
-        },
-      });
-    });
-  }, [messages, addMessageToChat, instanceReadyVersion]);
+      const transcriptKey = getTranscriptKey(message);
+      if (!voiceUserTranscriptIds.current.has(transcriptKey)) {
+        return;
+      }
 
-  const customSendMessage = useCallback<
-    NonNullable<PublicConfigMessaging["customSendMessage"]>
-  >(
+      if (insertedVoiceTranscriptIds.current.has(transcriptKey)) {
+        return;
+      }
+
+      insertedVoiceTranscriptIds.current.add(transcriptKey);
+      await addUserTranscriptToChat({
+        id: `rapida:${transcriptKey}`,
+        input: {
+          message_type: MessageInputType.TEXT,
+          text,
+        },
+        context: {
+          [VOICE_TRANSCRIPT_CONTEXT_KEY]: true,
+        },
+        history: {
+          label: text,
+        },
+        thread_id: "main",
+      });
+    }
+  }, [channel, messages, addMessageToChat, addUserTranscriptToChat, instanceReadyVersion]);
+
+  const customSendMessage = useCallback<NonNullable<PublicConfigMessaging["customSendMessage"]>>(
     async (request, requestOptions, instance) => {
       chatInstanceRef.current = instance;
+      if (
+        request.context &&
+        typeof request.context === "object" &&
+        VOICE_TRANSCRIPT_CONTEXT_KEY in request.context
+      ) {
+        instance.updateIsMessageLoadingCounter("reset");
+        return;
+      }
+
       const text = request.input.text?.trim() ?? "";
 
       if (!text) {
@@ -240,11 +339,15 @@ export const ChatComponent: FC<{
       afterInputElement: (
         <>
           {aiChatConfig.renderWriteableElements?.afterInputElement}
-          <AudioControls voiceAgent={voiceAgent} voiceEnabled={voiceEnabled} />
+          <AudioControls
+            voiceAgent={voiceAgent}
+            voiceEnabled={voiceEnabled}
+            transcript={voiceTranscript}
+          />
         </>
       ),
     }),
-    [aiChatConfig.renderWriteableElements, voiceAgent, voiceEnabled],
+    [aiChatConfig.renderWriteableElements, voiceAgent, voiceEnabled, voiceTranscript],
   );
 
   const chatProps = useMemo<ChatContainerProps>(() => {
@@ -291,9 +394,7 @@ export const ChatComponent: FC<{
       },
     };
     const resolvedInjectTheme =
-      injectTheme ??
-      aiChatConfig.injectCarbonTheme ??
-      defaultProps.injectCarbonTheme;
+      injectTheme ?? aiChatConfig.injectCarbonTheme ?? defaultProps.injectCarbonTheme;
 
     return {
       ...defaultProps,
@@ -358,19 +459,12 @@ export const ChatComponent: FC<{
 
   return (
     <div style={getCustomElementShellStyle(layout, dockSide, customElementOpen)}>
-      <ChatCustomElement
-        {...chatProps}
-        className="rapida-theme-chat"
-        style={customElementStyle}
-      />
+      <ChatCustomElement {...chatProps} className="rapida-theme-chat" style={customElementStyle} />
     </div>
   );
 };
 
-async function addWelcomeMessage(
-  instance: ChatInstance,
-  deployment: AssistantWebpluginDeployment,
-) {
+async function addWelcomeMessage(instance: ChatInstance, deployment: AssistantWebpluginDeployment) {
   const generic: MessageResponse["output"]["generic"] = [];
   const greeting = deployment.getGreeting();
   const suggestions = deployment.getSuggestionList();
@@ -417,6 +511,18 @@ function applyAiChatInputStyle() {
   });
 }
 
+function getTranscriptKey(message: { role: MessageRole; id: string; time: Date }) {
+  return `${message.role}:${message.id}:${message.time.getTime()}`;
+}
+
+function getMessageKey(message: { role: MessageRole; id: string; time: Date }) {
+  return `${message.role}:${message.id}:${message.time.getTime()}`;
+}
+
+function getMessageSignature(message: { messages: string[] }) {
+  return message.messages.join("\u0000");
+}
+
 function resolveLayoutSettings(
   settings: LayoutSettings,
   legacyPosition?: WidgetPosition,
@@ -440,12 +546,7 @@ function resolveLayoutSettings(
     };
   }
 
-  const {
-    mode = "floating",
-    position: layoutPosition,
-    showLauncher,
-    ...aiChatLayout
-  } = settings;
+  const { mode = "floating", position: layoutPosition, showLauncher, ...aiChatLayout } = settings;
 
   return {
     mode,
@@ -465,20 +566,13 @@ function getThemeLayoutProperties(
     [LayoutCustomProperties.width]: FLOATING_PANEL_WIDTH,
     [LayoutCustomProperties.height]: FLOATING_PANEL_HEIGHT,
     [LayoutCustomProperties.max_height]: FLOATING_PANEL_HEIGHT,
-    [LayoutCustomProperties.bottom_position]: position.startsWith("bottom")
+    [LayoutCustomProperties.bottom_position]: position.startsWith("bottom") ? SHELL_OFFSET : "auto",
+    [LayoutCustomProperties.top_position]: position.startsWith("top") ? SHELL_OFFSET : "auto",
+    [LayoutCustomProperties.right_position]: position.endsWith("right") ? SHELL_OFFSET : "auto",
+    [LayoutCustomProperties.left_position]: position.endsWith("left") ? SHELL_OFFSET : "auto",
+    [LayoutCustomProperties.launcher_position_bottom]: position.startsWith("bottom")
       ? SHELL_OFFSET
       : "auto",
-    [LayoutCustomProperties.top_position]: position.startsWith("top")
-      ? SHELL_OFFSET
-      : "auto",
-    [LayoutCustomProperties.right_position]: position.endsWith("right")
-      ? SHELL_OFFSET
-      : "auto",
-    [LayoutCustomProperties.left_position]: position.endsWith("left")
-      ? SHELL_OFFSET
-      : "auto",
-    [LayoutCustomProperties.launcher_position_bottom]:
-      position.startsWith("bottom") ? SHELL_OFFSET : "auto",
     [LayoutCustomProperties.launcher_position_right]: position.endsWith("right")
       ? SHELL_OFFSET
       : "auto",
