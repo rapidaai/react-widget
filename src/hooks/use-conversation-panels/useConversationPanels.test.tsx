@@ -24,8 +24,16 @@ describe("useConversationPanels", () => {
     } as any;
     const onBeforeRestart = jest.fn().mockResolvedValue(undefined);
     const onAfterRestart = jest.fn().mockResolvedValue(undefined);
+    const onOpenHistory = jest.fn().mockResolvedValue(undefined);
+    const onSelectConversation = jest.fn().mockResolvedValue(undefined);
     const hook = renderHook(() =>
-      useConversationPanels({ chatInstance, onBeforeRestart, onAfterRestart }),
+      useConversationPanels({
+        chatInstance,
+        onBeforeRestart,
+        onAfterRestart,
+        onOpenHistory,
+        onSelectConversation,
+      }),
     );
 
     return {
@@ -36,6 +44,8 @@ describe("useConversationPanels", () => {
       restartConversation,
       onBeforeRestart,
       onAfterRestart,
+      onOpenHistory,
+      onSelectConversation,
     };
   }
 
@@ -78,14 +88,31 @@ describe("useConversationPanels", () => {
   });
 
   it("opens history and routes new conversation through confirmation", async () => {
-    const { result, historyPanel, restartPanel } = setup();
+    const { result, historyPanel, restartPanel, onOpenHistory } = setup();
 
     await act(() => result.current.openHistoryPanel());
     expect(historyPanel.open).toHaveBeenCalled();
+    expect(onOpenHistory).toHaveBeenCalled();
 
     await act(() => result.current.startConversationFromHistory());
     expect(historyPanel.close).toHaveBeenCalled();
     expect(restartPanel.open).toHaveBeenCalled();
+  });
+
+  it("stops voice and restores a selected conversation", async () => {
+    const {
+      result,
+      historyPanel,
+      onBeforeRestart,
+      onSelectConversation,
+    } = setup();
+    const entry = { id: "42", title: "Past conversation" };
+
+    await act(() => result.current.selectConversation(entry));
+
+    expect(onBeforeRestart).toHaveBeenCalled();
+    expect(onSelectConversation).toHaveBeenCalledWith(entry);
+    expect(historyPanel.close).toHaveBeenCalled();
   });
 
   it("tracks Carbon-driven panel closure and removes the listener", async () => {

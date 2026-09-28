@@ -8,6 +8,7 @@ import {
 import {
   BusEventViewChange,
   ChatInstance,
+  HistoryItem,
 } from "@carbon/ai-chat";
 import { applyCarbonInputStyles } from "@/adapters/carbon";
 import { AudioControls } from "@/components/audio";
@@ -20,13 +21,13 @@ import { useAgentError } from "@/hooks/use-agent-error";
 import { useCarbonInputHasText } from "@/hooks/use-carbon-input";
 import { useChatProps } from "@/hooks/use-chat-props";
 import { useConversationPanels } from "@/hooks/use-conversation-panels";
+import type { ConversationHistoryState } from "@/hooks/use-conversation-history";
 import { useMessageSync } from "@/hooks/use-message-sync";
 import { useVoiceTranscript } from "@/hooks/use-voice-transcript";
 import {
   getCustomElementShellStyle,
   resolveLayoutSettings,
 } from "@/lib/layout";
-import { getConversationHistoryEntries } from "@/lib/conversation-history";
 import type { ChatbotConfig } from "@/types";
 import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
@@ -37,8 +38,10 @@ export interface UseChatControllerOptions {
   voiceAgent: VoiceAgent;
   config?: ChatbotConfig;
   environmentThemeMode?: "light" | "dark" | "system";
-  conversationHistory?: ConversationHistoryEntry[];
-  onRestartConversation?: (entry?: ConversationHistoryEntry) => unknown;
+  conversationHistory?: ConversationHistoryState;
+  initialHistory?: HistoryItem[];
+  onRestartConversation?: () => unknown;
+  onSelectConversation?: (entry: ConversationHistoryEntry) => Promise<void>;
 }
 
 export function useChatController({
@@ -46,8 +49,10 @@ export function useChatController({
   voiceAgent,
   config,
   environmentThemeMode,
-  conversationHistory = [],
+  conversationHistory,
+  initialHistory = [],
   onRestartConversation,
+  onSelectConversation,
 }: UseChatControllerOptions) {
   const {
     assistant_id: _assistantId,
@@ -91,23 +96,11 @@ export function useChatController({
       channel,
       messages,
       inputDisabled: isInputDisabled,
+      initialHistory,
     });
   const agentError = useAgentError(voiceAgent);
   const ownsCatastrophicPanel = useRef(false);
   const hasText = useCarbonInputHasText(chatInstance);
-  const currentConversationEntry = useMemo(
-    () => getConversationHistoryEntries(messages),
-    [messages],
-  )[0];
-  const historyEntries = useMemo(
-    () => [
-      ...(currentConversationEntry ? [currentConversationEntry] : []),
-      ...conversationHistory.filter(
-        ({ id }) => id !== currentConversationEntry?.id,
-      ),
-    ],
-    [conversationHistory, currentConversationEntry],
-  );
   const stopVoiceBeforeRestart = useCallback(async () => {
     if (audioControls.isConnected || audioControls.isConnecting) {
       await audioControls.stopVoice();
@@ -116,7 +109,9 @@ export function useChatController({
   const conversationPanels = useConversationPanels({
     chatInstance,
     onBeforeRestart: stopVoiceBeforeRestart,
-    onAfterRestart: () => onRestartConversation?.(currentConversationEntry),
+    onAfterRestart: onRestartConversation,
+    onOpenHistory: conversationHistory?.refresh,
+    onSelectConversation,
   });
 
   useEffect(() => {
@@ -212,12 +207,22 @@ export function useChatController({
   const historyPanelElement = useMemo(
     () => (
       <ConversationHistoryPanel
-        entries={historyEntries}
+        entries={conversationHistory?.entries ?? []}
+        isLoading={conversationHistory?.isLoading ?? false}
+        isLoadingMore={conversationHistory?.isLoadingMore ?? false}
+        restoringConversationId={
+          conversationHistory?.restoringConversationId ?? null
+        }
+        hasMore={conversationHistory?.hasMore ?? false}
+        error={conversationHistory?.error ?? null}
         onClose={conversationPanels.closeHistoryPanel}
         onNewConversation={conversationPanels.startConversationFromHistory}
+        onSearch={conversationHistory?.search}
+        onLoadMore={conversationHistory?.loadMore}
+        onSelectConversation={conversationPanels.selectConversation}
       />
     ),
-    [conversationPanels, historyEntries],
+    [conversationHistory, conversationPanels],
   );
 
   const chatProps = useChatProps({

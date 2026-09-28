@@ -9,6 +9,7 @@ import {
 } from "@rapidaai/react";
 import {
   ChatInstance,
+  HistoryItem,
   PublicConfigMessaging,
 } from "@carbon/ai-chat";
 import {
@@ -32,6 +33,7 @@ export interface UseMessageSyncOptions {
   channel: Channel;
   messages: Message[];
   inputDisabled: boolean;
+  initialHistory?: HistoryItem[];
 }
 
 export function useMessageSync({
@@ -40,6 +42,7 @@ export function useMessageSync({
   channel,
   messages,
   inputDisabled,
+  initialHistory = [],
 }: UseMessageSyncOptions) {
   const [chatInstance, setChatInstance] = useState<ChatInstance | null>(null);
   const renderedAssistantMessages = useRef<Map<string, RenderedAssistantMessage>>(
@@ -53,6 +56,7 @@ export function useMessageSync({
   const pendingResponses = useRef<PendingResponse[]>([]);
   const messageSyncQueue = useRef<Promise<void>>(Promise.resolve());
   const previousChannel = useRef(channel);
+  const insertedHistory = useRef<HistoryItem[] | null>(null);
 
   const registerChatInstance = useCallback((instance: ChatInstance) => {
     setChatInstance(instance);
@@ -153,6 +157,22 @@ export function useMessageSync({
       });
   }, [channel, messages, chatInstance, addUserTranscript, syncAssistantMessage]);
 
+  useEffect(() => {
+    if (
+      !chatInstance ||
+      initialHistory.length === 0 ||
+      insertedHistory.current === initialHistory
+    ) {
+      return;
+    }
+
+    insertedHistory.current = initialHistory;
+    void chatInstance.messaging.insertHistory(initialHistory).catch((error) => {
+      insertedHistory.current = null;
+      console.error("Unable to restore conversation history", error);
+    });
+  }, [chatInstance, initialHistory]);
+
   const customSendMessage = useCallback<
     NonNullable<PublicConfigMessaging["customSendMessage"]>
   >(
@@ -165,6 +185,7 @@ export function useMessageSync({
 
       const text = request.input.text?.trim() ?? "";
       if (!text) {
+        if (initialHistory.length > 0) return;
         const welcome = createWelcomeMessage(
           deployment.getGreeting(),
           deployment.getSuggestionList(),
@@ -194,7 +215,7 @@ export function useMessageSync({
         requestOptions.signal.addEventListener("abort", abortHandler, { once: true });
       });
     },
-    [deployment, voiceAgent, registerChatInstance],
+    [deployment, initialHistory.length, voiceAgent, registerChatInstance],
   );
 
   useEffect(() => {

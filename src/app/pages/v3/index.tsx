@@ -4,7 +4,9 @@ import {
   VoiceAgent,
 } from "@rapidaai/react";
 import { ChatContainer, ChatCustomElement } from "@carbon/ai-chat";
+import type { HistoryItem } from "@carbon/ai-chat";
 import { useChatController } from "@/hooks/use-chat-controller";
+import type { ConversationHistoryState } from "@/hooks/use-conversation-history";
 import type { ChatbotConfig } from "@/types";
 import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
@@ -13,8 +15,10 @@ export interface ChatComponentProps {
   voiceAgent: VoiceAgent;
   config?: ChatbotConfig;
   themeMode?: "light" | "dark" | "system";
-  conversationHistory?: ConversationHistoryEntry[];
-  onRestartConversation?: (entry?: ConversationHistoryEntry) => unknown;
+  conversationHistory?: ConversationHistoryState;
+  initialHistory?: HistoryItem[];
+  onRestartConversation?: () => unknown;
+  onSelectConversation?: (entry: ConversationHistoryEntry) => Promise<void>;
 }
 
 export const ChatComponent: FC<ChatComponentProps> = ({
@@ -23,7 +27,9 @@ export const ChatComponent: FC<ChatComponentProps> = ({
   config,
   themeMode,
   conversationHistory,
+  initialHistory,
   onRestartConversation,
+  onSelectConversation,
 }) => {
   const { chatProps, isCustomElement, shellStyle } = useChatController({
     deployment,
@@ -31,7 +37,9 @@ export const ChatComponent: FC<ChatComponentProps> = ({
     config,
     environmentThemeMode: themeMode,
     conversationHistory,
+    initialHistory,
     onRestartConversation,
+    onSelectConversation,
   });
 
   if (!isCustomElement) return <ChatContainer {...chatProps} />;

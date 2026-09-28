@@ -5,17 +5,22 @@ import {
   PanelType,
   TypeAndHandler,
 } from "@carbon/ai-chat";
+import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
 export interface UseConversationPanelsOptions {
   chatInstance: ChatInstance | null;
   onBeforeRestart?: () => unknown | Promise<unknown>;
   onAfterRestart?: () => unknown | Promise<unknown>;
+  onOpenHistory?: () => unknown | Promise<unknown>;
+  onSelectConversation?: (entry: ConversationHistoryEntry) => Promise<void>;
 }
 
 export function useConversationPanels({
   chatInstance,
   onBeforeRestart,
   onAfterRestart,
+  onOpenHistory,
+  onSelectConversation,
 }: UseConversationPanelsOptions) {
   const [isRestartPanelOpen, setRestartPanelOpen] = useState(false);
   const [isRestarting, setRestarting] = useState(false);
@@ -68,7 +73,8 @@ export function useConversationPanels({
 
   const openHistoryPanel = useCallback(async () => {
     await chatInstance?.customPanels?.getPanel(PanelType.HISTORY).open();
-  }, [chatInstance]);
+    await onOpenHistory?.();
+  }, [chatInstance, onOpenHistory]);
 
   const closeHistoryPanel = useCallback(async () => {
     await chatInstance?.customPanels?.getPanel(PanelType.HISTORY).close();
@@ -79,6 +85,15 @@ export function useConversationPanels({
     await openRestartPanel();
   }, [closeHistoryPanel, openRestartPanel]);
 
+  const selectConversation = useCallback(async (
+    entry: ConversationHistoryEntry,
+  ) => {
+    if (!onSelectConversation) return;
+    await onBeforeRestart?.();
+    await onSelectConversation(entry);
+    await closeHistoryPanel();
+  }, [closeHistoryPanel, onBeforeRestart, onSelectConversation]);
+
   return {
     isRestartPanelOpen,
     isRestarting,
@@ -88,5 +103,6 @@ export function useConversationPanels({
     openHistoryPanel,
     closeHistoryPanel,
     startConversationFromHistory,
+    selectConversation,
   };
 }

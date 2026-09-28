@@ -50,13 +50,17 @@ describe("ConversationHistoryPanel", () => {
     { id: "2", title: "Technical support" },
   ];
 
-  it("shows and filters recent conversations", () => {
+  it("shows conversations and delegates search to the server", () => {
     const onClose = jest.fn();
+    const onSearch = jest.fn();
+    const onSelectConversation = jest.fn();
     render(
       <ConversationHistoryPanel
         entries={entries}
         onClose={onClose}
         onNewConversation={jest.fn()}
+        onSearch={onSearch}
+        onSelectConversation={onSelectConversation}
       />,
     );
 
@@ -68,19 +72,15 @@ describe("ConversationHistoryPanel", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Search chat history" }), {
       target: { value: "billing" },
     });
-    expect(screen.getByText("Billing question")).toBeVisible();
-    expect(screen.queryByText("Technical support")).toBeNull();
-
-    fireEvent.change(screen.getByRole("textbox", { name: "Search chat history" }), {
-      target: { value: "missing" },
-    });
-    expect(screen.getByText("No matching conversations")).toBeVisible();
+    expect(onSearch).toHaveBeenCalledWith("billing");
 
     fireEvent.click(
       screen.getByRole("button", { name: "Use native search event" }),
     );
-    expect(screen.getByText("Technical support")).toBeVisible();
-    expect(screen.queryByText("Billing question")).toBeNull();
+    expect(onSearch).toHaveBeenLastCalledWith("technical");
+
+    fireEvent.click(screen.getByText("Billing question"));
+    expect(onSelectConversation).toHaveBeenCalledWith(entries[0]);
   });
 
   it("uses the panel actions and renders the empty state", () => {
@@ -99,5 +99,55 @@ describe("ConversationHistoryPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "New conversation" }));
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(onNewConversation).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows Carbon loading and error states", () => {
+    render(
+      <ConversationHistoryPanel
+        entries={[]}
+        isLoading
+        isLoadingMore
+        error="History service unavailable"
+        onClose={jest.fn()}
+        onNewConversation={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Unable to load chat history")).toBeVisible();
+    expect(screen.getByText("History service unavailable")).toBeVisible();
+    expect(screen.getByText("Loading conversations")).toBeVisible();
+    expect(screen.getByText("Loading more conversations")).toBeVisible();
+  });
+
+  it("loads the next page when the sentinel becomes visible", () => {
+    const onLoadMore = jest.fn();
+    let intersectionCallback: IntersectionObserverCallback | undefined;
+    const observe = jest.fn();
+    const disconnect = jest.fn();
+    const OriginalIntersectionObserver = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = jest.fn((callback) => {
+      intersectionCallback = callback;
+      return { observe, disconnect } as unknown as IntersectionObserver;
+    }) as unknown as typeof IntersectionObserver;
+
+    const { unmount } = render(
+      <ConversationHistoryPanel
+        entries={entries}
+        hasMore
+        onLoadMore={onLoadMore}
+        onClose={jest.fn()}
+        onNewConversation={jest.fn()}
+      />,
+    );
+
+    expect(observe).toHaveBeenCalledTimes(1);
+    intersectionCallback?.(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      {} as IntersectionObserver,
+    );
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+    unmount();
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    globalThis.IntersectionObserver = OriginalIntersectionObserver;
   });
 });

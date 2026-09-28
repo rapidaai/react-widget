@@ -1,6 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ComponentType, PropsWithChildren } from "react";
-import { ContainedList } from "@carbon/react";
+import {
+  ContainedList,
+  InlineLoading,
+  InlineNotification,
+} from "@carbon/react";
 import {
   HistoryContent,
   HistoryHeader,
@@ -10,16 +14,29 @@ import {
 import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 import "./conversation-history-panel.scss";
 
-// Carbon exposes this component at runtime through its documented compound API,
-// but the current package declaration omits the static property.
+interface ContainedListItemProps extends PropsWithChildren {
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+// Carbon publishes this documented compound component at runtime, while the
+// package root declaration currently omits its static property.
 const ContainedListItem = (ContainedList as unknown as {
-  ContainedListItem: ComponentType<PropsWithChildren>;
+  ContainedListItem: ComponentType<ContainedListItemProps>;
 }).ContainedListItem;
 
 export interface ConversationHistoryPanelProps {
   entries: ConversationHistoryEntry[];
+  isLoading?: boolean;
+  isLoadingMore?: boolean;
+  restoringConversationId?: string | null;
+  hasMore?: boolean;
+  error?: string | null;
   onClose: () => unknown;
   onNewConversation: () => unknown;
+  onSearch?: (query: string) => unknown;
+  onLoadMore?: () => unknown;
+  onSelectConversation?: (entry: ConversationHistoryEntry) => unknown;
 }
 
 function getSearchValue(event: Event): string {
@@ -31,17 +48,35 @@ function getSearchValue(event: Event): string {
 
 export function ConversationHistoryPanel({
   entries,
+  isLoading = false,
+  isLoadingMore = false,
+  restoringConversationId = null,
+  hasMore = false,
+  error = null,
   onClose,
   onNewConversation,
+  onSearch,
+  onLoadMore,
+  onSelectConversation,
 }: ConversationHistoryPanelProps) {
   const [query, setQuery] = useState("");
-  const visibleEntries = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase();
-    if (!normalizedQuery) return entries;
-    return entries.filter((entry) =>
-      entry.title.toLocaleLowerCase().includes(normalizedQuery),
-    );
-  }, [entries, query]);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasMore || isLoading || isLoadingMore || !onLoadMore) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) void onLoadMore();
+    });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, isLoadingMore, onLoadMore]);
+
+  const handleSearch = (event: Event) => {
+    const value = getSearchValue(event);
+    setQuery(value);
+    onSearch?.(value);
+  };
 
   return (
     <HistoryShell>
@@ -58,17 +93,36 @@ export function ConversationHistoryPanel({
           placeholder: "Search chat history",
           size: "md",
         }}
-        onSearchInput={(event: Event) => setQuery(getSearchValue(event))}
+        onSearchInput={handleSearch}
         onNewChatClick={() => void onNewConversation()}
       />
       <HistoryContent
         resultsLabel={query ? "Results" : "Recent conversations"}
-        resultsCount={visibleEntries.length}
+        resultsCount={entries.length}
       >
-        {visibleEntries.length > 0 ? (
+        {error && (
+          <InlineNotification
+            className="rapida-conversation-history__notification"
+            kind="error"
+            lowContrast
+            hideCloseButton
+            title="Unable to load chat history"
+            subtitle={error}
+          />
+        )}
+        {isLoading ? (
+          <InlineLoading
+            className="rapida-conversation-history__loading"
+            description="Loading conversations"
+          />
+        ) : entries.length > 0 ? (
           <ContainedList className="rapida-conversation-history__list">
-            {visibleEntries.map((entry) => (
-              <ContainedListItem key={entry.id}>
+            {entries.map((entry) => (
+              <ContainedListItem
+                key={entry.id}
+                disabled={Boolean(restoringConversationId)}
+                onClick={() => void onSelectConversation?.(entry)}
+              >
                 <span className="rapida-conversation-history__title">
                   {entry.title}
                 </span>
@@ -90,6 +144,9 @@ export function ConversationHistoryPanel({
             </span>
           </div>
         )}
+        <div ref={loadMoreRef} className="rapida-conversation-history__load-more">
+          {isLoadingMore && <InlineLoading description="Loading more conversations" />}
+        </div>
       </HistoryContent>
     </HistoryShell>
   );

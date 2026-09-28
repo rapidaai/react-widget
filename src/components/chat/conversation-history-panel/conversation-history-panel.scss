@@ -38,3 +38,14 @@
     line-height: var(--cds-body-01-line-height);
   }
 }
+
+.rapida-conversation-history__loading,
+.rapida-conversation-history__notification,
+.rapida-conversation-history__load-more {
+  inline-size: 100%;
+}
+
+.rapida-conversation-history__loading,
+.rapida-conversation-history__load-more {
+  padding: var(--cds-spacing-05);
+}

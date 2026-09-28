@@ -1,8 +1,10 @@
 import { FC } from "react";
 import { VoiceAgent } from "@rapidaai/react";
+import type { HistoryItem } from "@carbon/ai-chat";
 import { ChatComponent } from "@/app/pages/v3";
 import { CatastrophicErrorChat } from "@/components/chat";
 import { useAssistantDeployment } from "@/hooks/use-assistant-deployment";
+import type { ConversationHistoryState } from "@/hooks/use-conversation-history";
 import type { ChatbotConfig } from "@/types";
 import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
@@ -10,8 +12,10 @@ interface WebPluginChatProps {
   voiceAgent: VoiceAgent;
   config?: ChatbotConfig;
   themeMode?: "light" | "dark" | "system";
-  conversationHistory?: ConversationHistoryEntry[];
-  onRestartConversation?: (entry?: ConversationHistoryEntry) => unknown;
+  conversationHistory?: ConversationHistoryState;
+  initialHistory?: HistoryItem[];
+  onRestartConversation?: () => unknown;
+  onSelectConversation?: (entry: ConversationHistoryEntry) => Promise<void>;
 }
 
 export const WebPluginChat: FC<WebPluginChatProps> = ({
@@ -19,7 +23,9 @@ export const WebPluginChat: FC<WebPluginChatProps> = ({
   config,
   themeMode,
   conversationHistory,
+  initialHistory,
   onRestartConversation,
+  onSelectConversation,
 }) => {
   const state = useAssistantDeployment(voiceAgent);
 
@@ -31,7 +37,9 @@ export const WebPluginChat: FC<WebPluginChatProps> = ({
         config={config}
         themeMode={themeMode}
         conversationHistory={conversationHistory}
+        initialHistory={initialHistory}
         onRestartConversation={onRestartConversation}
+        onSelectConversation={onSelectConversation}
       />
     );
   }

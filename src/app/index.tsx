@@ -5,17 +5,20 @@ import {
   Channel,
   ConnectionConfig,
   InputOptions,
+  UserIdentifier,
   VoiceAgent,
 } from "@rapidaai/react";
+import type { HistoryItem } from "@carbon/ai-chat";
+import { initializeAgentConversation } from "@/adapters/rapida";
 import { useEnvironment } from "@/hooks/use-environment";
+import { useConversationHistory } from "@/hooks/use-conversation-history";
 import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
 export const App: FC = memo(() => {
   const { assistantId, token, user, apiBase, theme } = useEnvironment();
   const [agentGeneration, setAgentGeneration] = useState(0);
-  const [conversationHistory, setConversationHistory] = useState<
-    ConversationHistoryEntry[]
-  >([]);
+  const [activeConversationId, setActiveConversationId] = useState<string>();
+  const [initialHistory, setInitialHistory] = useState<HistoryItem[]>([]);
   useEffect(() => {
     if (!assistantId) {
       console.error(
@@ -42,17 +45,32 @@ export const App: FC = memo(() => {
   }, [token, user.user_id, apiBase]);
 
   const agentConfig = useMemo(() => {
-    if (assistantId)
-      return new AgentConfig(
+    if (assistantId) {
+      const nextConfig = new AgentConfig(
         assistantId,
         new InputOptions([Channel.Audio, Channel.Text], Channel.Text),
+        undefined,
+        undefined,
       );
-  }, [assistantId]);
+      nextConfig.userIdentifier = new UserIdentifier(user.user_id, user.name);
+      return nextConfig;
+    }
+  }, [assistantId, user.name, user.user_id]);
+
+  const conversationHistory = useConversationHistory({
+    connectionConfig,
+    assistantId,
+    userId: user.user_id,
+  });
 
   const voiceAgent = useMemo(() => {
-    if (connectionConfig && agentConfig)
-      return new VoiceAgent(connectionConfig, agentConfig);
-  }, [connectionConfig, agentConfig, agentGeneration]);
+    if (connectionConfig && agentConfig) {
+      return initializeAgentConversation(
+        new VoiceAgent(connectionConfig, agentConfig),
+        activeConversationId,
+      );
+    }
+  }, [connectionConfig, agentConfig, agentGeneration, activeConversationId]);
 
   useEffect(
     () => () => {
@@ -61,25 +79,33 @@ export const App: FC = memo(() => {
     [voiceAgent],
   );
 
-  const restartAgent = useCallback((entry?: ConversationHistoryEntry) => {
-    if (entry) {
-      setConversationHistory((current) => [
-        entry,
-        ...current.filter(({ id }) => id !== entry.id),
-      ]);
-    }
+  const restartAgent = useCallback(() => {
+    setActiveConversationId(undefined);
+    setInitialHistory([]);
     setAgentGeneration((generation) => generation + 1);
   }, []);
+
+  const restoreConversation = useCallback(async (
+    entry: ConversationHistoryEntry,
+  ) => {
+    const historyItems = await conversationHistory.loadConversation(entry.id);
+    setInitialHistory(historyItems);
+    setActiveConversationId(entry.id);
+    setAgentGeneration((generation) => generation + 1);
+  }, [conversationHistory.loadConversation]);
 
   if (!voiceAgent) return null;
 
   return (
     <WebPluginChat
+      key={`${agentGeneration}:${activeConversationId ?? "new"}`}
       voiceAgent={voiceAgent}
       config={window.chatbotConfig}
       themeMode={theme.mode}
       conversationHistory={conversationHistory}
+      initialHistory={initialHistory}
       onRestartConversation={restartAgent}
+      onSelectConversation={restoreConversation}
     />
   );
 });

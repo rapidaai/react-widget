@@ -14,6 +14,7 @@ function createInstance() {
     messaging: {
       addMessage: jest.fn().mockResolvedValue(undefined),
       addMessageChunk: jest.fn().mockResolvedValue(undefined),
+      insertHistory: jest.fn().mockResolvedValue(undefined),
     },
     updateInputIsDisabled: jest.fn(),
     updateIsMessageLoadingCounter: jest.fn(),
@@ -54,6 +55,76 @@ describe("useMessageSync", () => {
     expect(instance.messaging.addMessage).toHaveBeenCalledWith(
       expect.objectContaining({ id: "rapida-welcome" }),
     );
+  });
+
+  it("hydrates restored history without adding the welcome message", async () => {
+    const instance = createInstance();
+    const voiceAgent = { onSendText: jest.fn() } as unknown as VoiceAgent;
+    const initialHistory = [{
+      time: "2026-09-28T10:00:00.000Z",
+      message: {
+        id: "history:user:1",
+        input: { message_type: "text", text: "Earlier message" },
+      },
+    }] as any;
+    const { result } = renderHook(() =>
+      useMessageSync({
+        deployment,
+        voiceAgent,
+        channel: Channel.Text,
+        messages: [],
+        inputDisabled: false,
+        initialHistory,
+      }),
+    );
+
+    act(() => result.current.registerChatInstance(instance));
+    await waitFor(() =>
+      expect(instance.messaging.insertHistory).toHaveBeenCalledWith(initialHistory),
+    );
+    await act(async () => {
+      await result.current.customSendMessage(
+        { input: { message_type: "text", text: "" } } as any,
+        { signal: new AbortController().signal } as any,
+        instance,
+      );
+    });
+    expect(instance.messaging.addMessage).not.toHaveBeenCalled();
+  });
+
+  it("reports a failed history restore and allows it to be retried", async () => {
+    const instance = createInstance();
+    instance.messaging.insertHistory
+      .mockRejectedValueOnce(new Error("restore failed"))
+      .mockResolvedValueOnce(undefined);
+    const consoleError = jest.spyOn(console, "error").mockImplementation();
+    const initialHistory = [{
+      time: "2026-09-28T10:00:00.000Z",
+      message: { id: "history:user:1", input: { text: "Earlier message" } },
+    }] as any;
+    const voiceAgent = { onSendText: jest.fn() } as unknown as VoiceAgent;
+    const initialProps = {
+      deployment,
+      voiceAgent,
+      channel: Channel.Text,
+      messages: [] as Message[],
+      inputDisabled: false,
+      initialHistory,
+    };
+    const { result, rerender } = renderHook(
+      (props) => useMessageSync(props),
+      { initialProps },
+    );
+
+    act(() => result.current.registerChatInstance(instance));
+    await waitFor(() => expect(consoleError).toHaveBeenCalledWith(
+      "Unable to restore conversation history",
+      expect.any(Error),
+    ));
+
+    rerender({ ...initialProps, initialHistory: [...initialHistory] });
+    await waitFor(() => expect(instance.messaging.insertHistory).toHaveBeenCalledTimes(2));
+    consoleError.mockRestore();
   });
 
   it("streams assistant updates and settles a pending text response", async () => {
