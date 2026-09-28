@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
@@ -24,6 +23,9 @@ jobs:
     name: 01 Validate
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -45,6 +47,85 @@ jobs:
 
       - name: Run tests with coverage
         run: npm run test:coverage -- --runInBand
+
+      - name: Publish coverage summary
+        if: always()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const summaryPath = path.join(process.env.GITHUB_WORKSPACE, 'coverage/coverage-summary.json');
+
+            if (!fs.existsSync(summaryPath)) {
+              core.warning('Coverage summary was not generated.');
+              return;
+            }
+
+            const coverage = JSON.parse(fs.readFileSync(summaryPath, 'utf8')).total;
+            const jestConfig = require(path.join(process.env.GITHUB_WORKSPACE, 'jest.config.js'));
+            const thresholds = jestConfig.coverageThreshold.global;
+            const metrics = [
+              ['Statements', 'statements'],
+              ['Branches', 'branches'],
+              ['Functions', 'functions'],
+              ['Lines', 'lines'],
+            ];
+            const marker = '<!-- react-widget-coverage-summary -->';
+            const rows = metrics.map(([label, key]) => {
+              const value = coverage[key];
+              const gate = thresholds[key];
+              const status = value.pct >= gate ? '✅ Pass' : '❌ Fail';
+              return `| ${label} | ${value.covered} / ${value.total} | ${value.pct}% | ${gate}% | ${status} |`;
+            });
+            const body = [
+              marker,
+              '## Code coverage',
+              '',
+              '| Metric | Covered | Coverage | Gate | Status |',
+              '| --- | ---: | ---: | ---: | :---: |',
+              ...rows,
+              '',
+              `Commit: ${context.sha.substring(0, 7)}`,
+            ].join('\n');
+
+            await core.summary.addRaw(body.replace(marker, '')).write();
+
+            if (context.eventName !== 'pull_request') {
+              return;
+            }
+
+            const headRepository = context.payload.pull_request.head.repo.full_name;
+            if (headRepository !== `${context.repo.owner}/${context.repo.repo}`) {
+              core.notice('Skipping the PR comment for a fork because its token is read-only.');
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user?.type === 'Bot' && comment.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
