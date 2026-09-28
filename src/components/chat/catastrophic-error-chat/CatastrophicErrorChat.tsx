@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   BusEventViewChange,
+  BusEventType,
   CarbonTheme as AiChatTheme,
   ChatContainer,
   ChatContainerProps,
@@ -14,6 +15,7 @@ import {
   ChatInstance,
   CornersType,
   MinimizeButtonIconType,
+  TypeAndHandler,
 } from "@carbon/ai-chat";
 import { applyCarbonInputStyles } from "@/adapters/carbon";
 import {
@@ -29,12 +31,14 @@ export interface CatastrophicErrorChatProps {
   error: string;
   config?: ChatbotConfig;
   themeMode?: "light" | "dark" | "system";
+  onRetry?: () => unknown;
 }
 
 export function CatastrophicErrorChat({
   error,
   config,
   themeMode: environmentThemeMode,
+  onRetry,
 }: CatastrophicErrorChatProps) {
   const {
     assistant_id: _assistantId,
@@ -58,6 +62,11 @@ export function CatastrophicErrorChat({
   const themeMode = environmentThemeMode || themeSettings?.mode || "light";
   const displayName = name || "Assistant";
 
+  const retryHandler = useMemo<TypeAndHandler>(() => ({
+    type: BusEventType.RESTART_CONVERSATION,
+    handler: () => void onRetry?.(),
+  }), [onRetry]);
+
   useEffect(() => {
     if (!isDocked) return;
     const marginKey = dockSide === "right" ? "marginRight" : "marginLeft";
@@ -75,11 +84,11 @@ export function CatastrophicErrorChat({
         isOpen: true,
         title: "Unable to connect",
         bodyText: error,
-        hideRetryButton: true,
       });
+      instance.on(retryHandler);
       await aiChatConfig.onBeforeRender?.(instance);
     },
-    [aiChatConfig, error],
+    [aiChatConfig, error, retryHandler],
   );
 
   const onViewChange = useCallback(
@@ -146,6 +155,7 @@ export function CatastrophicErrorChat({
     logoUrl,
     onBeforeRender,
     onViewChange,
+    retryHandler,
     themeMode,
     themeSettings?.injectTheme,
   ]);

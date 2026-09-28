@@ -49,7 +49,8 @@ export function useAgentError(voiceAgent: VoiceAgent): string | null {
     ).subscribe((eventArguments: unknown) => {
       if (
         Array.isArray(eventArguments) &&
-        eventArguments[0] === ConnectionState.Connected
+        (eventArguments[0] === ConnectionState.Connecting ||
+          eventArguments[0] === ConnectionState.Connected)
       ) {
         setError(null);
       }

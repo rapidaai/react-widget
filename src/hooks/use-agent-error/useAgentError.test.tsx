@@ -10,7 +10,7 @@ jest.mock("@rapidaai/react", () => ({
     ErrorEvent: "onErrorEvent",
     ConnectionStateEvent: "onConnectionStateEvent",
   },
-  ConnectionState: { Connected: "connected" },
+  ConnectionState: { Connecting: "connecting", Connected: "connected" },
   agentEventSelector: (_agent: unknown, event: string) => ({
     subscribe: (observer: (value: unknown) => void) => {
       observers.set(event, observer);
@@ -25,7 +25,7 @@ describe("useAgentError", () => {
     unsubscribe.mockClear();
   });
 
-  it("shows agent failures and clears them after reconnecting", () => {
+  it("shows connection failures and clears them when recovery begins", () => {
     const voiceAgent = {} as VoiceAgent;
     const { result, unmount } = renderHook(() => useAgentError(voiceAgent));
 
@@ -36,6 +36,21 @@ describe("useAgentError", () => {
       ]);
     });
     expect(result.current).toBe("No connection available to send text");
+
+    act(() => {
+      observers.get(AgentEvent.ConnectionStateEvent)?.([
+        ConnectionState.Connecting,
+      ]);
+    });
+    expect(result.current).toBeNull();
+
+    act(() => {
+      observers.get(AgentEvent.ErrorEvent)?.([
+        "client",
+        "Connection failed again",
+      ]);
+    });
+    expect(result.current).toBe("Connection failed again");
 
     act(() => {
       observers.get(AgentEvent.ConnectionStateEvent)?.([

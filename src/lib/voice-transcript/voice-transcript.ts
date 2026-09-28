@@ -1,11 +1,19 @@
 import { Channel, Message, MessageRole, MessageStatus } from "@rapidaai/react";
 
-export function getActiveVoiceTranscript(messages: Message[], channel: Channel): string {
+export function getActiveVoiceTranscript(
+  messages: Message[],
+  channel: Channel,
+  ignoredMessageIds: ReadonlySet<string> = new Set(),
+): string {
   if (channel !== Channel.Audio) return "";
 
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index];
-    if (message.role !== MessageRole.User || message.status === MessageStatus.Complete) {
+    if (
+      message.role !== MessageRole.User ||
+      message.status === MessageStatus.Complete ||
+      ignoredMessageIds.has(message.id)
+    ) {
       continue;
     }
 

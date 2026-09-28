@@ -7,8 +7,10 @@ import {
 } from "@rapidaai/react";
 import {
   BusEventViewChange,
+  BusEventType,
   ChatInstance,
   HistoryItem,
+  TypeAndHandler,
 } from "@carbon/ai-chat";
 import { applyCarbonInputStyles } from "@/adapters/carbon";
 import { AudioControls } from "@/components/audio";
@@ -152,7 +154,6 @@ export function useChatController({
         isOpen: true,
         title: "Unable to connect",
         bodyText: agentError,
-        hideRetryButton: true,
       });
       return;
     }
@@ -162,6 +163,26 @@ export function useChatController({
       chatInstance.updateCatastrophicErrorPanel({ isOpen: false });
     }
   }, [agentError, chatInstance]);
+
+  useEffect(() => {
+    if (!chatInstance) return;
+    const retryHandler: TypeAndHandler = {
+      type: BusEventType.RESTART_CONVERSATION,
+      handler: () => {
+        if (!ownsCatastrophicPanel.current) return;
+        ownsCatastrophicPanel.current = false;
+        if (onRestartConversation) {
+          void onRestartConversation();
+        } else {
+          void voiceAgent.connect();
+        }
+      },
+    };
+    chatInstance.on(retryHandler);
+    return () => {
+      chatInstance.off(retryHandler);
+    };
+  }, [chatInstance, onRestartConversation, voiceAgent]);
 
   const inputControls = useMemo(
     () => (

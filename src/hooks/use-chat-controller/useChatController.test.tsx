@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { BusEventType } from "@carbon/ai-chat";
 import { useChatController } from "./useChatController";
 
 const registerChatInstance = jest.fn();
@@ -160,7 +161,6 @@ describe("useChatController", () => {
       isOpen: true,
       title: "Unable to connect",
       bodyText: "Connection failed",
-      hideRetryButton: true,
     });
 
     agentError = null;
@@ -168,5 +168,27 @@ describe("useChatController", () => {
     expect(updateCatastrophicErrorPanel).toHaveBeenLastCalledWith({
       isOpen: false,
     });
+  });
+
+  it("recreates the agent when Carbon retries a connection failure", () => {
+    const onRestartConversation = jest.fn();
+    const handlers = new Map<string, () => void>();
+    chatInstance = {
+      updateCatastrophicErrorPanel,
+      on: jest.fn(({ type, handler }) => handlers.set(type, handler)),
+      off: jest.fn(({ type }) => handlers.delete(type)),
+    };
+    agentError = "Connection failed";
+
+    renderHook(() =>
+      useChatController({
+        deployment,
+        voiceAgent: {} as any,
+        onRestartConversation,
+      }),
+    );
+
+    act(() => handlers.get(BusEventType.RESTART_CONVERSATION)?.());
+    expect(onRestartConversation).toHaveBeenCalledTimes(1);
   });
 });

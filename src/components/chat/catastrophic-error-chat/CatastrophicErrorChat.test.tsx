@@ -2,10 +2,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { CatastrophicErrorChat } from "./CatastrophicErrorChat";
 
 const updateCatastrophicErrorPanel = jest.fn();
+const eventHandlers = new Map<string, () => void>();
+const on = jest.fn(({ type, handler }) => eventHandlers.set(type, handler));
+const off = jest.fn(({ type }) => eventHandlers.delete(type));
 
 jest.mock("@carbon/ai-chat", () => {
   const renderChat = (type: string) => (props: any) => {
-    const instance = { updateCatastrophicErrorPanel };
+    const instance = { updateCatastrophicErrorPanel, on, off };
     void props.onBeforeRender?.(instance);
     return (
       <div data-testid={type} data-open={String(props.openChatByDefault)}>
@@ -29,6 +32,7 @@ jest.mock("@carbon/ai-chat", () => {
     ChatCustomElement: renderChat("chat-custom-element"),
     CornersType: { SQUARE: "square" },
     MinimizeButtonIconType: { MINIMIZE: "minimize" },
+    BusEventType: { RESTART_CONVERSATION: "restart" },
     LayoutCustomProperties: {
       width: "width",
       height: "height",
@@ -44,7 +48,12 @@ jest.mock("@carbon/ai-chat", () => {
 });
 
 describe("CatastrophicErrorChat", () => {
-  beforeEach(() => updateCatastrophicErrorPanel.mockClear());
+  beforeEach(() => {
+    updateCatastrophicErrorPanel.mockClear();
+    eventHandlers.clear();
+    on.mockClear();
+    off.mockClear();
+  });
 
   it("opens Carbon's catastrophic panel for deployment failures", () => {
     render(
@@ -62,8 +71,21 @@ describe("CatastrophicErrorChat", () => {
       isOpen: true,
       title: "Unable to connect",
       bodyText: "Server unavailable",
-      hideRetryButton: true,
     });
+  });
+
+  it("uses Carbon's retry action to request deployment again", () => {
+    const onRetry = jest.fn();
+    render(
+      <CatastrophicErrorChat
+        error="Server unavailable"
+        config={{ layout: { mode: "floating" } }}
+        onRetry={onRetry}
+      />,
+    );
+
+    eventHandlers.get("restart")?.();
+    expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
   it("fills an inline custom-element shell", () => {

@@ -52,6 +52,7 @@ export const WebPluginChat: FC<WebPluginChatProps> = ({
         error={state.error}
         config={config}
         themeMode={themeMode}
+        onRetry={state.retry}
       />
     );
   }

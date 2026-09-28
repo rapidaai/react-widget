@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { VoiceAgent } from "@rapidaai/react";
 import { useAssistantDeployment } from "./useAssistantDeployment";
 
@@ -69,5 +69,24 @@ describe("useAssistantDeployment", () => {
     unmount();
     resolveRequest({ getSuccess: () => true });
     await Promise.resolve();
+  });
+
+  it("requests deployment metadata again when retried", async () => {
+    const voiceAgent = {
+      getAssistant: jest
+        .fn()
+        .mockRejectedValueOnce(new Error("Network down"))
+        .mockResolvedValueOnce({
+          getSuccess: () => true,
+          getData: () => ({ getWebplugindeployment: () => ({}) }),
+        }),
+    } as unknown as VoiceAgent;
+    const { result } = renderHook(() => useAssistantDeployment(voiceAgent));
+    await waitFor(() => expect(result.current.status).toBe("error"));
+
+    act(() => result.current.retry());
+
+    await waitFor(() => expect(result.current.status).toBe("ready"));
+    expect(voiceAgent.getAssistant).toHaveBeenCalledTimes(2);
   });
 });

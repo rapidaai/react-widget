@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AssistantWebpluginDeployment,
   VoiceAgent,
@@ -15,6 +15,11 @@ type DeploymentState =
     };
 
 function isConnectionFailure(error: unknown): boolean {
+  const status = typeof error === "object" && error !== null && "status" in error
+    ? Number(error.status)
+    : undefined;
+  if (status && status >= 500) return true;
+
   const message = error instanceof Error
     ? error.message
     : typeof error === "object" &&
@@ -24,12 +29,13 @@ function isConnectionFailure(error: unknown): boolean {
       ? error.message
       : "";
   if (!message) return true;
-  return /connect|network|fetch|transport|websocket|grpc|timeout|offline|unavailable/i.test(
-    message,
-  );
+  return /connect|network|fetch|transport|websocket|grpc|timeout|offline|unavailable|internal server|server error|bad gateway/i.test(message);
 }
 
-export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState {
+export function useAssistantDeployment(
+  voiceAgent: VoiceAgent,
+): DeploymentState & { retry: () => void } {
+  const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<DeploymentState>({
     status: "loading",
     deployment: null,
@@ -81,7 +87,9 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
     return () => {
       active = false;
     };
-  }, [voiceAgent]);
+  }, [attempt, voiceAgent]);
 
-  return state;
+  const retry = useCallback(() => setAttempt((value) => value + 1), []);
+
+  return { ...state, retry };
 }

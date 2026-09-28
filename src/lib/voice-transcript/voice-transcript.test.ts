@@ -15,4 +15,10 @@ describe("getActiveVoiceTranscript", () => {
   it("returns no transcript outside voice mode", () => {
     expect(getActiveVoiceTranscript(messages, Channel.Text)).toBe("");
   });
+
+  it("ignores pending transcripts retained from an earlier voice session", () => {
+    expect(
+      getActiveVoiceTranscript(messages, Channel.Audio, new Set(["3"])),
+    ).toBe("");
+  });
 });
