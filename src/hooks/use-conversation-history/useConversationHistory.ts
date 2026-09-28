@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ConnectionConfig,
+  FieldSelector,
   GetAllAssistantConversation,
   GetAllAssistantConversationMessage,
+  GetAssistantConversation,
+  GetAssistantConversationRequest,
 } from "@rapidaai/react";
 import type {
   AssistantConversation,
@@ -180,24 +183,32 @@ async function toHistoryEntries(
   conversations: AssistantConversation[],
 ): Promise<ConversationHistoryEntry[]> {
   return Promise.all(conversations.map(async (conversation) => {
-    const embeddedTitle = getFirstUserMessageText(
+    const hasMessage = Boolean(getFirstUserMessageText(
       conversation.getAssistantconversationmessageList(),
+    ));
+    const hasDate = Boolean(
+      conversation.getUpdateddate() ?? conversation.getCreateddate(),
     );
-    if (embeddedTitle) {
-      return toConversationHistoryEntry(conversation, embeddedTitle);
+    if (hasMessage && hasDate) {
+      return toConversationHistoryEntry(conversation);
     }
 
     try {
-      const messages = await loadAllConversationMessages(
+      const request = new GetAssistantConversationRequest();
+      request.setAssistantid(assistantId);
+      request.setId(conversation.getId());
+      const messageSelector = new FieldSelector();
+      messageSelector.setField("message");
+      request.addSelectors(messageSelector);
+      const response = await GetAssistantConversation(
         connectionConfig,
-        assistantId,
-        conversation.getId(),
-        [{ key: "role", value: "user" }],
+        request,
+        connectionConfig.auth,
       );
-      return toConversationHistoryEntry(
-        conversation,
-        getFirstUserMessageText(messages),
-      );
+      if (!response.getSuccess() || !response.getData()) {
+        return toConversationHistoryEntry(conversation);
+      }
+      return toConversationHistoryEntry(response.getData()!);
     } catch {
       return toConversationHistoryEntry(conversation);
     }

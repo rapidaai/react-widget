@@ -3,12 +3,39 @@ import { useConversationHistory } from "./useConversationHistory";
 
 const mockGetAllAssistantConversation = jest.fn();
 const mockGetAllAssistantConversationMessage = jest.fn();
+const mockGetAssistantConversation = jest.fn();
 
 jest.mock("@rapidaai/react", () => ({
+  FieldSelector: class {
+    field = "";
+
+    setField(field: string) {
+      this.field = field;
+    }
+  },
   GetAllAssistantConversation: (...args: unknown[]) =>
     mockGetAllAssistantConversation(...args),
   GetAllAssistantConversationMessage: (...args: unknown[]) =>
     mockGetAllAssistantConversationMessage(...args),
+  GetAssistantConversation: (...args: unknown[]) =>
+    mockGetAssistantConversation(...args),
+  GetAssistantConversationRequest: class {
+    assistantId = "";
+    conversationId = "";
+    selectors: Array<{ field: string }> = [];
+
+    setAssistantid(assistantId: string) {
+      this.assistantId = assistantId;
+    }
+
+    setId(conversationId: string) {
+      this.conversationId = conversationId;
+    }
+
+    addSelectors(selector: { field: string }) {
+      this.selectors.push(selector);
+    }
+  },
 }));
 
 const timestamp = (value: string) => ({ toDate: () => new Date(value) });
@@ -106,21 +133,28 @@ describe("useConversationHistory", () => {
         callback(null, listResponse([{
           ...conversation("conversation-1", "Server title"),
           getAssistantconversationmessageList: () => [],
+          getUpdateddate: () => undefined,
+          getCreateddate: () => undefined,
         }]));
       },
     );
-    mockGetAllAssistantConversationMessage.mockImplementation(
-      (...args: unknown[]) => {
-        const callback = args[7] as Function;
-        callback(null, listResponse([
+    mockGetAssistantConversation.mockResolvedValue({
+      getSuccess: () => true,
+      getData: () => ({
+        ...conversation(
+          "conversation-1",
+          "Server title",
+          "2026-01-01T10:00:00.000Z",
+        ),
+        getAssistantconversationmessageList: () => [
           historyMessage("newer", "user", "Second user message"),
           {
             ...historyMessage("first", "user", "First user message"),
             getCreateddate: () => timestamp("2026-01-01T10:00:00.000Z"),
           },
-        ]));
-      },
-    );
+        ],
+      }),
+    });
     const { result } = renderHook(() => useConversationHistory({
       connectionConfig,
       assistantId: "assistant-1",
@@ -130,16 +164,16 @@ describe("useConversationHistory", () => {
     await waitFor(() => expect(result.current.entries[0]?.title).toBe(
       "First user message",
     ));
-    expect(mockGetAllAssistantConversationMessage).toHaveBeenCalledWith(
-      connectionConfig,
-      "assistant-1",
-      "conversation-1",
-      1,
-      100,
-      [{ key: "role", value: "user" }],
-      connectionConfig.auth,
-      expect.any(Function),
-    );
+    expect(result.current.entries[0]?.date).toEqual(expect.any(String));
+    expect(mockGetAssistantConversation).toHaveBeenCalledTimes(1);
+    const [config, request, auth] = mockGetAssistantConversation.mock.calls[0];
+    expect(config).toBe(connectionConfig);
+    expect(request).toMatchObject({
+      assistantId: "assistant-1",
+      conversationId: "conversation-1",
+      selectors: [{ field: "message" }],
+    });
+    expect(auth).toBe(connectionConfig.auth);
   });
 
   it("sends the search query to the server", async () => {
