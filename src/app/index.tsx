@@ -1,4 +1,4 @@
-import { FC, memo, useEffect, useMemo } from "react";
+import { FC, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { WebPluginChat } from "@/app/pages/web-plugin-chat";
 import {
   AgentConfig,
@@ -8,9 +8,14 @@ import {
   VoiceAgent,
 } from "@rapidaai/react";
 import { useEnvironment } from "@/hooks/use-environment";
+import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
 export const App: FC = memo(() => {
   const { assistantId, token, user, apiBase, theme } = useEnvironment();
+  const [agentGeneration, setAgentGeneration] = useState(0);
+  const [conversationHistory, setConversationHistory] = useState<
+    ConversationHistoryEntry[]
+  >([]);
   useEffect(() => {
     if (!assistantId) {
       console.error(
@@ -47,7 +52,24 @@ export const App: FC = memo(() => {
   const voiceAgent = useMemo(() => {
     if (connectionConfig && agentConfig)
       return new VoiceAgent(connectionConfig, agentConfig);
-  }, [connectionConfig, agentConfig]);
+  }, [connectionConfig, agentConfig, agentGeneration]);
+
+  useEffect(
+    () => () => {
+      void voiceAgent?.disconnect();
+    },
+    [voiceAgent],
+  );
+
+  const restartAgent = useCallback((entry?: ConversationHistoryEntry) => {
+    if (entry) {
+      setConversationHistory((current) => [
+        entry,
+        ...current.filter(({ id }) => id !== entry.id),
+      ]);
+    }
+    setAgentGeneration((generation) => generation + 1);
+  }, []);
 
   if (!voiceAgent) return null;
 
@@ -56,6 +78,8 @@ export const App: FC = memo(() => {
       voiceAgent={voiceAgent}
       config={window.chatbotConfig}
       themeMode={theme.mode}
+      conversationHistory={conversationHistory}
+      onRestartConversation={restartAgent}
     />
   );
 });

@@ -1,0 +1,1 @@
+export { VoiceTranscriptDisplay } from "./VoiceTranscriptDisplay";

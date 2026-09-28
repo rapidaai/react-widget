@@ -2,9 +2,9 @@ import type {
   ChatContainerProps,
   ChatCustomElementProps,
 } from "@carbon/ai-chat";
-import type { LayoutSettings } from "@/lib/layout/layout";
+import type { LayoutSettings } from "@/lib/layout";
 
-type AiChatConfig = Partial<
+export type AiChatConfig = Partial<
   Omit<ChatCustomElementProps, "className" | "layout"> &
     Omit<ChatContainerProps, "layout">
 >;

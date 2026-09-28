@@ -18,7 +18,7 @@ import {
   getMessageText,
   planAssistantSync,
   RenderedAssistantMessage,
-} from "@/lib/message-sync/message-sync";
+} from "@/lib/message-sync";
 
 interface PendingResponse {
   resolve: () => void;

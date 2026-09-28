@@ -1,4 +1,7 @@
-export const BusEventType = { STATE_CHANGE: "state:change" };
+export const BusEventType = {
+  STATE_CHANGE: "state:change",
+  CUSTOM_PANEL_CLOSE: "customPanel:close",
+};
 export const MessageInputType = { TEXT: "text", EVENT: "event" };
 export const MessageResponseTypes = { TEXT: "text", OPTION: "option" };
 export const OptionItemPreference = { BUTTON: "button" };
@@ -16,3 +19,4 @@ export const LayoutCustomProperties = {
 export const CarbonTheme = { G10: "g10", G100: "g100" };
 export const CornersType = { SQUARE: "square" };
 export const MinimizeButtonIconType = { MINIMIZE: "minimize" };
+export const PanelType = { DEFAULT: "default", HISTORY: "history" };

@@ -1,17 +1,41 @@
-name: Build, Deploy to Azure CDN, and Publish to npm
+name: Deploy and Publish
 
 on:
-  push:
+  workflow_run:
+    workflows:
+      - Continuous Integration
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Commit on main to deploy.
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "22"
 
 jobs:
-  build_and_deploy:
-    name: Build and Deploy
+  deploy:
+    name: Deploy widget
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
     permissions:
       contents: read
       id-token: write
@@ -24,148 +48,217 @@ jobs:
       AZURE_SUBSCRIPTION_ID: c33d62c6-7f88-47bf-9ae0-5630dca7dea5
       AZURE_TENANT_ID: 81511a15-ddb7-4236-9b7b-0a099bc32099
       AZURE_CLIENT_ID: 9479d9cc-723d-4dd0-877f-5615dccd17f7
+    outputs:
+      publish-needed: ${{ steps.package.outputs.publish-needed }}
+      source-sha: ${{ steps.source.outputs.source-sha }}
+      version: ${{ steps.package.outputs.version }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Resolve source commit
+        id: source
+        env:
+          DISPATCH_COMMIT: ${{ inputs.commit }}
+          WORKFLOW_RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = workflow_run ]; then
+            source_sha=$WORKFLOW_RUN_SHA
+          elif [ -n "$DISPATCH_COMMIT" ]; then
+            source_sha=$DISPATCH_COMMIT
+          else
+            source_sha='${{ github.sha }}'
+          fi
+          echo "source-sha=$source_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout source commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ steps.source.outputs.source-sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate main branch commit
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source-sha }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
-          node-version: "22.14.0"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Use npm with trusted publishing support
-        run: npm install -g npm@11.5.1
+        run: npm install --global npm@11.5.1
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build the project
+      - name: Validate source
+        run: |
+          npx tsc --noEmit
+          npm run test:coverage -- --runInBand
+
+      - name: Build widget
         run: npm run build
 
+      - name: Resolve package metadata
+        id: package
+        run: |
+          set -euo pipefail
+          package_name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          set +e
+          npm_output=$(npm view "${package_name}@${version}" version 2>&1)
+          npm_status=$?
+          set -e
+
+          if [ "$npm_status" -eq 0 ]; then
+            publish_needed=false
+          elif printf '%s' "$npm_output" | grep -q 'E404'; then
+            publish_needed=true
+          else
+            printf '%s\n' "$npm_output" >&2
+            exit "$npm_status"
+          fi
+
+          {
+            echo "package-name=$package_name"
+            echo "version=$version"
+            echo "publish-needed=$publish_needed"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Login to Azure
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: azure/login@v2
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5
         with:
           client-id: ${{ env.AZURE_CLIENT_ID }}
           tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ env.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Upload to Azure Storage
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Upload widget to Azure Storage
+        env:
+          PUBLISH_NEEDED: ${{ steps.package.outputs.publish-needed }}
+          VERSION: ${{ steps.package.outputs.version }}
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          LATEST_BLOB="public/scripts/app.min.js"
-          VERSIONED_BLOB="public/scripts/v${VERSION}/app.min.js"
+          set -euo pipefail
+          latest_blob="public/scripts/app.min.js"
+          versioned_blob="public/scripts/v${VERSION}/app.min.js"
 
           az storage blob lease break \
             --account-name "$AZURE_STORAGE_ACCOUNT" \
             --container-name "$AZURE_STORAGE_CONTAINER" \
-            --blob-name "$LATEST_BLOB" \
+            --blob-name "$latest_blob" \
             --auth-mode login || true
 
-          az storage blob lease break \
-            --account-name "$AZURE_STORAGE_ACCOUNT" \
-            --container-name "$AZURE_STORAGE_CONTAINER" \
-            --blob-name "$VERSIONED_BLOB" \
-            --auth-mode login || true
-
-          # Latest - short cache
           az storage blob upload \
             --account-name "$AZURE_STORAGE_ACCOUNT" \
             --container-name "$AZURE_STORAGE_CONTAINER" \
-            --name "$LATEST_BLOB" \
-            --file "./dist/app.min.js" \
-            --content-type "application/javascript" \
-            --content-cache-control "public,max-age=3600" \
+            --name "$latest_blob" \
+            --file dist/app.min.js \
+            --content-type application/javascript \
+            --content-cache-control public,max-age=3600 \
             --overwrite true \
             --auth-mode login
 
-          # Versioned - immutable cache for pinning
-          az storage blob upload \
-            --account-name "$AZURE_STORAGE_ACCOUNT" \
-            --container-name "$AZURE_STORAGE_CONTAINER" \
-            --name "$VERSIONED_BLOB" \
-            --file "./dist/app.min.js" \
-            --content-type "application/javascript" \
-            --content-cache-control "public,max-age=31536000,immutable" \
-            --overwrite true \
-            --auth-mode login
+          if [ "$PUBLISH_NEEDED" = true ]; then
+            az storage blob upload \
+              --account-name "$AZURE_STORAGE_ACCOUNT" \
+              --container-name "$AZURE_STORAGE_CONTAINER" \
+              --name "$versioned_blob" \
+              --file dist/app.min.js \
+              --content-type application/javascript \
+              --content-cache-control public,max-age=31536000,immutable \
+              --overwrite false \
+              --auth-mode login
+          fi
 
       - name: Purge Azure Front Door cache
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
+          set -euo pipefail
           az extension add --name cdn --upgrade
-
           az afd endpoint purge \
             --resource-group "$AZURE_CDN_RESOURCE_GROUP" \
             --profile-name "$AZURE_CDN_PROFILE_NAME" \
             --endpoint-name "$AZURE_CDN_ENDPOINT_NAME" \
-            --content-paths "/public/scripts/app.min.js"
+            --content-paths /public/scripts/app.min.js
 
-      - name: Publish to npm
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Publish package to npm
+        if: steps.package.outputs.publish-needed == 'true'
+        run: npm publish --access public --provenance
+
+      - name: Write deployment summary
         run: |
-          PKG=$(node -p "require('./package.json').name")
-          VER=$(node -p "require('./package.json').version")
-          if npm view "${PKG}@${VER}" version 2>/dev/null; then
-            echo "npm: ${PKG}@${VER} already published — skipping"
-          else
-            npm publish --access public --provenance
-            echo "npm: published ${PKG}@${VER}"
-          fi
+          {
+            echo "## Deployment"
+            echo ""
+            echo "- Commit: \`${{ steps.source.outputs.source-sha }}\`"
+            echo "- Version: \`${{ steps.package.outputs.version }}\`"
+            echo "- npm publish required: \`${{ steps.package.outputs.publish-needed }}\`"
+            echo "- CDN: \`https://cdn-01.rapida.ai/public/scripts/app.min.js\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-  create_release:
-    name: Create Release
-    needs: build_and_deploy
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  release:
+    name: Create GitHub release
+    needs: deploy
+    if: needs.deploy.outputs.publish-needed == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout deployed source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: ${{ needs.deploy.outputs.source-sha }}
           fetch-depth: 0
 
-      - name: Get version and create tag
-        id: version
+      - name: Create and push version tag
+        env:
+          SOURCE_SHA: ${{ needs.deploy.outputs.source-sha }}
+          VERSION: ${{ needs.deploy.outputs.version }}
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
-          echo "TAG_NAME=v${VERSION}" >> $GITHUB_OUTPUT
-          if git tag -l "v${VERSION}" | grep -q "v${VERSION}"; then
-            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+          set -euo pipefail
+          tag="v${VERSION}"
+          remote_target=$(git ls-remote --tags origin "refs/tags/${tag}^{}" | awk '{print $1}')
+          if [ -z "$remote_target" ]; then
+            remote_target=$(git ls-remote --tags origin "refs/tags/${tag}" | awk '{print $1}')
           fi
 
-      - name: Create and push tag
-        if: steps.version.outputs.TAG_EXISTS == 'false'
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.version.outputs.TAG_NAME }}" -m "Release ${{ steps.version.outputs.TAG_NAME }}"
-          git push origin "${{ steps.version.outputs.TAG_NAME }}"
+          if [ -n "$remote_target" ]; then
+            test "$remote_target" = "$SOURCE_SHA"
+          else
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git tag -a "$tag" "$SOURCE_SHA" -m "Release $tag"
+            git push origin "refs/tags/$tag"
+          fi
 
-      - name: Create GitHub Release
-        if: steps.version.outputs.TAG_EXISTS == 'false'
+      - name: Create GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ needs.deploy.outputs.source-sha }}
+          VERSION: ${{ needs.deploy.outputs.version }}
         run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists."
+            exit
+          fi
+
           {
-            echo "# Release ${{ steps.version.outputs.TAG_NAME }}"
+            echo "CDN: https://cdn-01.rapida.ai/public/scripts/v${VERSION}/app.min.js"
             echo ""
-            echo "## Deployment"
-            echo "| Target | URL |"
-            echo "|--------|-----|"
-            echo "| CDN (latest) | \`https://cdn-01.rapida.ai/public/scripts/app.min.js\` |"
-            echo "| CDN (pinned) | \`https://cdn-01.rapida.ai/public/scripts/v${{ steps.version.outputs.VERSION }}/app.min.js\` |"
-            echo "| npm | \`npm i @rapidaai/web-widget@${{ steps.version.outputs.VERSION }}\` |"
+            echo "npm: npm i @rapidaai/web-widget@${VERSION}"
             echo ""
-            echo "## Changes"
-            echo "- Commit: $(git rev-parse --short HEAD)"
+            echo "Commit: ${SOURCE_SHA}"
           } > release-notes.md
 
-          gh release create "${{ steps.version.outputs.TAG_NAME }}" \
-            --title "Release ${{ steps.version.outputs.TAG_NAME }}" \
+          gh release create "$tag" \
+            --verify-tag \
+            --title "Release $tag" \
             --notes-file release-notes.md
