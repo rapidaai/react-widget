@@ -86,7 +86,7 @@ export function ConversationHistoryPanel({
       />
       <HistoryContent
         resultsLabel={query ? "Results" : "Recent conversations"}
-        resultsCount={entries.length}
+        resultsCount={entries.length > 0 ? entries.length : undefined}
       >
         {error && (
           <InlineNotification

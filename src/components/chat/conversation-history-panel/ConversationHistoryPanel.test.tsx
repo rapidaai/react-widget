@@ -8,7 +8,14 @@ jest.mock("@carbon/ai-chat-components/es/react/history/index.js", () => {
   );
   return {
     HistoryShell: Container,
-    HistoryContent: Container,
+    HistoryContent: ({ children, resultsCount }: any) => (
+      <div
+        data-testid="history-content"
+        data-results-count={resultsCount}
+      >
+        {children}
+      </div>
+    ),
     HistoryPanel: Container,
     HistoryPanelItems: Container,
     HistoryLoading: () => <div>Loading conversations</div>,
@@ -73,6 +80,10 @@ describe("ConversationHistoryPanel", () => {
 
     expect(screen.getByText("Billing question")).toBeVisible();
     expect(screen.getByText("Technical support")).toBeVisible();
+    expect(screen.getByTestId("history-content")).toHaveAttribute(
+      "data-results-count",
+      "2",
+    );
     expect(
       screen.getByRole("textbox", { name: "Search chat history" }).parentElement,
     ).toHaveAttribute("data-search-size", "md");
@@ -102,6 +113,9 @@ describe("ConversationHistoryPanel", () => {
     );
 
     expect(screen.getByText("No chat history yet")).toBeVisible();
+    expect(screen.getByTestId("history-content")).not.toHaveAttribute(
+      "data-results-count",
+    );
     fireEvent.click(screen.getByRole("button", { name: "Close chat history" }));
     fireEvent.click(screen.getByRole("button", { name: "New conversation" }));
     expect(onClose).toHaveBeenCalledTimes(1);
