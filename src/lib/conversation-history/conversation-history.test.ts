@@ -40,7 +40,7 @@ describe("conversation history adapters", () => {
   it("maps an SDK conversation to a history entry", () => {
     const conversation = {
       getId: () => "42",
-      getName: () => "",
+      getName: () => "Server generated title",
       getAssistantconversationmessageList: () => [
         message({
           id: "message-1",
@@ -71,9 +71,23 @@ describe("conversation history adapters", () => {
 
     expect(toConversationHistoryEntry(conversation)).toEqual({
       id: "42",
-      title: "Conversation 42",
+      title: "Untitled conversation",
       date: undefined,
     });
+  });
+
+  it("does not use server names or ids when no user message is available", () => {
+    const conversation = {
+      getId: () => "conversation-id",
+      getName: () => "Server generated title",
+      getAssistantconversationmessageList: () => [],
+      getUpdateddate: () => undefined,
+      getCreateddate: () => undefined,
+    } as any;
+
+    expect(toConversationHistoryEntry(conversation).title).toBe(
+      "Untitled conversation",
+    );
   });
 
   it("maps and orders SDK messages as Carbon history", () => {

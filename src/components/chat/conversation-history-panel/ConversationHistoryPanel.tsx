@@ -1,29 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import type { ComponentType, PropsWithChildren } from "react";
-import {
-  ContainedList,
-  InlineLoading,
-  InlineNotification,
-} from "@carbon/react";
+import { InlineNotification } from "@carbon/react";
 import {
   HistoryContent,
   HistoryHeader,
+  HistoryLoading,
+  HistoryPanel,
+  HistoryPanelItems,
+  HistorySearchItem,
   HistoryShell,
   HistoryToolbar,
 } from "@carbon/ai-chat-components/es/react/history/index.js";
 import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 import "./conversation-history-panel.scss";
-
-interface ContainedListItemProps extends PropsWithChildren {
-  disabled?: boolean;
-  onClick?: () => void;
-}
-
-// Carbon publishes this documented compound component at runtime, while the
-// package root declaration currently omits its static property.
-const ContainedListItem = (ContainedList as unknown as {
-  ContainedListItem: ComponentType<ContainedListItemProps>;
-}).ContainedListItem;
 
 export interface ConversationHistoryPanelProps {
   entries: ConversationHistoryEntry[];
@@ -111,29 +99,26 @@ export function ConversationHistoryPanel({
           />
         )}
         {isLoading ? (
-          <InlineLoading
-            className="rapida-conversation-history__loading"
-            description="Loading conversations"
-          />
+          <HistoryLoading aria-label="Loading conversations" />
         ) : entries.length > 0 ? (
-          <ContainedList className="rapida-conversation-history__list">
-            {entries.map((entry) => (
-              <ContainedListItem
-                key={entry.id}
-                disabled={Boolean(restoringConversationId)}
-                onClick={() => void onSelectConversation?.(entry)}
-              >
-                <span className="rapida-conversation-history__title">
-                  {entry.title}
-                </span>
-                {entry.date && (
-                  <span className="rapida-conversation-history__date">
-                    {entry.date}
-                  </span>
-                )}
-              </ContainedListItem>
-            ))}
-          </ContainedList>
+          <HistoryPanel>
+            <HistoryPanelItems>
+              {entries.map((entry) => (
+                <HistorySearchItem
+                  key={entry.id}
+                  id={entry.id}
+                  name={entry.title}
+                  date={entry.date}
+                  disabled={Boolean(restoringConversationId)}
+                  onSelected={() => {
+                    if (!restoringConversationId) {
+                      void onSelectConversation?.(entry);
+                    }
+                  }}
+                />
+              ))}
+            </HistoryPanelItems>
+          </HistoryPanel>
         ) : (
           <div className="rapida-conversation-history__empty">
             <p>{query ? "No matching conversations" : "No chat history yet"}</p>
@@ -144,9 +129,7 @@ export function ConversationHistoryPanel({
             </span>
           </div>
         )}
-        <div ref={loadMoreRef} className="rapida-conversation-history__load-more">
-          {isLoadingMore && <InlineLoading description="Loading more conversations" />}
-        </div>
+        <div ref={loadMoreRef} aria-hidden="true" />
       </HistoryContent>
     </HistoryShell>
   );

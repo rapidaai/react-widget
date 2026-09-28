@@ -20,6 +20,17 @@ function getErrorMessage(eventArguments: unknown): string {
   return DEFAULT_CONNECTION_ERROR;
 }
 
+function isConnectionFailure(eventArguments: unknown): boolean {
+  if (!Array.isArray(eventArguments)) return false;
+  const message = String(eventArguments[1] ?? eventArguments[0] ?? "")
+    .trim()
+    .toLocaleLowerCase();
+  if (!message || /audio|microphone|permission|device/.test(message)) {
+    return false;
+  }
+  return /connect|network|transport|websocket|grpc/.test(message);
+}
+
 export function useAgentError(voiceAgent: VoiceAgent): string | null {
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +39,9 @@ export function useAgentError(voiceAgent: VoiceAgent): string | null {
       voiceAgent,
       AgentEvent.ErrorEvent,
     ).subscribe((eventArguments: unknown) => {
-      setError(getErrorMessage(eventArguments));
+      if (isConnectionFailure(eventArguments)) {
+        setError(getErrorMessage(eventArguments));
+      }
     });
     const connectionSubscription = agentEventSelector(
       voiceAgent,

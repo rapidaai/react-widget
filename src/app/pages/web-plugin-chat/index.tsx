@@ -46,6 +46,7 @@ export const WebPluginChat: FC<WebPluginChatProps> = ({
 
   if (state.status === "error") {
     console.error("[Rapida Widget]", state.error);
+    if (!state.isConnectionFailure) return null;
     return (
       <CatastrophicErrorChat
         error={state.error}

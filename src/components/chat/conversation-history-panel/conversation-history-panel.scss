@@ -1,26 +1,3 @@
-.rapida-conversation-history__list {
-  border-block-end: 0;
-}
-
-.rapida-conversation-history__title,
-.rapida-conversation-history__date {
-  display: block;
-}
-
-.rapida-conversation-history__title {
-  overflow: hidden;
-  color: var(--cds-text-primary);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.rapida-conversation-history__date {
-  margin-block-start: var(--cds-spacing-02);
-  color: var(--cds-text-secondary);
-  font-size: var(--cds-label-01-font-size);
-  line-height: var(--cds-label-01-line-height);
-}
-
 .rapida-conversation-history__empty {
   padding: var(--cds-spacing-06);
   color: var(--cds-text-secondary);
@@ -37,15 +14,4 @@
     font-size: var(--cds-body-01-font-size);
     line-height: var(--cds-body-01-line-height);
   }
-}
-
-.rapida-conversation-history__loading,
-.rapida-conversation-history__notification,
-.rapida-conversation-history__load-more {
-  inline-size: 100%;
-}
-
-.rapida-conversation-history__loading,
-.rapida-conversation-history__load-more {
-  padding: var(--cds-spacing-05);
 }

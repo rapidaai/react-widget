@@ -27,6 +27,7 @@ describe("useAssistantDeployment", () => {
 
     const { result } = renderHook(() => useAssistantDeployment(voiceAgent));
     await waitFor(() => expect(result.current.status).toBe("error"));
+    expect(result.current).toMatchObject({ isConnectionFailure: false });
   });
 
   it("reports unsuccessful and rejected assistant requests", async () => {
@@ -40,6 +41,9 @@ describe("useAssistantDeployment", () => {
     );
     await waitFor(() => expect(unsuccessful.result.current.status).toBe("error"));
     expect(unsuccessful.result.current.error).toContain("assistant_id");
+    expect(unsuccessful.result.current).toMatchObject({
+      isConnectionFailure: false,
+    });
     unsuccessful.unmount();
 
     const rejectedAgent = {
@@ -48,6 +52,7 @@ describe("useAssistantDeployment", () => {
     const rejected = renderHook(() => useAssistantDeployment(rejectedAgent));
     await waitFor(() => expect(rejected.result.current.status).toBe("error"));
     expect(rejected.result.current.error).toBe("Network down");
+    expect(rejected.result.current).toMatchObject({ isConnectionFailure: true });
   });
 
   it("ignores a response after unmount", async () => {

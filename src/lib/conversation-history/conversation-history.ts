@@ -49,19 +49,23 @@ export function buildConversationCriteria(
 export function toConversationHistoryEntry(
   conversation: AssistantConversation,
 ): ConversationHistoryEntry {
+  const conversationId = conversation.getId();
   const firstUserMessage = conversation
     .getAssistantconversationmessageList()
-    .find((message) => message.getRole().toLocaleLowerCase() === "user");
+    .find(
+      (message) =>
+        message.getRole().toLocaleLowerCase() === "user" &&
+        message.getBody().trim(),
+    );
   const title =
-    conversation.getName().trim() ||
     firstUserMessage?.getBody().trim() ||
-    `Conversation ${conversation.getId()}`;
+    "Untitled conversation";
   const date =
     conversation.getUpdateddate()?.toDate() ??
     conversation.getCreateddate()?.toDate();
 
   return {
-    id: conversation.getId(),
+    id: conversationId,
     title,
     date: formatDate(date),
   };

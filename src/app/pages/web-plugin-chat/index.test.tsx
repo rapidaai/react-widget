@@ -39,6 +39,7 @@ describe("WebPluginChat", () => {
       status: "error",
       deployment: null,
       error: "Server unavailable",
+      isConnectionFailure: true,
     };
     const consoleError = jest.spyOn(console, "error").mockImplementation();
 
@@ -47,6 +48,22 @@ describe("WebPluginChat", () => {
     expect(
       screen.getByText("Catastrophic error: Server unavailable"),
     ).toBeVisible();
+    consoleError.mockRestore();
+  });
+
+  it("does not use the catastrophic panel for configuration errors", () => {
+    deploymentState = {
+      status: "error",
+      deployment: null,
+      error: "No web plugin deployment found",
+      isConnectionFailure: false,
+    };
+    const consoleError = jest.spyOn(console, "error").mockImplementation();
+
+    const { container } = render(<WebPluginChat voiceAgent={voiceAgent} />);
+
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByText(/Catastrophic error/)).not.toBeInTheDocument();
     consoleError.mockRestore();
   });
 });

@@ -52,10 +52,19 @@ describe("useAgentError", () => {
     const voiceAgent = {} as VoiceAgent;
     const { result } = renderHook(() => useAgentError(voiceAgent));
 
-    act(() => {
-      observers.get(AgentEvent.ErrorEvent)?.(["client", null]);
-    });
+    act(() => observers.get(AgentEvent.ErrorEvent)?.(["client", null]));
+    expect(result.current).toBeNull();
 
-    expect(result.current).toContain("couldn't connect");
+    act(() => observers.get(AgentEvent.ErrorEvent)?.([
+      "client",
+      "Microphone permission denied or unavailable",
+    ]));
+    expect(result.current).toBeNull();
+
+    act(() => observers.get(AgentEvent.ErrorEvent)?.([
+      "server",
+      "Message validation failed",
+    ]));
+    expect(result.current).toBeNull();
   });
 });

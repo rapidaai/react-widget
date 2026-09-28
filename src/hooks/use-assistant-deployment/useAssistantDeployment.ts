@@ -7,7 +7,27 @@ import {
 type DeploymentState =
   | { status: "loading"; deployment: null; error: null }
   | { status: "ready"; deployment: AssistantWebpluginDeployment; error: null }
-  | { status: "error"; deployment: null; error: string };
+  | {
+      status: "error";
+      deployment: null;
+      error: string;
+      isConnectionFailure: boolean;
+    };
+
+function isConnectionFailure(error: unknown): boolean {
+  const message = error instanceof Error
+    ? error.message
+    : typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+      ? error.message
+      : "";
+  if (!message) return true;
+  return /connect|network|fetch|transport|websocket|grpc|timeout|offline|unavailable/i.test(
+    message,
+  );
+}
 
 export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState {
   const [state, setState] = useState<DeploymentState>({
@@ -29,6 +49,7 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
             status: "error",
             deployment: null,
             error: "Failed to load assistant. Check assistant_id and token.",
+            isConnectionFailure: false,
           });
           return;
         }
@@ -41,6 +62,7 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
                 status: "error",
                 deployment: null,
                 error: "No web plugin deployment found for this assistant.",
+                isConnectionFailure: false,
               },
         );
       })
@@ -52,6 +74,7 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
           error:
             error?.message ||
             "Failed to connect. Check api_base and network.",
+          isConnectionFailure: isConnectionFailure(error),
         });
       });
 

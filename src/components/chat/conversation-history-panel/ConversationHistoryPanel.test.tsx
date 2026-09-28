@@ -11,6 +11,13 @@ jest.mock("@carbon/ai-chat-components/es/react/history/index.js", () => {
     HistoryContent: Container,
     HistoryPanel: Container,
     HistoryPanelItems: Container,
+    HistoryLoading: () => <div>Loading conversations</div>,
+    HistorySearchItem: ({ name, date, onSelected, disabled }: any) => (
+      <button onClick={onSelected} disabled={disabled}>
+        {name}
+        {date && <span>{date}</span>}
+      </button>
+    ),
     HistoryHeader: ({ headerTitle, onClose }: any) => (
       <header>
         {headerTitle}
@@ -116,7 +123,7 @@ describe("ConversationHistoryPanel", () => {
     expect(screen.getByText("Unable to load chat history")).toBeVisible();
     expect(screen.getByText("History service unavailable")).toBeVisible();
     expect(screen.getByText("Loading conversations")).toBeVisible();
-    expect(screen.getByText("Loading more conversations")).toBeVisible();
+    expect(screen.queryByText("Loading more conversations")).not.toBeInTheDocument();
   });
 
   it("loads the next page when the sentinel becomes visible", () => {
