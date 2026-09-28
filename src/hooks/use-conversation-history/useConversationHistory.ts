@@ -14,6 +14,7 @@ import type { HistoryItem } from "@carbon/ai-chat";
 import {
   buildConversationCriteria,
   ConversationHistoryEntry,
+  getFirstUserMessageText,
   sortConversationsNewestFirst,
   toCarbonHistoryItems,
   toConversationHistoryEntry,
@@ -108,6 +109,8 @@ function listConversationMessages(
   assistantId: string,
   conversationId: string,
   page: number,
+  pageSize = MESSAGE_PAGE_SIZE,
+  criteria: { key: string; value: string }[] = [],
 ): Promise<{ messages: AssistantConversationMessage[]; total: number }> {
   return new Promise((resolve, reject) => {
     const auth = connectionConfig.auth;
@@ -121,8 +124,8 @@ function listConversationMessages(
       assistantId,
       conversationId,
       page,
-      MESSAGE_PAGE_SIZE,
-      [],
+      pageSize,
+      criteria,
       auth,
       (error, response: GetAllConversationMessageResponse | null) => {
         if (error) {
@@ -141,6 +144,64 @@ function listConversationMessages(
       },
     );
   });
+}
+
+async function loadAllConversationMessages(
+  connectionConfig: ConnectionConfig,
+  assistantId: string,
+  conversationId: string,
+  criteria: { key: string; value: string }[] = [],
+): Promise<AssistantConversationMessage[]> {
+  const messages: AssistantConversationMessage[] = [];
+  let page = 1;
+  while (true) {
+    const result = await listConversationMessages(
+      connectionConfig,
+      assistantId,
+      conversationId,
+      page,
+      MESSAGE_PAGE_SIZE,
+      criteria,
+    );
+    messages.push(...result.messages);
+    if (
+      result.messages.length < MESSAGE_PAGE_SIZE ||
+      (result.total > 0 && messages.length >= result.total)
+    ) {
+      return messages;
+    }
+    page += 1;
+  }
+}
+
+async function toHistoryEntries(
+  connectionConfig: ConnectionConfig,
+  assistantId: string,
+  conversations: AssistantConversation[],
+): Promise<ConversationHistoryEntry[]> {
+  return Promise.all(conversations.map(async (conversation) => {
+    const embeddedTitle = getFirstUserMessageText(
+      conversation.getAssistantconversationmessageList(),
+    );
+    if (embeddedTitle) {
+      return toConversationHistoryEntry(conversation, embeddedTitle);
+    }
+
+    try {
+      const messages = await loadAllConversationMessages(
+        connectionConfig,
+        assistantId,
+        conversation.getId(),
+        [{ key: "role", value: "user" }],
+      );
+      return toConversationHistoryEntry(
+        conversation,
+        getFirstUserMessageText(messages),
+      );
+    } catch {
+      return toConversationHistoryEntry(conversation);
+    }
+  }));
 }
 
 export function useConversationHistory({
@@ -196,7 +257,12 @@ export function useConversationHistory({
           conversation,
         ]),
       );
-      const nextEntries = sortedConversations.map(toConversationHistoryEntry);
+      const nextEntries = await toHistoryEntries(
+        connectionConfig,
+        assistantId,
+        sortedConversations,
+      );
+      if (requestId !== requestVersion.current) return;
       setEntries(nextEntries);
       setPage(1);
       setHasMore(
@@ -274,7 +340,20 @@ export function useConversationHistory({
           conversation,
         ]),
       );
-      setEntries(mergedConversations.map(toConversationHistoryEntry));
+      const nextEntries = await toHistoryEntries(
+        connectionConfig,
+        assistantId,
+        result.conversations,
+      );
+      if (requestId !== requestVersion.current) return;
+      const entriesById = new Map(entries.map((entry) => [entry.id, entry]));
+      nextEntries.forEach((entry) => entriesById.set(entry.id, entry));
+      setEntries(
+        mergedConversations.map((conversation) =>
+          entriesById.get(conversation.getId()) ??
+          toConversationHistoryEntry(conversation),
+        ),
+      );
       setHasMore(
         result.total > 0
           ? mergedConversations.length < result.total
@@ -291,6 +370,7 @@ export function useConversationHistory({
   }, [
     assistantId,
     connectionConfig,
+    entries,
     hasMore,
     isLoading,
     isLoadingMore,
@@ -308,24 +388,11 @@ export function useConversationHistory({
     setRestoringConversationId(conversationId);
     setError(null);
     try {
-      const messages: AssistantConversationMessage[] = [];
-      let messagePage = 1;
-      while (true) {
-        const result = await listConversationMessages(
-          connectionConfig,
-          assistantId,
-          conversationId,
-          messagePage,
-        );
-        messages.push(...result.messages);
-        if (
-          result.messages.length < MESSAGE_PAGE_SIZE ||
-          (result.total > 0 && messages.length >= result.total)
-        ) {
-          break;
-        }
-        messagePage += 1;
-      }
+      const messages = await loadAllConversationMessages(
+        connectionConfig,
+        assistantId,
+        conversationId,
+      );
       return toCarbonHistoryItems(messages);
     } catch (requestError) {
       setError(getErrorMessage(requestError));

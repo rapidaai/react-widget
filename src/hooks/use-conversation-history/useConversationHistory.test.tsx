@@ -99,6 +99,49 @@ describe("useConversationHistory", () => {
     expect(result.current.entries.map(({ id }) => id)).toEqual(["new", "old"]);
   });
 
+  it("fetches the first user message when it is absent from the list response", async () => {
+    mockGetAllAssistantConversation.mockImplementation(
+      (...args: unknown[]) => {
+        const callback = args[5] as Function;
+        callback(null, listResponse([{
+          ...conversation("conversation-1", "Server title"),
+          getAssistantconversationmessageList: () => [],
+        }]));
+      },
+    );
+    mockGetAllAssistantConversationMessage.mockImplementation(
+      (...args: unknown[]) => {
+        const callback = args[7] as Function;
+        callback(null, listResponse([
+          historyMessage("newer", "user", "Second user message"),
+          {
+            ...historyMessage("first", "user", "First user message"),
+            getCreateddate: () => timestamp("2026-01-01T10:00:00.000Z"),
+          },
+        ]));
+      },
+    );
+    const { result } = renderHook(() => useConversationHistory({
+      connectionConfig,
+      assistantId: "assistant-1",
+      userId: "user-1",
+    }));
+
+    await waitFor(() => expect(result.current.entries[0]?.title).toBe(
+      "First user message",
+    ));
+    expect(mockGetAllAssistantConversationMessage).toHaveBeenCalledWith(
+      connectionConfig,
+      "assistant-1",
+      "conversation-1",
+      1,
+      100,
+      [{ key: "role", value: "user" }],
+      connectionConfig.auth,
+      expect.any(Function),
+    );
+  });
+
   it("sends the search query to the server", async () => {
     mockGetAllAssistantConversation.mockImplementation(
       (...args: unknown[]) => {

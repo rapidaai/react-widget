@@ -54,16 +54,13 @@ export function buildConversationCriteria(
 
 export function toConversationHistoryEntry(
   conversation: AssistantConversation,
+  fetchedFirstUserMessage?: string,
 ): ConversationHistoryEntry {
   const conversationId = conversation.getId();
-  const firstUserMessage = conversation
-    .getAssistantconversationmessageList()
-    .find(
-      (message) =>
-        message.getRole().toLocaleLowerCase() === "user" &&
-        message.getBody().trim(),
-    );
-  const title = firstUserMessage?.getBody().trim() || "Untitled conversation";
+  const title =
+    getFirstUserMessageText(conversation.getAssistantconversationmessageList()) ||
+    fetchedFirstUserMessage?.trim() ||
+    "Untitled conversation";
   const date = getConversationDate(conversation);
 
   return {
@@ -71,6 +68,22 @@ export function toConversationHistoryEntry(
     title,
     date: date.getTime() > 0 ? formatDate(date) : undefined,
   };
+}
+
+export function getFirstUserMessageText(
+  messages: AssistantConversationMessage[],
+): string | undefined {
+  const firstUserMessage = [...messages]
+    .filter(
+      (message) =>
+        message.getRole().toLocaleLowerCase() === "user" &&
+        message.getBody().trim(),
+    )
+    .sort(
+      (left, right) =>
+        getMessageDate(left).getTime() - getMessageDate(right).getTime(),
+    )[0];
+  return firstUserMessage?.getBody().trim() || undefined;
 }
 
 export function sortConversationsNewestFirst(

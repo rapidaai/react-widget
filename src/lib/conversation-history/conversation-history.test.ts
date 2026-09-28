@@ -1,5 +1,6 @@
 import {
   buildConversationCriteria,
+  getFirstUserMessageText,
   sortConversationsNewestFirst,
   toCarbonHistoryItems,
   toConversationHistoryEntry,
@@ -149,6 +150,35 @@ describe("conversation history adapters", () => {
         output: { generic: [{ text: "How can I help?" }] },
       },
     });
+  });
+
+  it("selects the earliest non-empty user message for a title", () => {
+    expect(getFirstUserMessageText([
+      message({
+        id: "assistant-1",
+        role: "assistant",
+        body: "Welcome",
+        date: "2026-01-01T09:00:00.000Z",
+      }),
+      message({
+        id: "user-2",
+        role: "user",
+        body: "Second question",
+        date: "2026-01-01T11:00:00.000Z",
+      }),
+      message({
+        id: "user-empty",
+        role: "user",
+        body: " ",
+        date: "2026-01-01T08:00:00.000Z",
+      }),
+      message({
+        id: "user-1",
+        role: "user",
+        body: "First question",
+        date: "2026-01-01T10:00:00.000Z",
+      }),
+    ] as any)).toBe("First question");
   });
 
   it("ignores blank messages and supports SDK fallback ids and dates", () => {
