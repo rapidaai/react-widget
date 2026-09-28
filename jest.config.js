@@ -15,9 +15,10 @@ module.exports = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^@carbon/ai-chat$': '<rootDir>/src/__tests__/helpers/mock-carbon-ai-chat.ts',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
   setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
-  testMatch: ['<rootDir>/src/__tests__/**/*.test.(ts|tsx)'],
+  testMatch: ['<rootDir>/src/**/*.test.(ts|tsx)'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 };

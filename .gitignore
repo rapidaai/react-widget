@@ -4,6 +4,7 @@ dist/*
 .env.local
 coverage
 build
+storybook-static
 node_modules
 stats.json
 .pnp

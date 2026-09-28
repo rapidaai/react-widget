@@ -15,7 +15,6 @@ interface EnvironmentContextProps {
     meta?: Record<string, string>;
   };
   theme: {
-    color: string;
     mode?: "light" | "dark" | "system";
   };
 }
@@ -43,7 +42,6 @@ export const EnvironmentContext = createContext<EnvironmentContextProps>({
     user_id: window.chatbotConfig?.user?.user_id || RandomString(),
   },
   theme: {
-    color: window.chatbotConfig?.theme?.color || "#2663eb",
     mode: window.chatbotConfig?.theme?.mode || "light",
   },
 });
@@ -126,7 +124,6 @@ export const EnvironmentProvider: React.FC<{
           meta: defaultMeta(window.chatbotConfig?.user?.meta),
         },
         theme: {
-          color: window.chatbotConfig?.theme?.color || "#2663eb",
           mode: window.chatbotConfig?.theme?.mode || "light",
         },
       }}

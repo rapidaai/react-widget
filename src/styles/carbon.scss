@@ -5,12 +5,7 @@
 @use "@carbon/react/scss/layer";
 @use "@carbon/react/scss/components/button";
 @use "@carbon/react/scss/components/tooltip";
-@use "@carbon/react/scss/components/form";
-@use "@carbon/react/scss/components/text-area";
-@use "@carbon/react/scss/components/list-box";
-@use "@carbon/react/scss/components/dropdown";
-@use "@carbon/react/scss/components/tile";
-@use "@carbon/react/scss/components/inline-loading";
+@use "@carbon/react/scss/components/overflow-menu";
 
 .cds--white {
   @include carbon-theme.theme(themes.$white);
@@ -20,21 +15,7 @@
   @include carbon-theme.theme(themes.$g100);
 }
 
-.pks_font-sans {
-  height: 100%;
-}
-
-.pks_font-sans .cds-aichat--input-container {
-  border-radius: 0;
-  padding: 2px !important;
-}
-:host .cds-aichat--input-container {
-    padding: 2px !important;
-}
-.cds-aichat--input-container [contenteditable="true"], .cds-aichat--input-container textarea {
-    font-size: var(--cds-body-01-font-size, .875rem) !important;
-}
-
-.cds-aichat--input-container [contenteditable="true"], .cds-aichat--input-container textarea::placeholder {
-    font-size: var(--cds-body-01-font-size, .875rem) !important;
+.rapida-microphone-menu-options {
+  z-index: 10001;
+  min-width: min(16rem, calc(100vw - 2rem));
 }

@@ -1,50 +1,35 @@
-import { FC, useEffect, useState } from "react";
-import { AssistantWebpluginDeployment, VoiceAgent } from "@rapidaai/react";
+import { FC } from "react";
+import { VoiceAgent } from "@rapidaai/react";
 import { ChatComponent } from "@/app/pages/v3";
+import { useAssistantDeployment } from "@/hooks/use-assistant-deployment/useAssistantDeployment";
+import type { ChatbotConfig } from "@/types/widget";
 
-type State = "loading" | "ready" | "error";
+interface WebPluginChatProps {
+  voiceAgent: VoiceAgent;
+  config?: ChatbotConfig;
+  themeMode?: "light" | "dark" | "system";
+}
 
-export const WebPluginChat: FC<{ voiceAgent: VoiceAgent }> = ({
+export const WebPluginChat: FC<WebPluginChatProps> = ({
   voiceAgent,
+  config,
+  themeMode,
 }) => {
-  const [deployment, setDeployment] =
-    useState<AssistantWebpluginDeployment | null>(null);
-  const [state, setState] = useState<State>("loading");
-  const [error, setError] = useState<string>("");
+  const state = useAssistantDeployment(voiceAgent);
 
-  useEffect(() => {
-    setState("loading");
-    voiceAgent
-      .getAssistant()
-      .then((ex) => {
-        if (ex.getSuccess()) {
-          const webDeploy = ex.getData()?.getWebplugindeployment();
-          if (webDeploy) {
-            setDeployment(webDeploy);
-            setState("ready");
-          } else {
-            setError("No web plugin deployment found for this assistant.");
-            setState("error");
-          }
-        } else {
-          setError("Failed to load assistant. Check assistant_id and token.");
-          setState("error");
-        }
-      })
-      .catch((err) => {
-        setError(
-          err?.message || "Failed to connect. Check api_base and network.",
-        );
-        setState("error");
-      });
-  }, [voiceAgent]);
-
-  if (state === "ready" && deployment) {
-    return <ChatComponent deployment={deployment} voiceAgent={voiceAgent} />;
+  if (state.status === "ready") {
+    return (
+      <ChatComponent
+        deployment={state.deployment}
+        voiceAgent={voiceAgent}
+        config={config}
+        themeMode={themeMode}
+      />
+    );
   }
 
-  if (state === "error") {
-    console.error("[Rapida Widget]", error);
+  if (state.status === "error") {
+    console.error("[Rapida Widget]", state.error);
   }
 
   // Loading or error — render nothing in production,

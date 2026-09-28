@@ -151,11 +151,10 @@ Use `theme` for all theme-level options.
 |----------|------|---------|-------------|
 | `theme.mode` | `"light" \| "dark" \| "system"` | `"light"` | Widget color mode. `dark` defaults the UI token injection to `g100`; `light` defaults it to `g10`; `system` lets the host/system decide unless `theme.injectTheme` is set. |
 | `theme.injectTheme` | `"white" \| "g10" \| "g90" \| "g100"` | derived from `theme.mode` | UI theme token injected into the chat shadow DOM. Set this when the host page does not already provide compatible theme tokens. |
-| `theme.color` | `string` | none | Legacy primary brand color. Prefer `layout.customProperties` for current UI customization. |
 
 ### Layout Options
 
-`layout` can be a string for old embeds or an object for the current sectioned config.
+`layout` is a single section containing widget placement and native Carbon layout options.
 
 ```js
 window.chatbotConfig = {
@@ -174,10 +173,9 @@ window.chatbotConfig = {
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `layout` | `string \| object` | `"floating"` | Widget layout. String values are still supported: `"floating"`, `"docked-right"`, `"docked-left"`, `"inline"`. |
+| `layout` | `object` | `{ mode: "floating" }` | Widget placement and native Carbon layout options. |
 | `layout.mode` | `"floating" \| "docked-right" \| "docked-left" \| "inline"` | `"floating"` | Rapida placement mode. |
 | `layout.position` | `"bottom-right" \| "bottom-left" \| "top-right" \| "top-left"` | `"bottom-right"` | Floating launcher and panel position. |
-| `layout.showLauncher` | `boolean` | `true` for floating | Legacy launcher shortcut inside `layout`. Prefer `launcher.isOn`. |
 | `layout.showFrame` | `boolean` | `true` | Keeps the native border and shadow frame. |
 | `layout.hasContentMaxWidth` | `boolean` | UI default | Constrains message content to the UI max-width. |
 | `layout.corners` | `"round" \| "square" \| object` | `"square"` | Corner style. Use a string for all corners or an object for per-corner control. |
@@ -374,19 +372,6 @@ These are passed through to the native UI layer. Use them only when the host pag
 | `renderCustomMessageFooter` | function | Renders custom message footers. |
 | `renderWriteableElements` | object | Renders writable slots. Rapida merges `afterInputElement` with its audio controls. |
 
-### Legacy Shortcuts
-
-These remain supported for old embeds. Prefer the sectioned config above for new usage.
-
-| Property | Replacement |
-|----------|-------------|
-| `layout: "floating"` | `layout: { mode: "floating" }` |
-| `layout: "docked-right"` | `layout: { mode: "docked-right" }` |
-| `layout: "docked-left"` | `layout: { mode: "docked-left" }` |
-| `layout: "inline"` | `layout: { mode: "inline" }` |
-| `position` | `layout.position` |
-| `showLauncher` | `launcher.isOn` |
-
 ## Layout Modes
 
 ### Floating (default)
@@ -460,6 +445,8 @@ npm run build          # Production build -> dist/app.min.js
 npm test               # Run tests
 npm run test:watch     # Run tests in watch mode
 npm run test:coverage  # Run tests with coverage report
+npm run storybook      # Develop visual components in isolation
+npm run build-storybook # Verify the static component catalog
 ```
 
 ### Project Structure
@@ -471,24 +458,39 @@ src/
 │   ├── index.tsx                # App root, creates VoiceAgent
 │   └── pages/
 │       ├── web-plugin-chat/     # Deployment loader
-│       └── v3/
-│           ├── index.tsx        # Chat UI (messages, header, launcher)
-│           └── input.tsx        # Text/voice input + device selector
+│       └── v3/                  # Thin chat composition shell
+├── adapters/
+│   └── carbon/                  # Carbon-specific DOM and style integration
+├── components/
+│   └── audio/                   # Isolated voice UI, stories, and tests
 ├── contexts/
-│   ├── environment-context.tsx  # Config from window.chatbotConfig
-│   └── dark-mode-context.tsx    # Theme management
+│   └── environment-context.tsx  # Runtime configuration provider
 ├── hooks/
-│   └── use-environment.ts       # Environment context hook
+│   ├── use-chat-controller/     # Chat composition and Carbon config
+│   ├── use-message-sync/        # Rapida-to-Carbon synchronization
+│   └── use-audio-controls/      # Voice control state and actions
+├── lib/
+│   ├── layout/                  # Pure layout resolution
+│   ├── message-sync/            # Pure message mapping
+│   └── voice-transcript/        # Pure transcript selection
 ├── configs/
 │   └── index.ts                 # API base URL + constants
 ├── styles/
-│   └── carbon.scss              # Theme/component styles and widget style overrides
+│   └── carbon.scss              # Carbon imports and global overrides
 ├── types/
-│   ├── globals.d.ts             # ChatbotConfig type definition
-│   └── types.rapida.ts          # Shared types
-└── utils/
-    └── time.ts                  # Time formatting helpers
+│   ├── globals.d.ts             # Browser global declaration
+│   └── widget.ts                # Public widget configuration
+└── __tests__/
+    ├── helpers/                 # Shared test adapters
+    └── setup.ts                 # Global Jest setup
 ```
+
+Visual components keep their stories and tests beside the implementation.
+Business rules live in `lib/` and do not depend on React. Carbon owns the chat
+message UI; this repository only implements the Rapida integration and voice
+controls. Carbon currently exposes no input-action slot, so the isolated
+`adapters/carbon/CarbonInputActionPortal.tsx` adapter is the sole shadow-DOM
+boundary.
 
 ## CI/CD
 

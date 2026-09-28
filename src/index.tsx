@@ -1,5 +1,4 @@
 import ReactDOM from "react-dom/client";
-import { DarkModeProvider } from "@/contexts/dark-mode-context";
 import { EnvironmentProvider } from "@/contexts/environment-context";
 import { App } from "@/app";
 import "@/styles/carbon.scss";
@@ -16,9 +15,7 @@ if (!rootElement) {
 // Create root and render the React component
 const root = ReactDOM.createRoot(rootElement);
 root.render(
-  <DarkModeProvider>
-    <EnvironmentProvider>
-      <App />
-    </EnvironmentProvider>
-  </DarkModeProvider>,
+  <EnvironmentProvider>
+    <App />
+  </EnvironmentProvider>,
 );
