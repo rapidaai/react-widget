@@ -2,7 +2,6 @@ import { act, render, screen } from "@testing-library/react";
 import { App } from "./index";
 
 const mockUseEnvironment = jest.fn();
-const mockUseConversationHistory = jest.fn();
 const mockWebPluginChat = jest.fn();
 const mockWithCustomEndpoint = jest.fn();
 const mockDefaultConnectionConfig = jest.fn();
@@ -14,10 +13,6 @@ const mockUserIdentifier = jest.fn();
 
 jest.mock("@/hooks/use-environment", () => ({
   useEnvironment: () => mockUseEnvironment(),
-}));
-jest.mock("@/hooks/use-conversation-history", () => ({
-  useConversationHistory: (...args: unknown[]) =>
-    mockUseConversationHistory(...args),
 }));
 jest.mock("@/app/pages/web-plugin-chat", () => ({
   WebPluginChat: (props: unknown) => {
@@ -63,19 +58,6 @@ describe("App", () => {
       disconnect: jest.fn(),
       changeConversation: jest.fn(),
     });
-    mockUseConversationHistory.mockReturnValue({
-      entries: [],
-      query: "",
-      isLoading: false,
-      isLoadingMore: false,
-      restoringConversationId: null,
-      hasMore: false,
-      error: null,
-      search: jest.fn(),
-      refresh: jest.fn(),
-      loadMore: jest.fn(),
-      loadConversation: jest.fn(),
-    });
     window.chatbotConfig = { name: "Configured Assistant" };
   });
 
@@ -112,10 +94,7 @@ describe("App", () => {
         voiceAgent: expect.objectContaining({ voiceAgent: true }),
         config: window.chatbotConfig,
         themeMode: "dark",
-        conversationHistory: expect.objectContaining({ entries: [] }),
-        initialHistory: [],
         onRestartConversation: expect.any(Function),
-        onSelectConversation: expect.any(Function),
       }),
     );
   });
@@ -143,38 +122,8 @@ describe("App", () => {
     const restartedProps = mockWebPluginChat.mock.calls.at(-1)?.[0] as any;
     expect(firstAgent.disconnect).toHaveBeenCalled();
     expect(restartedProps.voiceAgent).toBe(secondAgent);
-    expect(restartedProps.initialHistory).toEqual([]);
+    expect(restartedProps.conversationHistory).toBeUndefined();
     expect(secondAgent.changeConversation).not.toHaveBeenCalled();
-  });
-
-  it("loads and resumes a selected server conversation", async () => {
-    const restoredHistory = [{ time: "2026-09-28T10:00:00.000Z", message: {} }];
-    const loadConversation = jest.fn().mockResolvedValue(restoredHistory);
-    mockUseConversationHistory.mockReturnValue({
-      ...mockUseConversationHistory(),
-      loadConversation,
-    });
-    const firstAgent = { id: "first", disconnect: jest.fn(), changeConversation: jest.fn() };
-    const secondAgent = { id: "second", disconnect: jest.fn(), changeConversation: jest.fn() };
-    mockVoiceAgent.mockReturnValueOnce(firstAgent).mockReturnValueOnce(secondAgent);
-    mockUseEnvironment.mockReturnValue({
-      assistantId: "assistant-1",
-      token: "token-1",
-      apiBase: "https://assistant.example",
-      user: { user_id: "user-1", name: "User One" },
-      theme: { mode: "dark" },
-    });
-
-    render(<App />);
-    const firstProps = mockWebPluginChat.mock.calls.at(-1)?.[0] as any;
-    await act(async () => {
-      await firstProps.onSelectConversation({ id: "42", title: "Past chat" });
-    });
-
-    const restoredProps = mockWebPluginChat.mock.calls.at(-1)?.[0] as any;
-    expect(loadConversation).toHaveBeenCalledWith("42");
-    expect(secondAgent.changeConversation).toHaveBeenCalledWith("42");
-    expect(restoredProps.initialHistory).toBe(restoredHistory);
   });
 
   it("renders nothing when required credentials are missing", () => {

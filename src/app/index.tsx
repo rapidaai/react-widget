@@ -8,17 +8,12 @@ import {
   UserIdentifier,
   VoiceAgent,
 } from "@rapidaai/react";
-import type { HistoryItem } from "@carbon/ai-chat";
 import { initializeAgentConversation } from "@/adapters/rapida";
 import { useEnvironment } from "@/hooks/use-environment";
-import { useConversationHistory } from "@/hooks/use-conversation-history";
-import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
 export const App: FC = memo(() => {
   const { assistantId, token, user, apiBase, theme } = useEnvironment();
   const [agentGeneration, setAgentGeneration] = useState(0);
-  const [activeConversationId, setActiveConversationId] = useState<string>();
-  const [initialHistory, setInitialHistory] = useState<HistoryItem[]>([]);
   useEffect(() => {
     if (!assistantId) {
       console.error(
@@ -57,20 +52,13 @@ export const App: FC = memo(() => {
     }
   }, [assistantId, user.name, user.user_id]);
 
-  const conversationHistory = useConversationHistory({
-    connectionConfig,
-    assistantId,
-    userId: user.user_id,
-  });
-
   const voiceAgent = useMemo(() => {
     if (connectionConfig && agentConfig) {
       return initializeAgentConversation(
         new VoiceAgent(connectionConfig, agentConfig),
-        activeConversationId,
       );
     }
-  }, [connectionConfig, agentConfig, agentGeneration, activeConversationId]);
+  }, [connectionConfig, agentConfig, agentGeneration]);
 
   useEffect(
     () => () => {
@@ -80,32 +68,18 @@ export const App: FC = memo(() => {
   );
 
   const restartAgent = useCallback(() => {
-    setActiveConversationId(undefined);
-    setInitialHistory([]);
     setAgentGeneration((generation) => generation + 1);
   }, []);
-
-  const restoreConversation = useCallback(async (
-    entry: ConversationHistoryEntry,
-  ) => {
-    const historyItems = await conversationHistory.loadConversation(entry.id);
-    setInitialHistory(historyItems);
-    setActiveConversationId(entry.id);
-    setAgentGeneration((generation) => generation + 1);
-  }, [conversationHistory.loadConversation]);
 
   if (!voiceAgent) return null;
 
   return (
     <WebPluginChat
-      key={`${agentGeneration}:${activeConversationId ?? "new"}`}
+      key={agentGeneration}
       voiceAgent={voiceAgent}
       config={window.chatbotConfig}
       themeMode={theme.mode}
-      conversationHistory={conversationHistory}
-      initialHistory={initialHistory}
       onRestartConversation={restartAgent}
-      onSelectConversation={restoreConversation}
     />
   );
 });
