@@ -24,6 +24,12 @@ function getMessageDate(message: AssistantConversationMessage): Date {
   return message.getCreateddate()?.toDate() ?? new Date(0);
 }
 
+function getConversationDate(conversation: AssistantConversation): Date {
+  return conversation.getUpdateddate()?.toDate() ??
+    conversation.getCreateddate()?.toDate() ??
+    new Date(0);
+}
+
 function formatDate(date?: Date): string | undefined {
   if (!date || Number.isNaN(date.getTime())) return undefined;
   return new Intl.DateTimeFormat(undefined, {
@@ -57,18 +63,24 @@ export function toConversationHistoryEntry(
         message.getRole().toLocaleLowerCase() === "user" &&
         message.getBody().trim(),
     );
-  const title =
-    firstUserMessage?.getBody().trim() ||
-    "Untitled conversation";
-  const date =
-    conversation.getUpdateddate()?.toDate() ??
-    conversation.getCreateddate()?.toDate();
+  const title = firstUserMessage?.getBody().trim() || "Untitled conversation";
+  const date = getConversationDate(conversation);
 
   return {
     id: conversationId,
     title,
-    date: formatDate(date),
+    date: date.getTime() > 0 ? formatDate(date) : undefined,
   };
+}
+
+export function sortConversationsNewestFirst(
+  conversations: AssistantConversation[],
+): AssistantConversation[] {
+  return [...conversations].sort(
+    (left, right) =>
+      getConversationDate(right).getTime() -
+      getConversationDate(left).getTime(),
+  );
 }
 
 export function toCarbonHistoryItems(

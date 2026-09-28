@@ -1,5 +1,6 @@
 import {
   buildConversationCriteria,
+  sortConversationsNewestFirst,
   toCarbonHistoryItems,
   toConversationHistoryEntry,
 } from "./conversation-history";
@@ -88,6 +89,30 @@ describe("conversation history adapters", () => {
     expect(toConversationHistoryEntry(conversation).title).toBe(
       "Untitled conversation",
     );
+  });
+
+  it("orders conversations by their most recent activity", () => {
+    const buildConversation = (
+      id: string,
+      updatedDate?: string,
+      createdDate?: string,
+    ) => ({
+      getId: () => id,
+      getUpdateddate: () => updatedDate ? timestamp(updatedDate) : undefined,
+      getCreateddate: () => createdDate ? timestamp(createdDate) : undefined,
+    });
+
+    const ordered = sortConversationsNewestFirst([
+      buildConversation("old", "2026-01-01T10:00:00.000Z"),
+      buildConversation("new", "2026-09-28T10:00:00.000Z"),
+      buildConversation("middle", undefined, "2026-05-01T10:00:00.000Z"),
+    ] as any);
+
+    expect(ordered.map((conversation) => conversation.getId())).toEqual([
+      "new",
+      "middle",
+      "old",
+    ]);
   });
 
   it("maps and orders SDK messages as Carbon history", () => {

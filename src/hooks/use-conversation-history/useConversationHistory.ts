@@ -14,6 +14,7 @@ import type { HistoryItem } from "@carbon/ai-chat";
 import {
   buildConversationCriteria,
   ConversationHistoryEntry,
+  sortConversationsNewestFirst,
   toCarbonHistoryItems,
   toConversationHistoryEntry,
 } from "@/lib/conversation-history";
@@ -157,10 +158,12 @@ export function useConversationHistory({
   const [restoringConversationId, setRestoringConversationId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const requestVersion = useRef(0);
+  const conversationsById = useRef(new Map<string, AssistantConversation>());
 
   const fetchFirstPage = useCallback(async (searchQuery: string) => {
     if (!connectionConfig || !assistantId || !userId) {
       requestVersion.current += 1;
+      conversationsById.current.clear();
       setEntries([]);
       setPage(0);
       setHasMore(false);
@@ -184,7 +187,16 @@ export function useConversationHistory({
         searchQuery,
       );
       if (requestId !== requestVersion.current) return;
-      const nextEntries = result.conversations.map(toConversationHistoryEntry);
+      const sortedConversations = sortConversationsNewestFirst(
+        result.conversations,
+      );
+      conversationsById.current = new Map(
+        sortedConversations.map((conversation) => [
+          conversation.getId(),
+          conversation,
+        ]),
+      );
+      const nextEntries = sortedConversations.map(toConversationHistoryEntry);
       setEntries(nextEntries);
       setPage(1);
       setHasMore(
@@ -195,6 +207,7 @@ export function useConversationHistory({
     } catch (requestError) {
       if (requestId !== requestVersion.current) return;
       setEntries([]);
+      conversationsById.current.clear();
       setPage(0);
       setHasMore(false);
       setError(getErrorMessage(requestError));
@@ -248,15 +261,23 @@ export function useConversationHistory({
         query,
       );
       if (requestId !== requestVersion.current) return;
-      const byId = new Map(entries.map((entry) => [entry.id, entry]));
-      result.conversations
-        .map(toConversationHistoryEntry)
-        .forEach((entry) => byId.set(entry.id, entry));
-      const merged = [...byId.values()];
-      setEntries(merged);
+      const byId = new Map(conversationsById.current);
+      result.conversations.forEach((conversation) => {
+        byId.set(conversation.getId(), conversation);
+      });
+      const mergedConversations = sortConversationsNewestFirst([
+        ...byId.values(),
+      ]);
+      conversationsById.current = new Map(
+        mergedConversations.map((conversation) => [
+          conversation.getId(),
+          conversation,
+        ]),
+      );
+      setEntries(mergedConversations.map(toConversationHistoryEntry));
       setHasMore(
         result.total > 0
-          ? merged.length < result.total
+          ? mergedConversations.length < result.total
           : result.conversations.length === pageSize,
       );
       setPage(nextPage);
@@ -270,7 +291,6 @@ export function useConversationHistory({
   }, [
     assistantId,
     connectionConfig,
-    entries,
     hasMore,
     isLoading,
     isLoadingMore,

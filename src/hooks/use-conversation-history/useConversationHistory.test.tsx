@@ -13,11 +13,18 @@ jest.mock("@rapidaai/react", () => ({
 
 const timestamp = (value: string) => ({ toDate: () => new Date(value) });
 
-const conversation = (id: string, name: string) => ({
+const conversation = (
+  id: string,
+  name: string,
+  date = "2026-09-28T10:00:00.000Z",
+) => ({
   getId: () => id,
   getName: () => name,
-  getAssistantconversationmessageList: () => [],
-  getUpdateddate: () => timestamp("2026-09-28T10:00:00.000Z"),
+  getAssistantconversationmessageList: () => [{
+    getRole: () => "user",
+    getBody: () => name,
+  }],
+  getUpdateddate: () => timestamp(date),
   getCreateddate: () => undefined,
 });
 
@@ -70,6 +77,26 @@ describe("useConversationHistory", () => {
 
     expect(result.current.entries.map(({ id }) => id)).toEqual(["1", "2"]);
     expect(result.current.hasMore).toBe(false);
+  });
+
+  it("orders loaded conversations newest first", async () => {
+    mockGetAllAssistantConversation.mockImplementation(
+      (...args: unknown[]) => {
+        const callback = args[5] as Function;
+        callback(null, listResponse([
+          conversation("old", "Old", "2026-01-01T10:00:00.000Z"),
+          conversation("new", "New", "2026-09-28T10:00:00.000Z"),
+        ]));
+      },
+    );
+    const { result } = renderHook(() => useConversationHistory({
+      connectionConfig,
+      assistantId: "assistant-1",
+      userId: "user-1",
+    }));
+
+    await waitFor(() => expect(result.current.entries).toHaveLength(2));
+    expect(result.current.entries.map(({ id }) => id)).toEqual(["new", "old"]);
   });
 
   it("sends the search query to the server", async () => {
