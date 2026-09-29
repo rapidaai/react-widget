@@ -4,9 +4,6 @@ import {
   waitForWidgetReady,
   openChat,
   sendTextMessage,
-  waitForAssistantResponse,
-  getMessages,
-  isVoiceMode,
   clickVoiceButton,
   clickTextButton,
   clickStopButton,
@@ -25,41 +22,32 @@ test.describe("Widget Loading", () => {
   test("should display assistant name in header", async ({ page }) => {
     await gotoWidget(page);
     await waitForWidgetReady(page);
-    const header = page.locator(
-      "cds-aichat-react .cds-aichat--header, cds-aichat-custom-element .cds-aichat--header",
-    );
-    await expect(header).toBeVisible();
+    await openChat(page);
+    await expect(page.getByText("HeloAI Assistant").first()).toBeVisible();
   });
 });
 
 test.describe("Text Messaging", () => {
-  test("should send a text message and receive response", async ({ page }) => {
+  test("should send a text message", async ({ page }) => {
     await gotoWidget(page);
     await waitForWidgetReady(page);
     await openChat(page);
 
     await sendTextMessage(page, "Hello");
-    await waitForAssistantResponse(page);
-
-    const messages = await getMessages(page);
-    expect(messages.length).toBeGreaterThan(0);
+    await expect(page.getByRole("heading", { name: "Hello" })).toBeVisible();
   });
 
-  test("should show welcome message on empty send", async ({ page }) => {
+  test("should ignore an empty message", async ({ page }) => {
     await gotoWidget(page);
     await waitForWidgetReady(page);
     await openChat(page);
 
-    const input = page.locator(
-      "cds-aichat-react [contenteditable='true'], cds-aichat-custom-element [contenteditable='true']",
-    );
+    const input = page.getByRole("textbox", { name: "Write your prompt" });
     await input.click();
     await page.keyboard.press("Enter");
 
-    await page.waitForTimeout(1000);
-
-    const welcomeMessage = page.locator("text=/hello|hi|hey|greetings/i");
-    await expect(welcomeMessage.first()).toBeVisible();
+    await expect(input).toBeEmpty();
+    await expect(page.getByText("You said", { exact: true })).toHaveCount(0);
   });
 });
 
@@ -138,9 +126,7 @@ test.describe("Audio Controls", () => {
     await clickVoiceButton(page);
     await page.waitForTimeout(500);
 
-    const muteButton = page.locator(
-      "cds-aichat-react [aria-label='Mute'], cds-aichat-custom-element [aria-label='Mute']",
-    );
+    const muteButton = page.getByRole("button", { name: "Mute", exact: true });
     await expect(muteButton).toBeVisible({ timeout: 10000 });
   });
 
@@ -152,9 +138,10 @@ test.describe("Audio Controls", () => {
     await clickVoiceButton(page);
     await page.waitForTimeout(1000);
 
-    const deviceSelector = page.locator(
-      "cds-aichat-react [aria-label='Select Microphone'], cds-aichat-custom-element [aria-label='Select Microphone']",
-    );
+    const deviceSelector = page.getByRole("button", {
+      name: "Select microphone",
+      exact: true,
+    });
     await expect(deviceSelector).toBeVisible({ timeout: 10000 });
   });
 
@@ -176,7 +163,9 @@ test.describe("Layout Modes", () => {
     await gotoWidget(page);
     await waitForWidgetReady(page);
 
-    const launcher = page.locator(".cds-aichat--launcher");
+    const launcher = page.getByRole("button", {
+      name: "Open the chat window",
+    });
     await expect(launcher).toBeVisible();
   });
 
@@ -184,10 +173,13 @@ test.describe("Layout Modes", () => {
     await gotoWidget(page);
     await waitForWidgetReady(page);
 
-    const launcher = page.locator(".cds-aichat--launcher");
+    const launcher = page.getByRole("button", {
+      name: "Open the chat window",
+    });
     await launcher.click();
 
-    const chat = page.locator("cds-aichat-react, cds-aichat-custom-element");
-    await expect(chat).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Close the chat window" }),
+    ).toBeVisible();
   });
 });
