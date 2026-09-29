@@ -1,0 +1,1 @@
+export { useCarbonInputHasText } from "./useCarbonInputHasText";

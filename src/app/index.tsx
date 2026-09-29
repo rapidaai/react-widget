@@ -1,16 +1,19 @@
-import { FC, memo, useEffect, useMemo } from "react";
+import { FC, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { WebPluginChat } from "@/app/pages/web-plugin-chat";
 import {
   AgentConfig,
   Channel,
   ConnectionConfig,
   InputOptions,
+  UserIdentifier,
   VoiceAgent,
 } from "@rapidaai/react";
+import { initializeAgentConversation } from "@/adapters/rapida";
 import { useEnvironment } from "@/hooks/use-environment";
 
 export const App: FC = memo(() => {
   const { assistantId, token, user, apiBase, theme } = useEnvironment();
+  const [agentGeneration, setAgentGeneration] = useState(0);
   useEffect(() => {
     if (!assistantId) {
       console.error(
@@ -37,25 +40,46 @@ export const App: FC = memo(() => {
   }, [token, user.user_id, apiBase]);
 
   const agentConfig = useMemo(() => {
-    if (assistantId)
-      return new AgentConfig(
+    if (assistantId) {
+      const nextConfig = new AgentConfig(
         assistantId,
         new InputOptions([Channel.Audio, Channel.Text], Channel.Text),
+        undefined,
+        undefined,
       );
-  }, [assistantId]);
+      nextConfig.userIdentifier = new UserIdentifier(user.user_id, user.name);
+      return nextConfig;
+    }
+  }, [assistantId, user.name, user.user_id]);
 
   const voiceAgent = useMemo(() => {
-    if (connectionConfig && agentConfig)
-      return new VoiceAgent(connectionConfig, agentConfig);
-  }, [connectionConfig, agentConfig]);
+    if (connectionConfig && agentConfig) {
+      return initializeAgentConversation(
+        new VoiceAgent(connectionConfig, agentConfig),
+      );
+    }
+  }, [connectionConfig, agentConfig, agentGeneration]);
+
+  useEffect(
+    () => () => {
+      void voiceAgent?.disconnect();
+    },
+    [voiceAgent],
+  );
+
+  const restartAgent = useCallback(() => {
+    setAgentGeneration((generation) => generation + 1);
+  }, []);
 
   if (!voiceAgent) return null;
 
   return (
     <WebPluginChat
+      key={agentGeneration}
       voiceAgent={voiceAgent}
       config={window.chatbotConfig}
       themeMode={theme.mode}
+      onRestartConversation={restartAgent}
     />
   );
 });

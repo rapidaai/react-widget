@@ -41,6 +41,11 @@ export function useAudioControls(voiceAgent: VoiceAgent) {
     [activeDeviceId, setActiveMediaDevice],
   );
 
+  const switchToText = useCallback(async () => {
+    if (isConnecting) await handleDisconnectAgent();
+    await handleTextToggle();
+  }, [handleDisconnectAgent, handleTextToggle, isConnecting]);
+
   return {
     channel,
     isConnected,
@@ -52,7 +57,7 @@ export function useAudioControls(voiceAgent: VoiceAgent) {
     startVoice,
     selectDevice,
     toggleMute: handleToggleMute,
-    switchToText: handleTextToggle,
+    switchToText,
     stopVoice: handleDisconnectAgent,
   };
 }

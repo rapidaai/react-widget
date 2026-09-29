@@ -7,16 +7,19 @@ import {
   MicrophoneOff,
   StopFilledAlt,
 } from "@carbon/icons-react";
-import { DeviceSelector } from "@/components/audio/device-selector/DeviceSelector";
-import { FrequencyBars } from "@/components/audio/frequency-bars/FrequencyBars";
-import { VoiceTranscriptDisplay } from "@/components/audio/voice-transcript-display/VoiceTranscriptDisplay";
+import { DeviceSelector } from "@/components/audio/device-selector";
+import {
+  FrequencyBars,
+  FrequencyBarsProps,
+} from "@/components/audio/frequency-bars";
+import { VoiceTranscriptDisplay } from "@/components/audio/voice-transcript-display";
 import "../audio-controls/audio-controls.scss";
 
 export interface AudioPanelProps {
   isConnected: boolean;
   isConnecting: boolean;
   isMuted: boolean;
-  frequencies: Float32Array[] | number[][];
+  frequencies: FrequencyBarsProps["frequencies"];
   transcript?: string;
   devices: MediaDeviceInfo[];
   activeDeviceId: string;
@@ -80,7 +83,6 @@ export const AudioPanel: FC<AudioPanelProps> = ({
         size="sm"
         hasIconOnly
         tooltipPosition="top"
-        disabled={!isConnected}
         onClick={() => void onSwitchToText()}
         iconDescription="Text"
         renderIcon={Chat}

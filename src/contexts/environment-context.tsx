@@ -1,134 +1,103 @@
-import { ASSISTANT_API } from "@/configs";
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
+import { DEFAULT_ASSISTANT_API } from "@/configs";
 
-interface EnvironmentContextProps {
+export interface EnvironmentContextValue {
   assistantId?: string;
   assistantVersion: string | null;
-  language: string | "en";
-  apiBase?: string;
+  language: string;
+  apiBase: string;
   token?: string;
   debug: boolean;
   user: {
     name: string;
     user_id: string;
-    meta?: Record<string, string>;
+    meta: Record<string, string>;
   };
   theme: {
-    mode?: "light" | "dark" | "system";
+    mode: "light" | "dark" | "system";
   };
 }
 
-// Function to generate a random string
-const RandomString = () => {
-  return `web_agent_${uuidv4()}`;
+const DEFAULT_ENVIRONMENT: EnvironmentContextValue = {
+  assistantVersion: null,
+  language: "en",
+  apiBase: DEFAULT_ASSISTANT_API,
+  debug: false,
+  user: {
+    name: "Guest",
+    user_id: "",
+    meta: { source: "web plugin" },
+  },
+  theme: { mode: "light" },
 };
 
-// Create the context with default values
-export const EnvironmentContext = createContext<EnvironmentContextProps>({
-  assistantId: window.chatbotConfig?.assistant_id,
-  apiBase: window.chatbotConfig?.api_base
-    ? window.chatbotConfig?.api_base
-    : "https://assistant-01.in.rapida.ai",
-  assistantVersion: window.chatbotConfig?.assistant_version
-    ? window.chatbotConfig?.assistant_version
-    : null,
-  token: window.chatbotConfig?.token,
-  debug: window.chatbotConfig?.debug || false,
-  language: window.chatbotConfig?.language || "en",
-  user: {
-    ...window.chatbotConfig?.user,
-    name: window.chatbotConfig?.user?.name || "Guest",
-    user_id: window.chatbotConfig?.user?.user_id || RandomString(),
-  },
-  theme: {
-    mode: window.chatbotConfig?.theme?.mode || "light",
-  },
-});
+export const EnvironmentContext =
+  createContext<EnvironmentContextValue>(DEFAULT_ENVIRONMENT);
 
-export const EnvironmentProvider: React.FC<{
-  children: React.ReactNode;
-}> = ({ children }) => {
-  const [language, setLanguage] = useState(
-    window.chatbotConfig?.language || "en",
-  );
+function getOrCreateUserId(configuredUserId?: string): string {
+  if (configuredUserId) return configuredUserId;
 
-  const userId = useCallback((userId?: string): string => {
-    // Check if the user_id exists in local storage
-    if (userId) return userId;
-    let storedUserId = localStorage.getItem("rpd__uuid");
-    if (!storedUserId) {
-      // Generate a new user_id and store it in local storage
-      storedUserId = RandomString(); // Generate a 12-character random string
-      localStorage.setItem("rpd__uuid", storedUserId);
-    }
-    return storedUserId;
-  }, []);
+  const storedUserId = localStorage.getItem("rpd__uuid");
+  if (storedUserId) return storedUserId;
 
-  const defaultMeta = (meta?: Record<string, string>) => {
-    const defaultMeta = { source: "web plugin" };
-    return meta ? { ...defaultMeta, ...meta } : defaultMeta;
-  };
+  const generatedUserId = `web_agent_${uuidv4()}`;
+  localStorage.setItem("rpd__uuid", generatedUserId);
+  return generatedUserId;
+}
+
+export function EnvironmentProvider({ children }: { children: ReactNode }) {
+  const config = window.chatbotConfig;
+  const [language, setLanguage] = useState(config?.language || "en");
+  const [userId] = useState(() => getOrCreateUserId(config?.user?.user_id));
 
   useEffect(() => {
-    const observeHtmlLang = (callback: any) => {
-      const targetNode = document.documentElement;
-      const config = { attributes: true, attributeFilter: ["lang"] };
-
-      const observer = new MutationObserver((mutationsList) => {
-        for (const mutation of mutationsList) {
-          if (
-            mutation.type === "attributes" &&
-            mutation.attributeName === "lang"
-          ) {
-            const newLang = targetNode.lang;
-            callback(newLang);
-          }
-        }
-      });
-
-      observer.observe(targetNode, config);
-      callback(targetNode.lang);
-      return () => observer.disconnect();
+    const html = document.documentElement;
+    const updateLanguage = () => {
+      const nextLanguage = html.lang.trim();
+      if (!nextLanguage) return;
+      if (window.chatbotConfig) window.chatbotConfig.language = nextLanguage;
+      setLanguage(nextLanguage);
     };
+    const observer = new MutationObserver(updateLanguage);
 
-    const handleLanguageChange = (newLang: string) => {
-      if (window.chatbotConfig) {
-        window.chatbotConfig.language = newLang;
-      }
-      setLanguage(newLang);
-    };
+    observer.observe(html, {
+      attributes: true,
+      attributeFilter: ["lang"],
+    });
+    updateLanguage();
 
-    const stopObserving = observeHtmlLang(handleLanguageChange);
-
-    // Cleanup function
-    return stopObserving;
+    return () => observer.disconnect();
   }, []);
+
+  const value = useMemo<EnvironmentContextValue>(
+    () => ({
+      assistantId: config?.assistant_id,
+      apiBase: config?.api_base || DEFAULT_ASSISTANT_API,
+      assistantVersion: config?.assistant_version || null,
+      token: config?.token,
+      language,
+      debug: config?.debug || false,
+      user: {
+        ...config?.user,
+        name: config?.user?.name || "Guest",
+        user_id: userId,
+        meta: { source: "web plugin", ...config?.user?.meta },
+      },
+      theme: { mode: config?.theme?.mode || "light" },
+    }),
+    [config, language, userId],
+  );
+
   return (
-    <EnvironmentContext.Provider
-      value={{
-        assistantId: window.chatbotConfig?.assistant_id,
-        apiBase: ASSISTANT_API,
-        assistantVersion: window.chatbotConfig?.assistant_version
-          ? window.chatbotConfig?.assistant_version
-          : null,
-        token: window.chatbotConfig?.token,
-        language,
-        debug: window.chatbotConfig?.debug || false,
-        user: {
-          ...window.chatbotConfig?.user,
-          name: window.chatbotConfig?.user?.name || "Guest",
-          user_id:
-            window.chatbotConfig?.user?.user_id ||
-            userId(window.chatbotConfig?.user?.user_id),
-          meta: defaultMeta(window.chatbotConfig?.user?.meta),
-        },
-        theme: {
-          mode: window.chatbotConfig?.theme?.mode || "light",
-        },
-      }}
-    >
+    <EnvironmentContext.Provider value={value}>
       {children}
     </EnvironmentContext.Provider>
   );
-};
+}

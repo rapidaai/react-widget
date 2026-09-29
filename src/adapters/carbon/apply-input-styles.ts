@@ -7,6 +7,11 @@ const INPUT_STYLE = `
     line-height: var(--cds-body-01-line-height, 1.42857) !important;
     letter-spacing: var(--cds-body-01-letter-spacing, 0.16px) !important;
   }
+
+  .rapida-text-voice-action {
+    order: -1;
+    color: var(--cds-interactive);
+  }
 `;
 
 export function applyCarbonInputStyles(rootDocument: Document = document): void {

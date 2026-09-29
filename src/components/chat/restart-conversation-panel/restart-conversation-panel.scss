@@ -1,0 +1,28 @@
+.rapida-restart-conversation {
+  display: flex;
+  block-size: 100%;
+  inline-size: 100%;
+  min-block-size: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--cds-layer);
+}
+
+.rapida-restart-conversation__content {
+  padding: var(--cds-spacing-07);
+
+  h2 {
+    margin: 0 0 var(--cds-spacing-03);
+    color: var(--cds-text-primary);
+    font-size: var(--cds-heading-03-font-size);
+    font-weight: var(--cds-heading-03-font-weight);
+    line-height: var(--cds-heading-03-line-height);
+  }
+
+  p {
+    margin: 0;
+    color: var(--cds-text-secondary);
+    font-size: var(--cds-body-01-font-size);
+    line-height: var(--cds-body-01-line-height);
+  }
+}

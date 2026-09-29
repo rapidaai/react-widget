@@ -1,0 +1,142 @@
+import type {
+  AssistantConversation,
+  AssistantConversationMessage,
+} from "@rapidaai/react";
+import {
+  MessageInputType,
+  MessageResponseTypes,
+} from "@carbon/ai-chat";
+import type { HistoryItem } from "@carbon/ai-chat";
+
+export interface ConversationHistoryEntry {
+  id: string;
+  title: string;
+  date?: string;
+}
+
+export interface ConversationCriteria {
+  key: string;
+  value: string;
+  logic: string;
+}
+
+function getMessageDate(message: AssistantConversationMessage): Date {
+  return message.getCreateddate()?.toDate() ?? new Date(0);
+}
+
+function getConversationDate(conversation: AssistantConversation): Date {
+  return conversation.getUpdateddate()?.toDate() ??
+    conversation.getCreateddate()?.toDate() ??
+    new Date(0);
+}
+
+function formatDate(date?: Date): string | undefined {
+  if (!date || Number.isNaN(date.getTime())) return undefined;
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+export function buildConversationCriteria(
+  userId: string,
+  query = "",
+): ConversationCriteria[] {
+  const criteria: ConversationCriteria[] = [
+    { key: "user_id", value: userId, logic: "eq" },
+  ];
+  const normalizedQuery = query.trim();
+  if (normalizedQuery) {
+    criteria.push({ key: "name", value: normalizedQuery, logic: "contains" });
+  }
+  return criteria;
+}
+
+export function toConversationHistoryEntry(
+  conversation: AssistantConversation,
+  fetchedFirstUserMessage?: string,
+): ConversationHistoryEntry {
+  const conversationId = conversation.getId();
+  const title =
+    getFirstUserMessageText(conversation.getAssistantconversationmessageList()) ||
+    fetchedFirstUserMessage?.trim() ||
+    "Untitled conversation";
+  const date = getConversationDate(conversation);
+
+  return {
+    id: conversationId,
+    title,
+    date: date.getTime() > 0 ? formatDate(date) : undefined,
+  };
+}
+
+export function getFirstUserMessageText(
+  messages: AssistantConversationMessage[],
+): string | undefined {
+  const firstUserMessage = [...messages]
+    .filter(
+      (message) =>
+        message.getRole().toLocaleLowerCase() === "user" &&
+        message.getBody().trim(),
+    )
+    .sort(
+      (left, right) =>
+        getMessageDate(left).getTime() - getMessageDate(right).getTime(),
+    )[0];
+  return firstUserMessage?.getBody().trim() || undefined;
+}
+
+export function sortConversationsNewestFirst(
+  conversations: AssistantConversation[],
+): AssistantConversation[] {
+  return [...conversations].sort(
+    (left, right) =>
+      getConversationDate(right).getTime() -
+      getConversationDate(left).getTime(),
+  );
+}
+
+export function toCarbonHistoryItems(
+  messages: AssistantConversationMessage[],
+): HistoryItem[] {
+  return [...messages]
+    .sort(
+      (left, right) =>
+        getMessageDate(left).getTime() - getMessageDate(right).getTime(),
+    )
+    .flatMap<HistoryItem>((message) => {
+      const text = message.getBody().trim();
+      if (!text) return [];
+
+      const id = message.getMessageid() || message.getId();
+      const role = message.getRole().toLocaleLowerCase();
+      const time = getMessageDate(message).toISOString();
+
+      if (role === "user") {
+        return [{
+          time,
+          message: {
+            id: `history:user:${id}`,
+            input: { message_type: MessageInputType.TEXT, text },
+            history: { label: text },
+            thread_id: "main",
+          },
+        }];
+      }
+
+      if (role === "assistant") {
+        return [{
+          time,
+          message: {
+            id: `history:assistant:${id}`,
+            output: {
+              generic: [{ response_type: MessageResponseTypes.TEXT, text }],
+            },
+            thread_id: "main",
+          },
+        }];
+      }
+
+      return [];
+    });
+}

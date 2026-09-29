@@ -1,7 +1,7 @@
 import { FC, useMemo } from "react";
 
 export interface FrequencyBarsProps {
-  frequencies: Float32Array[] | number[][];
+  frequencies: ReadonlyArray<ArrayLike<number>>;
   isMuted: boolean;
 }
 
@@ -13,7 +13,7 @@ export const FrequencyBars: FC<FrequencyBarsProps> = ({
     () =>
       frequencies.map((band) => {
         if (!band?.length) return 0;
-        const values = Array.from(band as ArrayLike<number>);
+        const values = Array.from(band);
         const rms = Math.sqrt(
           values.reduce((sum, value) => sum + value * value, 0) / values.length,
         );

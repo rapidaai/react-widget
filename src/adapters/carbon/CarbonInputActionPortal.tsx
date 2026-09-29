@@ -3,37 +3,50 @@ import { createPortal } from "react-dom";
 
 const SEND_ACTION_SELECTOR =
   ".cds-aichat--input-container__send-button-container";
+const CHAT_SCOPE_SELECTOR =
+  "cds-aichat-react, cds-aichat-custom-element, .cds-aichat--container--render";
+
+function getCarbonSearchRoots(anchor: HTMLElement): ParentNode[] {
+  const roots = new Set<ParentNode>([anchor.ownerDocument]);
+  const anchorRoot = anchor.getRootNode();
+  if (anchorRoot instanceof Document || anchorRoot instanceof ShadowRoot) {
+    roots.add(anchorRoot);
+  }
+  let element: HTMLElement | null = anchor;
+
+  while (element) {
+    const slotRoot = element.assignedSlot?.getRootNode();
+    if (slotRoot instanceof Document || slotRoot instanceof ShadowRoot) {
+      roots.add(slotRoot);
+    }
+    if (element.shadowRoot) roots.add(element.shadowRoot);
+    element = element.parentElement;
+  }
+
+  return [...roots];
+}
 
 export function findCarbonInputActionTarget(
   anchor: HTMLElement | null,
 ): HTMLElement | null {
   if (!anchor) return null;
 
-  const roots: ParentNode[] = [];
-  let element: HTMLElement | null = anchor;
+  const chatScope = anchor.closest<HTMLElement>(CHAT_SCOPE_SELECTOR);
+  const scopedTarget =
+    chatScope?.shadowRoot?.querySelector<HTMLElement>(SEND_ACTION_SELECTOR) ??
+    chatScope?.querySelector<HTMLElement>(SEND_ACTION_SELECTOR);
+  if (scopedTarget) return scopedTarget;
 
-  while (element) {
-    const slotRoot = element.assignedSlot?.getRootNode();
-    if (slotRoot instanceof Document || slotRoot instanceof ShadowRoot) {
-      roots.push(slotRoot);
-    }
-    if (element.shadowRoot) roots.push(element.shadowRoot);
-    element = element.parentElement;
-  }
-
-  anchor.ownerDocument
-    .querySelectorAll<HTMLElement>("cds-aichat-react, cds-aichat-custom-element")
-    .forEach((host) => {
-      if (host.shadowRoot) roots.push(host.shadowRoot);
-    });
-  roots.push(anchor.ownerDocument);
-
-  for (const root of roots) {
+  for (const root of getCarbonSearchRoots(anchor)) {
+    if (root instanceof Document) continue;
     const target = root.querySelector<HTMLElement>(SEND_ACTION_SELECTOR);
     if (target) return target;
   }
 
-  return null;
+  const documentTargets = anchor.ownerDocument.querySelectorAll<HTMLElement>(
+    SEND_ACTION_SELECTOR,
+  );
+  return documentTargets.length === 1 ? documentTargets[0] : null;
 }
 
 /**
@@ -47,14 +60,24 @@ export const CarbonInputActionPortal: FC<{ children: ReactNode }> = ({
   const [target, setTarget] = useState<HTMLElement | null>(null);
 
   useLayoutEffect(() => {
-    const findTarget = () => {
+    const anchor = anchorRef.current;
+    if (!anchor) return;
+
+    const observers = new Map<ParentNode, MutationObserver>();
+    const observeRoot = (root: ParentNode) => {
+      if (observers.has(root)) return;
+      const observer = new MutationObserver(syncTarget);
+      observer.observe(root, { childList: true, subtree: true });
+      observers.set(root, observer);
+    };
+    const syncTarget = () => {
+      getCarbonSearchRoots(anchor).forEach(observeRoot);
       const nextTarget = findCarbonInputActionTarget(anchorRef.current);
       setTarget((current) => (current === nextTarget ? current : nextTarget));
     };
 
-    findTarget();
-    const intervalId = window.setInterval(findTarget, 100);
-    return () => window.clearInterval(intervalId);
+    syncTarget();
+    return () => observers.forEach((observer) => observer.disconnect());
   }, []);
 
   return (

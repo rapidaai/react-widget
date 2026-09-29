@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AssistantWebpluginDeployment,
   VoiceAgent,
@@ -7,9 +7,35 @@ import {
 type DeploymentState =
   | { status: "loading"; deployment: null; error: null }
   | { status: "ready"; deployment: AssistantWebpluginDeployment; error: null }
-  | { status: "error"; deployment: null; error: string };
+  | {
+      status: "error";
+      deployment: null;
+      error: string;
+      isConnectionFailure: boolean;
+    };
 
-export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState {
+function isConnectionFailure(error: unknown): boolean {
+  const status = typeof error === "object" && error !== null && "status" in error
+    ? Number(error.status)
+    : undefined;
+  if (status && status >= 500) return true;
+
+  const message = error instanceof Error
+    ? error.message
+    : typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+      ? error.message
+      : "";
+  if (!message) return true;
+  return /connect|network|fetch|transport|websocket|grpc|timeout|offline|unavailable|internal server|server error|bad gateway/i.test(message);
+}
+
+export function useAssistantDeployment(
+  voiceAgent: VoiceAgent,
+): DeploymentState & { retry: () => void } {
+  const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<DeploymentState>({
     status: "loading",
     deployment: null,
@@ -29,6 +55,7 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
             status: "error",
             deployment: null,
             error: "Failed to load assistant. Check assistant_id and token.",
+            isConnectionFailure: false,
           });
           return;
         }
@@ -41,6 +68,7 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
                 status: "error",
                 deployment: null,
                 error: "No web plugin deployment found for this assistant.",
+                isConnectionFailure: false,
               },
         );
       })
@@ -52,13 +80,16 @@ export function useAssistantDeployment(voiceAgent: VoiceAgent): DeploymentState 
           error:
             error?.message ||
             "Failed to connect. Check api_base and network.",
+          isConnectionFailure: isConnectionFailure(error),
         });
       });
 
     return () => {
       active = false;
     };
-  }, [voiceAgent]);
+  }, [attempt, voiceAgent]);
 
-  return state;
+  const retry = useCallback(() => setAttempt((value) => value + 1), []);
+
+  return { ...state, retry };
 }

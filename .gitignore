@@ -5,6 +5,8 @@ dist/*
 coverage
 build
 storybook-static
+playwright-report
+screenshots/test-results
 node_modules
 stats.json
 .pnp

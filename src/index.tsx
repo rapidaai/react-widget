@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { EnvironmentProvider } from "@/contexts/environment-context";
+import { EnvironmentProvider } from "@/contexts";
 import { App } from "@/app";
 import "@/styles/carbon.scss";
 

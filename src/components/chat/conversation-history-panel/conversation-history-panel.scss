@@ -1,0 +1,17 @@
+.rapida-conversation-history__empty {
+  padding: var(--cds-spacing-06);
+  color: var(--cds-text-secondary);
+
+  p {
+    margin: 0 0 var(--cds-spacing-02);
+    color: var(--cds-text-primary);
+    font-size: var(--cds-heading-compact-01-font-size);
+    font-weight: var(--cds-heading-compact-01-font-weight);
+    line-height: var(--cds-heading-compact-01-line-height);
+  }
+
+  span {
+    font-size: var(--cds-body-01-font-size);
+    line-height: var(--cds-body-01-line-height);
+  }
+}

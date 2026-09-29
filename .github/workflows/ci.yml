@@ -1,72 +1,247 @@
-name: CI
+name: Continuous Integration
 
 on:
   pull_request:
-    branches: [main]
   push:
-    branches: [main]
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
 
 jobs:
-  build:
-    name: Build
+  validate:
+    name: 01 Validate
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Type check
+      - name: Type-check
         run: npx tsc --noEmit
 
-      - name: Build
-        run: npm run build
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --runInBand
 
-      - name: Verify output
-        run: |
-          if [ ! -f dist/app.min.js ]; then
-            echo "Build output missing: dist/app.min.js"
-            exit 1
-          fi
-          SIZE=$(stat -f%z dist/app.min.js 2>/dev/null || stat -c%s dist/app.min.js)
-          echo "Bundle size: ${SIZE} bytes ($(( SIZE / 1024 ))KB)"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Publish coverage summary
+        if: always()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
-          name: widget-dist
-          path: dist/app.min.js
-          retention-days: 30
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const summaryPath = path.join(process.env.GITHUB_WORKSPACE, 'coverage/coverage-summary.json');
 
-  test:
-    name: Test
+            if (!fs.existsSync(summaryPath)) {
+              core.warning('Coverage summary was not generated.');
+              return;
+            }
+
+            const coverage = JSON.parse(fs.readFileSync(summaryPath, 'utf8')).total;
+            const jestConfig = require(path.join(process.env.GITHUB_WORKSPACE, 'jest.config.js'));
+            const thresholds = jestConfig.coverageThreshold.global;
+            const metrics = [
+              ['Statements', 'statements'],
+              ['Branches', 'branches'],
+              ['Functions', 'functions'],
+              ['Lines', 'lines'],
+            ];
+            const marker = '<!-- react-widget-coverage-summary -->';
+            const rows = metrics.map(([label, key]) => {
+              const value = coverage[key];
+              const gate = thresholds[key];
+              const status = value.pct >= gate ? '✅ Pass' : '❌ Fail';
+              return `| ${label} | ${value.covered} / ${value.total} | ${value.pct}% | ${gate}% | ${status} |`;
+            });
+            const body = [
+              marker,
+              '## Code coverage',
+              '',
+              '| Metric | Covered | Coverage | Gate | Status |',
+              '| --- | ---: | ---: | ---: | :---: |',
+              ...rows,
+              '',
+              `Commit: ${context.sha.substring(0, 7)}`,
+            ].join('\n');
+
+            await core.summary.addRaw(body.replace(marker, '')).write();
+
+            if (context.eventName !== 'pull_request') {
+              return;
+            }
+
+            const headRepository = context.payload.pull_request.head.repo.full_name;
+            if (headRepository !== `${context.repo.owner}/${context.repo.repo}`) {
+              core.notice('Skipping the PR comment for a fork because its token is read-only.');
+              return;
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user?.type === 'Bot' && comment.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
+        with:
+          files: ./coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    name: 02 Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm test -- --passWithNoTests
+      - name: Build widget
+        run: npm run build
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Verify build output
+        run: |
+          set -euo pipefail
+          test -s dist/app.min.js
+          size=$(stat -c%s dist/app.min.js)
+          echo "Bundle size: ${size} bytes ($((size / 1024)) KiB)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload widget artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: widget-dist-${{ github.sha }}
+          path: dist/app.min.js
+          if-no-files-found: error
+          retention-days: 30
+
+  e2e:
+    name: 03 End-to-end
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: playwright-report-${{ github.sha }}
+          path: |
+            playwright-report/
+            screenshots/test-results/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ci-success:
+    name: 04 CI Complete
+    runs-on: ubuntu-latest
+    needs:
+      - validate
+      - build
+      - e2e
+    if: always()
+    steps:
+      - name: Check required jobs
+        env:
+          VALIDATE_RESULT: ${{ needs.validate.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: |
+          set -euo pipefail
+          test "$VALIDATE_RESULT" = success
+          test "$BUILD_RESULT" = success
+          test "$E2E_RESULT" = success
+
+      - name: Write summary
+        run: |
+          {
+            echo "## CI Results"
+            echo ""
+            echo "| Stage | Result |"
+            echo "|-------|--------|"
+            echo "| Validate | ${{ needs.validate.result }} |"
+            echo "| Build | ${{ needs.build.result }} |"
+            echo "| End-to-end | ${{ needs.e2e.result }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

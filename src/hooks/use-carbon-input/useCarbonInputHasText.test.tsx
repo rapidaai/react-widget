@@ -2,6 +2,11 @@ import { act, renderHook } from "@testing-library/react";
 import { useCarbonInputHasText } from "./useCarbonInputHasText";
 
 describe("useCarbonInputHasText", () => {
+  it("stays false without a chat instance", () => {
+    const { result } = renderHook(() => useCarbonInputHasText(null));
+    expect(result.current).toBe(false);
+  });
+
   it("tracks Carbon input state changes", () => {
     let handler: any;
     const instance = {

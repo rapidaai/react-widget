@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AssistantWebpluginDeployment,
   Channel,
@@ -7,25 +7,31 @@ import {
 } from "@rapidaai/react";
 import {
   BusEventViewChange,
-  CarbonTheme as AiChatTheme,
-  ChatContainerProps,
+  BusEventType,
   ChatInstance,
-  CornersType,
-  MinimizeButtonIconType,
-  RenderWriteableElementResponse,
+  HistoryItem,
+  TypeAndHandler,
 } from "@carbon/ai-chat";
-import { applyCarbonInputStyles } from "@/adapters/carbon/apply-input-styles";
-import { AudioControls } from "@/components/audio/audio-controls/AudioControls";
-import { useAudioControls } from "@/hooks/use-audio-controls/useAudioControls";
-import { useCarbonInputHasText } from "@/hooks/use-carbon-input/useCarbonInputHasText";
-import { useMessageSync } from "@/hooks/use-message-sync/useMessageSync";
-import { useVoiceTranscript } from "@/hooks/use-voice-transcript/useVoiceTranscript";
+import { applyCarbonInputStyles } from "@/adapters/carbon";
+import { AudioControls } from "@/components/audio";
+import {
+  ConversationHistoryPanel,
+  RestartConversationPanel,
+} from "@/components/chat";
+import { useAudioControls } from "@/hooks/use-audio-controls";
+import { useAgentError } from "@/hooks/use-agent-error";
+import { useCarbonInputHasText } from "@/hooks/use-carbon-input";
+import { useChatProps } from "@/hooks/use-chat-props";
+import { useConversationPanels } from "@/hooks/use-conversation-panels";
+import type { ConversationHistoryState } from "@/hooks/use-conversation-history";
+import { useMessageSync } from "@/hooks/use-message-sync";
+import { useVoiceTranscript } from "@/hooks/use-voice-transcript";
 import {
   getCustomElementShellStyle,
-  getThemeLayoutProperties,
   resolveLayoutSettings,
-} from "@/lib/layout/layout";
-import type { ChatbotConfig } from "@/types/widget";
+} from "@/lib/layout";
+import type { ChatbotConfig } from "@/types";
+import type { ConversationHistoryEntry } from "@/lib/conversation-history";
 
 const PANEL_WIDTH = "min(100vw, 450px)";
 
@@ -34,6 +40,10 @@ export interface UseChatControllerOptions {
   voiceAgent: VoiceAgent;
   config?: ChatbotConfig;
   environmentThemeMode?: "light" | "dark" | "system";
+  conversationHistory?: ConversationHistoryState;
+  initialHistory?: HistoryItem[];
+  onRestartConversation?: () => unknown;
+  onSelectConversation?: (entry: ConversationHistoryEntry) => Promise<void>;
 }
 
 export function useChatController({
@@ -41,6 +51,10 @@ export function useChatController({
   voiceAgent,
   config,
   environmentThemeMode,
+  conversationHistory,
+  initialHistory = [],
+  onRestartConversation,
+  onSelectConversation,
 }: UseChatControllerOptions) {
   const {
     assistant_id: _assistantId,
@@ -59,8 +73,8 @@ export function useChatController({
     mode: configThemeMode,
     injectTheme,
   } = themeSettings ?? {};
-  const { mode: layout, position, aiChatLayout } =
-    resolveLayoutSettings(layoutSettings);
+  const resolvedLayout = resolveLayoutSettings(layoutSettings);
+  const { mode: layout } = resolvedLayout;
   const displayName = name || deployment.getName() || "Assistant";
   const themeMode = environmentThemeMode || configThemeMode || "light";
   const voiceEnabled =
@@ -84,8 +98,23 @@ export function useChatController({
       channel,
       messages,
       inputDisabled: isInputDisabled,
+      initialHistory,
     });
+  const agentError = useAgentError(voiceAgent);
+  const ownsCatastrophicPanel = useRef(false);
   const hasText = useCarbonInputHasText(chatInstance);
+  const stopVoiceBeforeRestart = useCallback(async () => {
+    if (audioControls.isConnected || audioControls.isConnecting) {
+      await audioControls.stopVoice();
+    }
+  }, [audioControls]);
+  const conversationPanels = useConversationPanels({
+    chatInstance,
+    onBeforeRestart: stopVoiceBeforeRestart,
+    onAfterRestart: onRestartConversation,
+    onOpenHistory: conversationHistory?.refresh,
+    onSelectConversation,
+  });
 
   useEffect(() => {
     if (!isDocked) return;
@@ -116,138 +145,129 @@ export function useChatController({
 
   useEffect(() => applyCarbonInputStyles(), [chatInstance, isInputDisabled]);
 
-  const renderWriteableElements = useMemo<RenderWriteableElementResponse>(
-    () => ({
-      ...aiChatConfig.renderWriteableElements,
-      afterInputElement: (
-        <>
-          {showInputControls && (
-            <AudioControls
-              channel={channel}
-              voiceEnabled={voiceEnabled}
-              hasText={hasText}
-              transcript={voiceTranscript}
-              disabled={isInputDisabled}
-              isConnected={audioControls.isConnected}
-              isConnecting={audioControls.isConnecting}
-              isMuted={audioControls.isMuted}
-              frequencies={audioControls.frequencies}
-              devices={audioControls.devices}
-              activeDeviceId={audioControls.activeDeviceId}
-              onStartVoice={audioControls.startVoice}
-              onToggleMute={audioControls.toggleMute}
-              onSwitchToText={audioControls.switchToText}
-              onStop={audioControls.stopVoice}
-              onDeviceChange={audioControls.selectDevice}
-            />
-          )}
-          {aiChatConfig.renderWriteableElements?.afterInputElement}
-        </>
-      ),
-    }),
+  useEffect(() => {
+    if (!chatInstance) return;
+
+    if (agentError) {
+      ownsCatastrophicPanel.current = true;
+      chatInstance.updateCatastrophicErrorPanel({
+        isOpen: true,
+        title: "Unable to connect",
+        bodyText: agentError,
+      });
+      return;
+    }
+
+    if (ownsCatastrophicPanel.current) {
+      ownsCatastrophicPanel.current = false;
+      chatInstance.updateCatastrophicErrorPanel({ isOpen: false });
+    }
+  }, [agentError, chatInstance]);
+
+  useEffect(() => {
+    if (!chatInstance) return;
+    const retryHandler: TypeAndHandler = {
+      type: BusEventType.RESTART_CONVERSATION,
+      handler: () => {
+        if (!ownsCatastrophicPanel.current) return;
+        ownsCatastrophicPanel.current = false;
+        if (onRestartConversation) {
+          void onRestartConversation();
+        } else {
+          void voiceAgent.connect();
+        }
+      },
+    };
+    chatInstance.on(retryHandler);
+    return () => {
+      chatInstance.off(retryHandler);
+    };
+  }, [chatInstance, onRestartConversation, voiceAgent]);
+
+  const inputControls = useMemo(
+    () => (
+      <AudioControls
+        channel={channel}
+        voiceEnabled={voiceEnabled}
+        hasText={hasText}
+        transcript={voiceTranscript}
+        disabled={isInputDisabled}
+        isConnected={audioControls.isConnected}
+        isConnecting={audioControls.isConnecting}
+        isMuted={audioControls.isMuted}
+        frequencies={audioControls.frequencies}
+        devices={audioControls.devices}
+        activeDeviceId={audioControls.activeDeviceId}
+        onStartVoice={audioControls.startVoice}
+        onToggleMute={audioControls.toggleMute}
+        onSwitchToText={audioControls.switchToText}
+        onStop={audioControls.stopVoice}
+        onDeviceChange={audioControls.selectDevice}
+      />
+    ),
     [
-      aiChatConfig.renderWriteableElements,
       audioControls,
       channel,
-      chatInstance,
       hasText,
       isInputDisabled,
-      showInputControls,
       voiceEnabled,
       voiceTranscript,
     ],
   );
 
-  const chatProps = useMemo<ChatContainerProps>(() => {
-    const defaults: ChatContainerProps = {
-      aiEnabled: false,
-      assistantName: displayName,
-      assistantAvatarUrl: logoUrl,
-      debug: aiChatConfig.debug,
-      injectCarbonTheme:
-        injectTheme ??
-        (themeMode === "dark"
-          ? AiChatTheme.G100
-          : themeMode === "light"
-            ? AiChatTheme.G10
-            : undefined),
-      locale: language,
-      namespace: "rapida-chat",
-      openChatByDefault: isCustomElement,
-      shouldSanitizeHTML: true,
-      shouldTakeFocusIfOpensAutomatically: false,
-      header: {
-        title: displayName,
-        showAiLabel: false,
-        hideDefaultAiLabelContent: true,
-        showRestartButton: true,
-        minimizeButtonIconType: MinimizeButtonIconType.MINIMIZE,
-      },
-      history: { isOn: false },
-      launcher: {
-        isOn: layout === "floating",
-      },
-      layout: {
-        corners: CornersType.SQUARE,
-        showFrame: true,
-        customProperties: getThemeLayoutProperties(layout, position),
-      },
-      messaging: {
-        messageTimeoutSecs: 150,
-        messageLoadingIndicatorTimeoutSecs: 1,
-      },
-    };
-    const resolvedInjectTheme =
-      injectTheme ?? aiChatConfig.injectCarbonTheme ?? defaults.injectCarbonTheme;
+  const restartPanelElement = useMemo(
+    () => (
+      <RestartConversationPanel
+        isRestarting={conversationPanels.isRestarting}
+        onCancel={conversationPanels.closeRestartPanel}
+        onConfirm={conversationPanels.confirmRestart}
+      />
+    ),
+    [conversationPanels],
+  );
+  const historyPanelElement = useMemo(
+    () => (
+      <ConversationHistoryPanel
+        entries={conversationHistory?.entries ?? []}
+        isLoading={conversationHistory?.isLoading ?? false}
+        isLoadingMore={conversationHistory?.isLoadingMore ?? false}
+        restoringConversationId={
+          conversationHistory?.restoringConversationId ?? null
+        }
+        hasMore={conversationHistory?.hasMore ?? false}
+        error={conversationHistory?.error ?? null}
+        onClose={conversationPanels.closeHistoryPanel}
+        onNewConversation={conversationPanels.startConversationFromHistory}
+        onSearch={conversationHistory?.search}
+        onLoadMore={conversationHistory?.loadMore}
+        onSelectConversation={conversationPanels.selectConversation}
+      />
+    ),
+    [conversationHistory, conversationPanels],
+  );
 
-    return {
-      ...defaults,
-      ...aiChatConfig,
-      injectCarbonTheme: resolvedInjectTheme,
-      header: { ...defaults.header, ...aiChatConfig.header },
-      history: { ...defaults.history, ...aiChatConfig.history },
-      launcher: { ...defaults.launcher, ...aiChatConfig.launcher },
-      layout: {
-        ...defaults.layout,
-        ...aiChatLayout,
-        customProperties: {
-          ...defaults.layout?.customProperties,
-          ...aiChatLayout?.customProperties,
-        },
-      },
-      input: {
-        ...aiChatConfig.input,
-        isDisabled: isInputDisabled,
-        isVisible: showInputControls && channel !== Channel.Audio,
-      },
-      messaging: {
-        ...defaults.messaging,
-        ...aiChatConfig.messaging,
-        customSendMessage,
-      },
-      onBeforeRender,
-      onViewChange,
-      renderWriteableElements,
-    };
-  }, [
-    aiChatConfig,
-    aiChatLayout,
+  const chatProps = useChatProps({
+    config: aiChatConfig,
+    displayName,
+    logoUrl,
+    language,
+    themeMode,
+    injectTheme,
+    layout: resolvedLayout,
+    isCustomElement,
+    inputDisabled: isInputDisabled,
+    inputControlsVisible: showInputControls,
     channel,
     customSendMessage,
-    displayName,
-    injectTheme,
-    isCustomElement,
-    isInputDisabled,
-    language,
-    layout,
-    logoUrl,
     onBeforeRender,
     onViewChange,
-    position,
-    renderWriteableElements,
-    showInputControls,
-    themeMode,
-  ]);
+    inputControls,
+    isRestartPanelOpen: conversationPanels.isRestartPanelOpen,
+    restartPanelElement,
+    historyPanelElement,
+    onOpenRestartPanel: conversationPanels.openRestartPanel,
+    onOpenHistoryPanel: conversationPanels.openHistoryPanel,
+  });
 
   return {
     chatProps,
