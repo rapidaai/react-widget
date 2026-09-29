@@ -200,7 +200,7 @@ jobs:
             echo ""
             echo "- Commit: \`${{ steps.source.outputs.source-sha }}\`"
             echo "- Version: \`${{ steps.package.outputs.version }}\`"
-            echo "- npm package: \`@rapidaai/web-widget@${{ steps.package.outputs.version }}\`"
+            echo "- npm package: \`${{ steps.package.outputs.package-name }}@${{ steps.package.outputs.version }}\`"
             echo "- CDN: \`https://cdn-01.rapida.ai/public/scripts/app.min.js\`"
             echo "- Versioned CDN: \`https://cdn-01.rapida.ai/public/scripts/v${{ steps.package.outputs.version }}/app.min.js\`"
           } >> "$GITHUB_STEP_SUMMARY"
@@ -257,7 +257,7 @@ jobs:
           {
             echo "CDN: https://cdn-01.rapida.ai/public/scripts/v${VERSION}/app.min.js"
             echo ""
-            echo "npm: npm i @rapidaai/web-widget@${VERSION}"
+            echo "npm: npm i @rapidaai/react-widget@${VERSION}"
             echo ""
             echo "Commit: ${SOURCE_SHA}"
           } > release-notes.md

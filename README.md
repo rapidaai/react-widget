@@ -1,9 +1,9 @@
-# @rapidaai/web-widget
+# @rapidaai/react-widget
 
 Embeddable voice + text AI agent widget. Drop a single script tag into any website to add an intelligent chat assistant powered by [Rapida](https://rapida.ai).
 
 [![CI](https://github.com/rapidaai/react-widget/actions/workflows/ci.yml/badge.svg)](https://github.com/rapidaai/react-widget/actions/workflows/ci.yml)
-[![npm](https://img.shields.io/npm/v/@rapidaai/web-widget)](https://www.npmjs.com/package/@rapidaai/web-widget)
+[![npm](https://img.shields.io/npm/v/@rapidaai/react-widget)](https://www.npmjs.com/package/@rapidaai/react-widget)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Quick Start
@@ -41,7 +41,7 @@ Pin to a specific version:
 ### npm
 
 ```bash
-npm install @rapidaai/web-widget
+npm install @rapidaai/react-widget
 ```
 
 Then import the built file from `dist/app.min.js` in your bundler or serve it statically.
@@ -498,7 +498,7 @@ On push to `main`:
 
 1. **Build** - `npm ci && npm run build`
 2. **CDN** - uploads `dist/app.min.js` to S3 with CloudFront invalidation
-3. **npm** - publishes to npm as `@rapidaai/web-widget`
+3. **npm** - publishes to npm as `@rapidaai/react-widget`
 4. **Release** - creates a GitHub release with a version tag
 
 Pull requests run the CI pipeline (build + test) without deploying.

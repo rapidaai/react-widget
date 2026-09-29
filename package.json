@@ -1,12 +1,11 @@
 {
-    "name": "@rapidaai/web-widget",
+    "name": "@rapidaai/react-widget",
     "version": "1.2.1",
     "description": "Rapida AI chat widget — embeddable voice + text AI agent",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/rapidaai/voice-ai.git",
-        "directory": "sdks/react-widget"
+        "url": "https://github.com/rapidaai/react-widget.git"
     },
     "files": [
         "dist/app.min.js"
