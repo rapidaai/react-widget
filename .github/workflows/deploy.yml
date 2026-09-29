@@ -107,6 +107,8 @@ jobs:
 
       - name: Resolve package metadata
         id: package
+        env:
+          SOURCE_SHA: ${{ steps.source.outputs.source-sha }}
         run: |
           set -euo pipefail
           package_name=$(node -p "require('./package.json').name")
@@ -117,6 +119,12 @@ jobs:
           set -e
 
           if [ "$npm_status" -eq 0 ]; then
+            tag="v${version}"
+            tag_target=$(git rev-list -n 1 "$tag" 2>/dev/null || true)
+            if [ "$tag_target" != "$SOURCE_SHA" ]; then
+              echo "::error::${package_name}@${version} is already published. Bump the version in package.json before merging."
+              exit 1
+            fi
             publish_needed=false
           elif printf '%s' "$npm_output" | grep -q 'E404'; then
             publish_needed=true
@@ -140,7 +148,6 @@ jobs:
 
       - name: Upload widget to Azure Storage
         env:
-          PUBLISH_NEEDED: ${{ steps.package.outputs.publish-needed }}
           VERSION: ${{ steps.package.outputs.version }}
         run: |
           set -euo pipefail
@@ -163,17 +170,15 @@ jobs:
             --overwrite true \
             --auth-mode login
 
-          if [ "$PUBLISH_NEEDED" = true ]; then
-            az storage blob upload \
-              --account-name "$AZURE_STORAGE_ACCOUNT" \
-              --container-name "$AZURE_STORAGE_CONTAINER" \
-              --name "$versioned_blob" \
-              --file dist/app.min.js \
-              --content-type application/javascript \
-              --content-cache-control public,max-age=31536000,immutable \
-              --overwrite false \
-              --auth-mode login
-          fi
+          az storage blob upload \
+            --account-name "$AZURE_STORAGE_ACCOUNT" \
+            --container-name "$AZURE_STORAGE_CONTAINER" \
+            --name "$versioned_blob" \
+            --file dist/app.min.js \
+            --content-type application/javascript \
+            --content-cache-control public,max-age=31536000,immutable \
+            --overwrite true \
+            --auth-mode login
 
       - name: Purge Azure Front Door cache
         run: |
@@ -196,14 +201,14 @@ jobs:
             echo ""
             echo "- Commit: \`${{ steps.source.outputs.source-sha }}\`"
             echo "- Version: \`${{ steps.package.outputs.version }}\`"
-            echo "- npm publish required: \`${{ steps.package.outputs.publish-needed }}\`"
+            echo "- npm package: \`@rapidaai/web-widget@${{ steps.package.outputs.version }}\`"
             echo "- CDN: \`https://cdn-01.rapida.ai/public/scripts/app.min.js\`"
+            echo "- Versioned CDN: \`https://cdn-01.rapida.ai/public/scripts/v${{ steps.package.outputs.version }}/app.min.js\`"
           } >> "$GITHUB_STEP_SUMMARY"
 
   release:
     name: Create GitHub release
     needs: deploy
-    if: needs.deploy.outputs.publish-needed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
