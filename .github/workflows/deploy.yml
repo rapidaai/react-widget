@@ -35,7 +35,6 @@ jobs:
       github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    environment: production
     permissions:
       contents: read
       id-token: write
@@ -139,6 +138,10 @@ jobs:
             echo "publish-needed=$publish_needed"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Publish package to npm
+        if: steps.package.outputs.publish-needed == 'true'
+        run: npm publish --access public --provenance
+
       - name: Login to Azure
         uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5
         with:
@@ -189,10 +192,6 @@ jobs:
             --profile-name "$AZURE_CDN_PROFILE_NAME" \
             --endpoint-name "$AZURE_CDN_ENDPOINT_NAME" \
             --content-paths /public/scripts/app.min.js
-
-      - name: Publish package to npm
-        if: steps.package.outputs.publish-needed == 'true'
-        run: npm publish --access public --provenance
 
       - name: Write deployment summary
         run: |
